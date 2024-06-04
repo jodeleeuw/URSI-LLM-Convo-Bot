@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> URSI LLM Convo Bot Experiment </title>
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-slider-response"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-image-slider-response"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <style>
+        .slider {
+            font-size: 20px;
+            font-weight: bold;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+<script>
+
+
+
+    /* initialize jsPsych */
+    var jsPsych = initJsPsych({
+        on_finish: function () {
+            jsPsych.data.displayData();
+        }
+    });
+
+    const subject_id = jsPsych.randomization.randomID(10);
+    const filename = `${subject_id}.csv`;
+
+    /* create timeline */
+    var timeline = [];
+
+
+    /* may need to preload chat stuff, don't know atm */
+    /*
+    var preload = {
+        type: jsPsychPreload,
+        images: images
+    };
+    timeline.push(preload);
+    */
+
+    /* define welcome message trial */
+    var welcome = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: "Welcome to the experiment. Press any key to begin."
+    };
+    timeline.push(welcome);
+
+    /* define instructions trial */
+    var instructions = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+    <p> In today's task you will be shown images of football players. </p>
+        <p>Please <strong> rate these players </strong> regarding their <strong> body size </strong> on the scale, taking no longer than <strong> three seconds </strong> to respond.</p>
+        <p> On the next page you will see two examples of how the football players might look like. </p> 
+        <div style='width: 700px;'>
+        </div>
+        <p>Press enter to proceed. </p>
+  `,
+        post_trial_gap: 500
+    };
+    timeline.push(instructions);
+
+    //PUT SURVEY HERE
+
+    var pre_chat_survey = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+    <p> TO BE FILLED IN</p> 
+    `
+    };
+    timeline.push(pre_chat_survey);
+
+    
+    //PUT CHAT HERE
+    
+
+    //might want to have a break at some point. could have chat plug in trigger this variable mid-chat?
+    var chat_break = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+        <p> You have now completed the first block of trials. <p>
+        <p> Feel free to take a short break if needed. <p> 
+        <p> Press any key when you are ready to begin the second block. <p>
+      `,
+        post_trial_gap: 1000
+    };
+    timeline.push(chat_break);
+
+    /* define post-chatinstructions, add post-chat survey */
+    var post_chat_survey = {
+        type: jsPsychHtmlKeyboardResponse,
+         stimulus: `
+        <p> <b>TO BE FILLED IN<b> </p>
+      `,
+        post_trial_gap: 1000
+    };
+    timeline.push(post_chat_survey);
+
+    var test_complete = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+        <p> Congrats! You have now completed the experiment. <p>
+        <p> Thank you for participating! <p> 
+        <p> Please wait for further instruction from your experimenter <p>
+      `,
+        post_trial_gap: 1000
+    };
+    timeline.push(test_complete);
+
+ 
+
+    const save_data = {
+        type: jsPsychPipe,
+        action: "save",
+        experiment_id: "desVih9f2BAf",
+        filename: filename,
+        data_string: () => jsPsych.data.get().csv()
+    };
+
+    //run experiment 
+    jsPsych.run(timeline)
+
+</script>
+</body>
+</html>
