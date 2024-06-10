@@ -24,7 +24,6 @@
 <script>
 
 
-
     /* initialize jsPsych */
     var jsPsych = initJsPsych({
         on_finish: function () {
@@ -39,7 +38,7 @@
     var timeline = [];
 
 
-    /* may need to preload chat stuff, we don't know atm */
+    /* may need to preload chat stuff or graphics, we don't know atm */
     /*
     var preload = {
         type: jsPsychPreload,
@@ -59,9 +58,7 @@
     var instructions = {
         type: jsPsychHtmlKeyboardResponse,
         stimulus: `
-    <p> In today's task you will be shown images of football players. </p>
-        <p>Please <strong> rate these players </strong> regarding their <strong> body size </strong> on the scale, taking no longer than <strong> three seconds </strong> to respond.</p>
-        <p> On the next page you will see two examples of how the football players might look like. </p> 
+    <p> In this experiment, . </p>
         <div style='width: 700px;'>
         </div>
         <p>Press enter to proceed. </p>
@@ -70,7 +67,9 @@
     };
     timeline.push(instructions);
 
-    //PUT SURVEY HERE
+    // PUT TOPIC SELECTION HERE
+    // DIRECT TO THE TOPIC-RELEVANT PRE-CONVO SURVEY (& TOPIC-RELEVANT POST-CONVO SURVEY)
+    // PUT SURVEY HERE
 
     var pre_chat_survey = {
         type: jsPsychHtmlKeyboardResponse,
@@ -80,21 +79,23 @@
     };
     timeline.push(pre_chat_survey);
 
-    
-    //PUT CHAT HERE
-    
+    // RANDOMLY DIRECT TO CHAT (EXPERIMENTAL CONDITION) OR FREE RESPONSE (CONTROL GROUP)
+    // PUT CHAT HERE
 
-    //might want to have a break at some point. could have chat plug in trigger this variable mid-chat?
+
+    //might want to have a break at some point. could have chat trigger this variable mid-chat if necessary
     var chat_break = {
         type: jsPsychHtmlKeyboardResponse,
         stimulus: `
         <p> You have now completed the first block of trials. <p>
         <p> Feel free to take a short break if needed. <p> 
-        <p> Press any key when you are ready to begin the second block. <p>
+        <p> Press any key when you are ready to begin. <p>
       `,
         post_trial_gap: 1000
     };
     timeline.push(chat_break);
+
+    // DIRECT TO THE TOPIC-RELEVANT POST-CONVO SURVEY 
 
     /* define post-chatinstructions, add post-chat survey */
     var post_chat_survey = {
@@ -116,8 +117,6 @@
         post_trial_gap: 1000
     };
     timeline.push(test_complete);
-
- 
 
     const save_data = {
         type: jsPsychPipe,
