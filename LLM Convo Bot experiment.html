@@ -10,6 +10,9 @@
     <script src="https://unpkg.com/@jspsych/plugin-html-slider-response"></script>
     <script src="https://unpkg.com/@jspsych/plugin-image-slider-response"></script>
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css">
     <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
     <style>
         .slider {
@@ -21,114 +24,231 @@
 </head>
 
 <body>
-<script>
+    <script>
 
 
-    /* initialize jsPsych */
-    var jsPsych = initJsPsych({
-        on_finish: function () {
-            jsPsych.data.displayData();
-        }
-    });
+        /* initialize jsPsych */
+        var jsPsych = initJsPsych({
+            on_finish: function () {
+                jsPsych.data.displayData();
+            }
+        });
 
-    const subject_id = jsPsych.randomization.randomID(10);
-    const filename = `${subject_id}.csv`;
+        const subject_id = jsPsych.randomization.randomID(10);
+        const filename = `${subject_id}.csv`;
 
-    /* create timeline */
-    var timeline = [];
+        /* create timeline */
+        var timeline = [];
 
 
-    /* may need to preload chat stuff or graphics, we don't know atm */
-    /*
-    var preload = {
-        type: jsPsychPreload,
-        images: images
-    };
-    timeline.push(preload);
-    */
+        /* may need to preload chat stuff or graphics, we don't know atm */
+        /*
+        var preload = {
+            type: jsPsychPreload,
+            images: images
+        };
+        timeline.push(preload);
+        */
 
-    /* define welcome message trial */
-    var welcome = {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: "Welcome to the experiment. Press any key to begin."
-    };
-    timeline.push(welcome);
+        /* define welcome message trial */
+        var welcome = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: "Welcome to the experiment. Press any key to begin."
+        };
+        timeline.push(welcome);
 
-    /* define instructions trial */
-    var instructions = {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: `
-    <p> In this experiment, . </p>
+        /* define instructions trial */
+        var instructions = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+    <p> In this experiment, you will be conversing with an Artificial Intelligent chat bot we made that specializes in talking about controversial topics.
+        You will first be asked to take a survey before and after the conversation.
+        Press any key to start the surveys.
+        </p>
         <div style='width: 700px;'>
         </div>
         <p>Press enter to proceed. </p>
   `,
-        post_trial_gap: 500
-    };
-    timeline.push(instructions);
+            post_trial_gap: 500
+        };
+        timeline.push(instructions);
 
-    // PUT TOPIC SELECTION HERE
-    // DIRECT TO THE TOPIC-RELEVANT PRE-CONVO SURVEY (& TOPIC-RELEVANT POST-CONVO SURVEY)
-    // PUT SURVEY HERE
+        // PUT TOPIC SELECTION HERE
+        var select_topic = {
+            type: jsPsychSurveyMultiChoice,
+            questions: [
+                {
+                    prompt: "Because the chatbot's limnited, we ask you to select a topic to discuss first before starting",
+                    name: 'TopicPreference',
+                    options: ['The role of the U.S. government in healthcare',
+                        'The Hiroshima and Nagasaki atomic bombings',
+                        'The role of the U.S. government in public education policy',
+                        'Vaccines',
+                        'Criminal justice reform'],
+                    required: true
+                }
+            ],
+        };
+        timeline.push(select_topic);
 
-    var pre_chat_survey = {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: `
+        const topic_choice = jsPsych.data.get();
+
+        console.log(JSON.stringify(topic_choice));
+        // DIRECT TO THE TOPIC-RELEVANT PRE-CONVO SURVEY (& TOPIC-RELEVANT POST-CONVO SURVEY)
+        // PUT SURVEY HERE
+        /*
+                var test_choice = {
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: () => {
+                        const topicChoice = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
+                        return `<p>This is the data: ${topicChoice}</p>`
+                    },
+                    choices: [' '],
+                    data: { task: 'Instruction' },
+                };
+                timeline.push(test_choice);
+        
+                */
+
+        const topicChoice = () => {
+            var topicChoice = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
+            return `<p>${topicChoice}</p>`
+        }
+
+        var test_choice = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: topicChoice,
+            choices: [' '],
+            data: { task: 'Instruction' },
+        };
+        timeline.push(test_choice);
+
+        if (topicChoice == "The role of the U.S. government in healthcare") {
+        var healthcare = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: () => 'You selected healthcare',
+            choices: [' '],
+            data: { task: 'Instruction' },
+        };
+        timeline.push(healthcare);
+        }
+        else if(topicChoice == "The Hiroshima and Nagasaki atomic bombings") {
+            var bombing = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: 'You selected bombing',
+                choices: [' '],
+                data: { task: 'Instruction' },
+            };
+            timeline.push(bombing);
+        }
+        else if(topicChoice == "The role of the U.S. government in public education policy") {
+            var edu_poli = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: 'You selected edu poli',
+                choices: [' '],
+                data: { task: 'Instruction' },
+            };
+            timeline.push(edu_poli);
+        }
+        else if(topicChoice == "Vaccines") {
+            var vaccines = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: 'You selected vaccines!',
+                choices: [' '],
+                data: { task: 'Instruction' },
+            };
+            timeline.push(vaccines);
+        }
+        else {
+            //criminal justice reform
+            var criminal_justice = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: 'You selected criminal_justice!',
+                choices: [' '],
+                data: { task: 'Instruction' },
+            };
+            timeline.push(criminal_justice);
+        }
+
+
+        const survey_json = {
+            elements: [{
+                name: "example",
+                title: "Enter some text in the box below!",
+                type: "text"
+            }]
+        };
+
+        const survey_trial = {
+            type: jsPsychSurvey,
+            survey_json: survey_json
+        };
+        timeline.push(survey_trial);
+
+        /*
+        var pre_chat_survey = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
     <p> TO BE FILLED IN</p> 
     `
-    };
-    timeline.push(pre_chat_survey);
+        };
+        timeline.push(pre_chat_survey);
 
-    // RANDOMLY DIRECT TO CHAT (EXPERIMENTAL CONDITION) OR FREE RESPONSE (CONTROL GROUP)
-    // PUT CHAT HERE
+        // RANDOMLY DIRECT TO CHAT (EXPERIMENTAL CONDITION) OR FREE RESPONSE (CONTROL GROUP)
+        // PUT CHAT HERE
 
 
-    //might want to have a break at some point. could have chat trigger this variable mid-chat if necessary
-    var chat_break = {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: `
+        //might want to have a break at some point. could have chat trigger this variable mid-chat if necessary
+        var chat_break = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
         <p> You have now completed the first block of trials. <p>
         <p> Feel free to take a short break if needed. <p> 
         <p> Press any key when you are ready to begin. <p>
       `,
-        post_trial_gap: 1000
-    };
-    timeline.push(chat_break);
+            post_trial_gap: 1000
+        };
+        timeline.push(chat_break);
 
-    // DIRECT TO THE TOPIC-RELEVANT POST-CONVO SURVEY 
+        // DIRECT TO THE TOPIC-RELEVANT POST-CONVO SURVEY 
 
-    /* define post-chatinstructions, add post-chat survey */
-    var post_chat_survey = {
-        type: jsPsychHtmlKeyboardResponse,
-         stimulus: `
+        /* define post-chatinstructions, add post-chat survey */
+
+        /*
+        var post_chat_survey = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
         <p> <b>TO BE FILLED IN<b> </p>
       `,
-        post_trial_gap: 1000
-    };
-    timeline.push(post_chat_survey);
+            post_trial_gap: 1000
+        };
+        timeline.push(post_chat_survey);
 
-    var test_complete = {
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: `
+        var test_complete = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
         <p> Congrats! You have now completed the experiment. <p>
         <p> Thank you for participating! <p> 
         <p> Please wait for further instruction from your experimenter <p>
       `,
-        post_trial_gap: 1000
-    };
-    timeline.push(test_complete);
+            post_trial_gap: 1000
+        };
+        timeline.push(test_complete);
 
-    const save_data = {
-        type: jsPsychPipe,
-        action: "save",
-        experiment_id: "desVih9f2BAf",
-        filename: filename,
-        data_string: () => jsPsych.data.get().csv()
-    };
+        */
 
-    //run experiment 
-    jsPsych.run(timeline)
+        const save_data = {
+            type: jsPsychPipe,
+            action: "save",
+            experiment_id: "desVih9f2BAf",
+            filename: filename,
+            data_string: () => jsPsych.data.get().csv()
+        };
 
-</script>
+        //run experiment 
+        jsPsych.run(timeline)
+
+    </script>
 </body>
+
 </html>
