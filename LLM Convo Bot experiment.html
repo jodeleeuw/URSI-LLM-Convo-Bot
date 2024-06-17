@@ -91,29 +91,20 @@
         };
         timeline.push(select_topic);
 
-        const topic_choice = jsPsych.data.get();
+        //const topic_choice = jsPsych.data.get(); //object[Object]
 
-        console.log(JSON.stringify(topic_choice));
+        //console.log(JSON.stringify(topic_choice)); //undefined 
+
         // DIRECT TO THE TOPIC-RELEVANT PRE-CONVO SURVEY (& TOPIC-RELEVANT POST-CONVO SURVEY)
         // PUT SURVEY HERE
-        /*
-                var test_choice = {
-                    type: jsPsychHtmlKeyboardResponse,
-                    stimulus: () => {
-                        const topicChoice = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
-                        return `<p>This is the data: ${topicChoice}</p>`
-                    },
-                    choices: [' '],
-                    data: { task: 'Instruction' },
-                };
-                timeline.push(test_choice);
-        
-                */
-
+       
         const topicChoice = () => {
             var topicChoice = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
-            return `<p>${topicChoice}</p>`
+            return `<p>${topicChoice}</p>` 
         }
+
+        //const topicString = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
+             
 
         var test_choice = {
             type: jsPsychHtmlKeyboardResponse,
