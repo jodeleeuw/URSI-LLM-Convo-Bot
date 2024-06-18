@@ -44,16 +44,6 @@
         /* create timeline */
         var timeline = [];
 
-
-        /* may need to preload chat stuff or graphics, we don't know atm */
-        /*
-        var preload = {
-            type: jsPsychPreload,
-            images: images
-        };
-        timeline.push(preload);
-        */
-
         /* define welcome message trial */
         var welcome = {
             type: jsPsychHtmlKeyboardResponse,
@@ -77,95 +67,7 @@
         };
         timeline.push(instructions);
 
-        // PUT TOPIC SELECTION HERE
-        var select_topic = {
-            type: jsPsychSurveyMultiChoice,
-            questions: [
-                {
-                    prompt: "Because the chatbot's limnited, we ask you to select a topic to discuss first before starting",
-                    name: 'TopicPreference',
-                    options: ['The role of the U.S. government in healthcare',
-                        'The Hiroshima and Nagasaki atomic bombings',
-                        'The role of the U.S. government in public education policy',
-                        'Vaccines',
-                        'Criminal justice reform'],
-                    required: true
-                }
-            ],
-        };
-        timeline.push(select_topic);
-
-        //const topic_choice = jsPsych.data.get(); //object[Object]
-
-        //console.log(JSON.stringify(topic_choice)); //undefined 
-
-        // DIRECT TO THE TOPIC-RELEVANT PRE-CONVO SURVEY (& TOPIC-RELEVANT POST-CONVO SURVEY)
-        // PUT SURVEY HERE
-       
-        const topicChoice = () => {
-            var topicChoice = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
-            return `<p>${topicChoice}</p>` 
-        }
-
-        //const topicString = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
-             
-
-        // var test_choice = {
-        //     type: jsPsychHtmlKeyboardResponse,
-        //     stimulus: topicChoice,
-        //     choices: [' '],
-        //     data: { task: 'Instruction' },
-        // };
-        // timeline.push(test_choice);
-
-        // if (topicChoice == "The role of the U.S. government in healthcare") {
-        // var healthcare = {
-        //     type: jsPsychHtmlKeyboardResponse,
-        //     stimulus: () => 'You selected healthcare',
-        //     choices: [' '],
-        //     data: { task: 'Instruction' },
-        // };
-        // timeline.push(healthcare);
-        // }
-        // else if(topicChoice == "The Hiroshima and Nagasaki atomic bombings") {
-        //     var bombing = {
-        //         type: jsPsychHtmlKeyboardResponse,
-        //         stimulus: 'You selected bombing',
-        //         choices: [' '],
-        //         data: { task: 'Instruction' },
-        //     };
-        //     timeline.push(bombing);
-        // }
-        // else if(topicChoice == "The role of the U.S. government in public education policy") {
-        //     var edu_poli = {
-        //         type: jsPsychHtmlKeyboardResponse,
-        //         stimulus: 'You selected edu poli',
-        //         choices: [' '],
-        //         data: { task: 'Instruction' },
-        //     };
-        //     timeline.push(edu_poli);
-        // }
-        // else if(topicChoice == "Vaccines") {
-        //     var vaccines = {
-        //         type: jsPsychHtmlKeyboardResponse,
-        //         stimulus: 'You selected vaccines!',
-        //         choices: [' '],
-        //         data: { task: 'Instruction' },
-        //     };
-        //     timeline.push(vaccines);
-        // }
-        // else {
-        //     //criminal justice reform
-        //     var criminal_justice = {
-        //         type: jsPsychHtmlKeyboardResponse,
-        //         stimulus: 'You selected criminal_justice!',
-        //         choices: [' '],
-        //         data: { task: 'Instruction' },
-        //     };
-        //     timeline.push(criminal_justice);
-        // }
-
-
+       //pre-chat survey with different topic options implemented via SurveyJS
         const survey_json = {
             elements: [{
                 name: "example",
@@ -217,14 +119,7 @@
 
 
         /*
-        var pre_chat_survey = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: `
-    <p> TO BE FILLED IN</p> 
-    `
-        };
-        timeline.push(pre_chat_survey);
-
+        
         // RANDOMLY DIRECT TO CHAT (EXPERIMENTAL CONDITION) OR FREE RESPONSE (CONTROL GROUP)
         // PUT CHAT HERE
 
