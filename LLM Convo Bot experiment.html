@@ -3,18 +3,21 @@
 
 <head>
     <title> URSI LLM Convo Bot Experiment </title>
-    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.3"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>  
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/jspsych@7.3.4"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-slider-response"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-image-slider-response"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
     <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css">
+    <link href="https://unpkg.com/browse/nouislider@15.8.0/package.json">
+    <link href="nouislider.min.css" rel="stylesheet">
     <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
-    <style>
+        <style>
         .slider {
             font-size: 20px;
             font-weight: bold;
@@ -50,6 +53,7 @@
         timeline.push(preload);
         */
 
+        
         /* define welcome message trial */
         var welcome = {
             type: jsPsychHtmlKeyboardResponse,
@@ -61,149 +65,118 @@
         var instructions = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
-    <p> In this experiment, you will be conversing with an Artificial Intelligent chat bot we made that specializes in talking about controversial topics.
-        You will first be asked to take a survey before and after the conversation.
-        Press any key to start the surveys.
+    <p> In this experiment, you will have a short conversation with a chat bot about a disputed topic in America.
+        Before you chat with the bot, though, there is a questionnaire for you to fill out.
         </p>
         <div style='width: 700px;'>
         </div>
-        <p>Press enter to proceed. </p>
+        <p>Press any key to proceed to the questionnaire. </p>
   `,
             post_trial_gap: 500
         };
         timeline.push(instructions);
 
-        // PUT TOPIC SELECTION HERE
-        var select_topic = {
-            type: jsPsychSurveyMultiChoice,
-            questions: [
-                {
-                    prompt: "Because the chatbot's limnited, we ask you to select a topic to discuss first before starting",
-                    name: 'TopicPreference',
-                    options: ['The role of the U.S. government in healthcare',
-                        'The Hiroshima and Nagasaki atomic bombings',
-                        'The role of the U.S. government in public education policy',
-                        'Vaccines',
-                        'Criminal justice reform'],
-                    required: true
-                }
-            ],
-        };
-        timeline.push(select_topic);
 
-        //const topic_choice = jsPsych.data.get(); //object[Object]
+// START SURVEY HERE
 
-        //console.log(JSON.stringify(topic_choice)); //undefined 
+const survey_json = {
+"title": "Pre-conversation form",
+ "logoPosition": "right",
+ "pages":  [
+    {
+     "name": "1",
+   "elements": [
+{
+    "type": "nouislider",
+    "name": "slider",
+    "title": "Please select your revenue",
+    isRequired: true,
+    "orientation": 'vertical',
+    'step': 25, //min step
+    'start': 75,
+    'range': `{'min': ${0}, 'max': ${3000}}`
+    },
+    {
+     "type": "comment",
+     "name": "question14",
+     "title": "What contributes to your willingness or unwillingness to converse with others about <topic>? Please freely reflect in the space below"
+     }
+    ]
+    }
+    ]
+  };
 
-        // DIRECT TO THE TOPIC-RELEVANT PRE-CONVO SURVEY (& TOPIC-RELEVANT POST-CONVO SURVEY)
-        // PUT SURVEY HERE
-       
-        const topicChoice = () => {
-            var topicChoice = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
-            return `<p>${topicChoice}</p>` 
-        }
-
-        //const topicString = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
-             
-
-        var test_choice = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: topicChoice,
-            choices: [' '],
-            data: { task: 'Instruction' },
-        };
-        timeline.push(test_choice);
-
-        if (topicChoice == "The role of the U.S. government in healthcare") {
-        var healthcare = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: () => 'You selected healthcare',
-            choices: [' '],
-            data: { task: 'Instruction' },
-        };
-        timeline.push(healthcare);
-        }
-        else if(topicChoice == "The Hiroshima and Nagasaki atomic bombings") {
-            var bombing = {
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: 'You selected bombing',
-                choices: [' '],
-                data: { task: 'Instruction' },
-            };
-            timeline.push(bombing);
-        }
-        else if(topicChoice == "The role of the U.S. government in public education policy") {
-            var edu_poli = {
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: 'You selected edu poli',
-                choices: [' '],
-                data: { task: 'Instruction' },
-            };
-            timeline.push(edu_poli);
-        }
-        else if(topicChoice == "Vaccines") {
-            var vaccines = {
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: 'You selected vaccines!',
-                choices: [' '],
-                data: { task: 'Instruction' },
-            };
-            timeline.push(vaccines);
-        }
-        else {
-            //criminal justice reform
-            var criminal_justice = {
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: 'You selected criminal_justice!',
-                choices: [' '],
-                data: { task: 'Instruction' },
-            };
-            timeline.push(criminal_justice);
-        }
-
-
-        const survey_json = {
-            elements: [{
-                name: "example",
-                title: "Enter some text in the box below!",
-                type: "text"
-            }]
-        };
-
-        const survey_trial = {
+const survey_trial = {
             type: jsPsychSurvey,
             survey_json: survey_json
-        };
-        timeline.push(survey_trial);
+       };
+       timeline.push(survey_trial);
 
-        /*
-        var pre_chat_survey = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: `
-    <p> TO BE FILLED IN</p> 
-    `
-        };
-        timeline.push(pre_chat_survey);
-
-        // RANDOMLY DIRECT TO CHAT (EXPERIMENTAL CONDITION) OR FREE RESPONSE (CONTROL GROUP)
-        // PUT CHAT HERE
-
-
+    
         //might want to have a break at some point. could have chat trigger this variable mid-chat if necessary
         var chat_break = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
-        <p> You have now completed the first block of trials. <p>
+        <p> You have now completed the pre-conversation questionnaire. <p>
         <p> Feel free to take a short break if needed. <p> 
-        <p> Press any key when you are ready to begin. <p>
+        <p> Press any key when you are ready to begin with the conversation. <p>
       `,
             post_trial_gap: 1000
         };
         timeline.push(chat_break);
 
-        // DIRECT TO THE TOPIC-RELEVANT POST-CONVO SURVEY 
+// RANDOM ASSIGNMENT TO EXPERIMENTAL OR CONTROL GROUP, WITH MAX CAPS ON EACH GROUP        
+// Defining experimental group timeline (chatbot) and control group timeline (free response textbox)
+// var timeline1 = {chat_bot};  // Experimental group
+// var timeline2 = {control_free_response};  // Control group
 
-        /* define post-chatinstructions, add post-chat survey */
+// var timeline1Count = 0;
+// var timeline2Count = 0;
+
+// var maxParticipantsPerTimeline = 100; // Number should be half of our intended sample size
+
+// var assignTimeline = function() {
+//     if (timeline1Count < maxParticipantsPerTimeline && timeline2Count < maxParticipantsPerTimeline) {
+//         // Randomly assign until max reached for either timeline
+//         if (Math.random() < 0.5) { // Pick a random number from 0 to 1, and if it's less than 0.5, pick timeline 1
+//             timeline1Count++; // Increase the timeline 1 count by 1
+//             return timeline1; // Pick timeline 1
+//         } else {  // If the random number is 0.5 or greater, pick timeline 2
+//             timeline2Count++; // Increase timeline 2 count by 1
+//             return timeline2; // Pick timeline 2 
+//         }   } else if (timeline1Count == maxParticipantsPerTimeline) {
+//         // Assign to timeline1 if timeline2 is full
+//         timeline2Count++;
+//         return timeline2;
+//     } else if (timeline2Count == maxParticipantsPerTimeline) {
+//         // Assign to timeline2 if timeline1 is full
+//         timeline1Count++;
+//         return timeline1;
+//     } else {
+//         // To see if something went wrong while we check the code
+//         throw new Error("Both timelines are full!");
+//     }
+// };
+        
+// var chat_bot = {
+//             type: jsPsychHtmlKeyboardResponse,
+//             stimulus: `
+//         <p> typing random stuff to test whether the randomization thing works. <p>
+//       `,
+//             post_trial_gap: 1000
+//         };
+//         timeline.push(chat_bot);
+
+
+// var control_free_response = {
+//             type: jsPsychHtmlKeyboardResponse,
+//             stimulus: `
+//         <p> typing MORE random stuff to test whether the randomization thing works. <p>
+//       `,
+//             post_trial_gap: 1000
+//         };
+//         timeline.push(control_free_response);
+//         /* define post-chatinstructions, add post-chat survey */
 
         /*
         var post_chat_survey = {
@@ -236,6 +209,11 @@
             data_string: () => jsPsych.data.get().csv()
         };
 
+var jsPsych = initJsPsych({
+  on_finish: function(){
+    window.location = "https://openguessr.com/"
+  }
+});
         //run experiment 
         jsPsych.run(timeline)
 
