@@ -12,6 +12,10 @@
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script> 
+
     <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css">
     <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
     <style>
@@ -106,60 +110,60 @@
         //const topicString = JSON.stringify(jsPsych.data.getLastTrialData().values()[0]['response']['TopicPreference']);
              
 
-        var test_choice = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: topicChoice,
-            choices: [' '],
-            data: { task: 'Instruction' },
-        };
-        timeline.push(test_choice);
+        // var test_choice = {
+        //     type: jsPsychHtmlKeyboardResponse,
+        //     stimulus: topicChoice,
+        //     choices: [' '],
+        //     data: { task: 'Instruction' },
+        // };
+        // timeline.push(test_choice);
 
-        if (topicChoice == "The role of the U.S. government in healthcare") {
-        var healthcare = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: () => 'You selected healthcare',
-            choices: [' '],
-            data: { task: 'Instruction' },
-        };
-        timeline.push(healthcare);
-        }
-        else if(topicChoice == "The Hiroshima and Nagasaki atomic bombings") {
-            var bombing = {
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: 'You selected bombing',
-                choices: [' '],
-                data: { task: 'Instruction' },
-            };
-            timeline.push(bombing);
-        }
-        else if(topicChoice == "The role of the U.S. government in public education policy") {
-            var edu_poli = {
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: 'You selected edu poli',
-                choices: [' '],
-                data: { task: 'Instruction' },
-            };
-            timeline.push(edu_poli);
-        }
-        else if(topicChoice == "Vaccines") {
-            var vaccines = {
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: 'You selected vaccines!',
-                choices: [' '],
-                data: { task: 'Instruction' },
-            };
-            timeline.push(vaccines);
-        }
-        else {
-            //criminal justice reform
-            var criminal_justice = {
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: 'You selected criminal_justice!',
-                choices: [' '],
-                data: { task: 'Instruction' },
-            };
-            timeline.push(criminal_justice);
-        }
+        // if (topicChoice == "The role of the U.S. government in healthcare") {
+        // var healthcare = {
+        //     type: jsPsychHtmlKeyboardResponse,
+        //     stimulus: () => 'You selected healthcare',
+        //     choices: [' '],
+        //     data: { task: 'Instruction' },
+        // };
+        // timeline.push(healthcare);
+        // }
+        // else if(topicChoice == "The Hiroshima and Nagasaki atomic bombings") {
+        //     var bombing = {
+        //         type: jsPsychHtmlKeyboardResponse,
+        //         stimulus: 'You selected bombing',
+        //         choices: [' '],
+        //         data: { task: 'Instruction' },
+        //     };
+        //     timeline.push(bombing);
+        // }
+        // else if(topicChoice == "The role of the U.S. government in public education policy") {
+        //     var edu_poli = {
+        //         type: jsPsychHtmlKeyboardResponse,
+        //         stimulus: 'You selected edu poli',
+        //         choices: [' '],
+        //         data: { task: 'Instruction' },
+        //     };
+        //     timeline.push(edu_poli);
+        // }
+        // else if(topicChoice == "Vaccines") {
+        //     var vaccines = {
+        //         type: jsPsychHtmlKeyboardResponse,
+        //         stimulus: 'You selected vaccines!',
+        //         choices: [' '],
+        //         data: { task: 'Instruction' },
+        //     };
+        //     timeline.push(vaccines);
+        // }
+        // else {
+        //     //criminal justice reform
+        //     var criminal_justice = {
+        //         type: jsPsychHtmlKeyboardResponse,
+        //         stimulus: 'You selected criminal_justice!',
+        //         choices: [' '],
+        //         data: { task: 'Instruction' },
+        //     };
+        //     timeline.push(criminal_justice);
+        // }
 
 
         const survey_json = {
@@ -167,14 +171,50 @@
                 name: "example",
                 title: "Enter some text in the box below!",
                 type: "text"
+            },
+            {
+                name: "sliderQuestionDemographics",
+                title: "Adjust the slider below!",
+                type: "html",
+                html: '<div id="sliderQuestionDemographics"></div>' // Placeholder for the slider
+            },
+            {
+                name: "sliderQuestionPolitics",
+                title: "Adjust the slider below!",
+                type: "html",
+                html: '<div id="sliderQuestionPolitics"></div>' // Placeholder for the slider
             }]
+        };
+
+        const initializeSlider = (survey) => {
+            const sliderQuestions = ["sliderQuestionDemographics", "sliderQuestionPolitics"]; // use this as array to keep track of slider questions
+
+            survey.onAfterRenderQuestion.add(function(survey, options) {
+                if (sliderQuestions.includes(options.question.name)) {
+                    var slider = document.getElementById(options.question.name);
+                    noUiSlider.create(slider, {
+                        start: [50],
+                        range: {
+                        min: 0,
+                        max: 100
+                        },
+                        step: 1,
+                        tooltips: true
+                    });
+                    slider.noUiSlider.on('set', function() {
+                        options.question.value = slider.noUiSlider.get();
+                    });
+                }
+            });
         };
 
         const survey_trial = {
             type: jsPsychSurvey,
-            survey_json: survey_json
+            survey_json: survey_json,
+            survey_function: initializeSlider,
         };
         timeline.push(survey_trial);
+
 
         /*
         var pre_chat_survey = {
