@@ -132,7 +132,7 @@
     },
     {
      "type": "radiogroup",
-     "name": "question2",
+     "name": "gender-identification",
      "title": "With which gender do you most identify? (Select one)",
      "isRequired": false,
      "choices": [
@@ -149,7 +149,7 @@
     },
     {
      "type": "radiogroup",
-     "name": "question1",
+     "name": "education-level",
      "title": "What is the highest level of education that you have completed? (Select one)",
      "isRequired": false,
      "choices": [
@@ -189,13 +189,13 @@
     },
     {
      "type": "text",
-     "name": "question3",
+     "name": "religious-affiliation",
      "title": "With which religious family do you most identify? (Fill in)",
      "isRequired": false
     },
     {
      "type": "radiogroup",
-     "name": "question4",
+     "name": "political-ideology",
      "title": "How would you describe your political ideology? (Select one)",
      "isRequired": false,
      "choices": [
@@ -231,7 +231,7 @@
     },
     {
      "type": "matrix",
-     "name": "question6",
+     "name": "personality-trait-identification",
      "title": "Here are a number of personality traits that may or may not apply to you. Please indicate the extent to which you agree or disagree with each statement. You should rate the extent to which the pair of traits applies to you, even if one characteristic applies more strongly than the other.",
      "isRequired": false,
      "columns": [
@@ -309,7 +309,7 @@
     },
     {
      "type": "matrix",
-     "name": "question9Pre",
+     "name": "rating-republicans",
      "visibleIf": "{political-affiliation} <> 'Item 1'",
      "title": "How strongly do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -372,7 +372,7 @@
     },
     {
      "type": "matrix",
-     "name": "question5a",
+     "name": "rating-democrats",
      "visibleIf": "{political-affiliation} <> 'Item 2'",
      "title": "How strongly do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -435,7 +435,7 @@
     },
     {
      "type": "matrix",
-     "name": "question10Pre",
+     "name": "interacting-with-republicans",
      "visibleIf": "{political-affiliation} <> 'Item 1'",
      "title": "To what extent do these statements apply to you?",
      "isRequired": false,
@@ -486,7 +486,7 @@
     },
     {
      "type": "matrix",
-     "name": "question17PreDemocrat",
+     "name": "interacting-with-democrats",
      "visibleIf": "{political-affiliation} <> 'Item 2'",
      "title": "To what extent do these statements apply to you?",
      "isRequired": false,
@@ -537,7 +537,7 @@
     },
     {
      "type": "matrix",
-     "name": "question11",
+     "name": "self-reported-tendency-for-strong-opinions",
      "title": "How much do you agree or disagree with the following statements?",
      "isRequired": false,
      "columns": [
@@ -669,13 +669,13 @@
       },
       {
        "value": "Item 7",
-       "text": "Gay marriage in the U.S."
+       "text": "same-sex marriage in the U.S."
       }
      ]
     },
     {
      "type": "matrix",
-     "name": "question7Post",
+     "name": "euthanasia-polarization1",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Please indicate whether you would support or oppose the following proposals about human euthanasia in the U.S.",
      "isRequired": false,
@@ -743,7 +743,7 @@
     },
     {
      "type": "matrix",
-     "name": "question15PreGender",
+     "name": "gender-polarization1",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Please indicate whether you would support or oppose the following proposals about gender inequality in the U.S.",
      "isRequired": false,
@@ -811,7 +811,7 @@
     },
     {
      "type": "matrix",
-     "name": "question16PreHealthcare",
+     "name": "healthcare-polarization1",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Please indicate whether you would support or oppose the following proposals about the role of the U.S. government in healthcare",
      "isRequired": false,
@@ -879,7 +879,7 @@
     },
     {
      "type": "matrix",
-     "name": "question20PreVaccines",
+     "name": "vaccines-polarization1",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Please indicate whether you would support or oppose the following proposals about mandating vaccines in the U.S.",
      "isRequired": false,
@@ -943,7 +943,7 @@
     },
     {
      "type": "matrix",
-     "name": "question21PreCriminal",
+     "name": "criminal-polarization1",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Please indicate whether you would support or oppose the following proposals about criminal justice reform in the U.S.",     
      "isRequired": false,
@@ -1007,9 +1007,9 @@
     },
     {
      "type": "matrix",
-     "name": "question22PreMarriage",
+     "name": "same-sex-polarization1",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Please indicate whether you would support or oppose the following proposals about gay marriage",
+     "title": "Please indicate whether you would support or oppose the following proposals about same-sex marriage",
      "isRequired": false,
      "columns": [
       {
@@ -1071,7 +1071,7 @@
     },
     {
      "type": "matrix",
-     "name": "question8Pre",
+     "name": "euthanasia-polarization2",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "How much do you agree or disagree with the following statements on human euthanasia in the U.S.? ",
      "isRequired": false,
@@ -1126,7 +1126,7 @@
     },
     {
      "type": "matrix",
-     "name": "question23PreGender",
+     "name": "gender-polarization2",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "How much do you agree or disagree with the following statements on gender inequality in the U.S.? ",
      "isRequired": false,
@@ -1181,7 +1181,7 @@
     },
     {
      "type": "matrix",
-     "name": "question24PreHealthcare",
+     "name": "healthcare-polarization2",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "How much do you agree or disagree with the following statements on the role of the U.S. government in healthcare? ",
      "isRequired": false,
@@ -1236,7 +1236,7 @@
     },
     {
      "type": "matrix",
-     "name": "question25PreBombings",
+     "name": "bombing-polarization1",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "How much do you agree or disagree with the following statements on the atomic bombings of Hiroshima and Nagasaki? ",
      "isRequired": false,
@@ -1319,7 +1319,7 @@
     },
     {
      "type": "matrix",
-     "name": "question26PreVaccines",
+     "name": "vaccine-polarization2",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "How much do you agree or disagree with the following statements on vaccine mandates in the U.S.? ",
      "isRequired": false,
@@ -1374,7 +1374,7 @@
     },
     {
      "type": "matrix",
-     "name": "question27PreCriminal",
+     "name": "criminal-polarization2",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "How much do you agree or disagree with the following statements on criminal justice reform in the U.S.? ",
      "isRequired": false,
@@ -1429,9 +1429,9 @@
     },
     {
      "type": "matrix",
-     "name": "question28PreMarriage",
+     "name": "same-sex-polarization2",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "How much do you agree or disagree with the following statements on gay marriage in the U.S.? ",
+     "title": "How much do you agree or disagree with the following statements on same-sex marriage in the U.S.? ",
      "isRequired": false,
      "columns": [
       {
@@ -1484,52 +1484,52 @@
     },
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "euthanasia-slider1",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about human euthanasia in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderOne",
+     "name": "euthanasia-slider1-placeholder",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about human euthanasia in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "euthanasia-slider2",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderTwo",
+     "name": "euthanasia-slider2-placeholder",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "euthanasia-slider3",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderThree",
+     "name": "euthanasia-slider3-placeholder",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "euthanasia-slider4",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderFour",
+     "name": "euthanasia-slider4-placeholder",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -1537,52 +1537,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "gender-slider1",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gender inequality in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderOne",
+     "name": "gender-slider1-placeholder",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gender inequality in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "gender-slider2",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderTwo",
+     "name": "gender-slider2-placeholder",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "gender-slider3",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderThree",
+     "name": "gender-slider3-placeholder",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "gender-slider4",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderFour",
+     "name": "gender-slider4-placeholder",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -1590,52 +1590,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "healthcare-slider1",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the role of the government in U.S. healthcare, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderOne",
+     "name": "healthcare-slider1-placeholder",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the role of the government in U.S. healthcare, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "healthcare-slider2",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderTwo",
+     "name": "healthcare-slider2-placeholder",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "healthcare-slider3",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderThree",
+     "name": "healthcare-slider3-placeholder",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "healthcare-slider4",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderFour",
+     "name": "healthcare-slider4-placeholder",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -1643,52 +1643,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "bombing-slider1",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the atomic bombings of Hiroshima and Nagasaki, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderOne",
+     "name": "bombing-slider1-placeholder",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the atomic bombings of Hiroshima and Nagasaki, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "bombing-slider2",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderTwo",
+     "name": "bombing-slider2-placeholder",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "bombing-slider3",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderThree",
+     "name": "bombing-slider3-placeholder",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "bombing-slider4",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderFour",
+     "name": "bombing-slider4-placeholder",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -1696,52 +1696,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "vaccines-slider1",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about mandating vaccines in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderOne",
+     "name": "vaccines-slider1-placeholder",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about mandating vaccines in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "vaccines-slider2",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderTwo",
+     "name": "vaccines-slider2-placeholder",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "vaccines-slider3",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderThree",
+     "name": "vaccines-slider3-placeholder",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "vaccines-slider4",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderFour",
+     "name": "vaccines-slider4-placeholder",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -1749,52 +1749,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "criminal-slider1",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about criminal justice reform in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderOne",
+     "name": "criminal-slider1-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about criminal justice reform in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "criminal-slider2-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderTwo",
+     "name": "criminal-slider2-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "criminal-slider3-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderThree",
+     "name": "criminal-slider3-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "criminal-slider4",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderFour",
+     "name": "criminal-slider4-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -1802,59 +1802,59 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "same-sex-slider1",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gay marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about same-sex marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderOne",
+     "name": "same-sex-slider1-placeholder",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gay marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about same-sex marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "same-sex-slider2",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderTwo",
+     "name": "same-sex-slider2-placeholder",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "same-sex-slider3",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderThree",
+     "name": "same-sex-slider3-placeholder",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "same-sex-slider4",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderFour",
+     "name": "same-sex-slider4-placeholder",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
     },
     {
      "type": "matrix",
-     "name": "question13PreEuthanasia",
+     "name": "euthanasia-offending-reason",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Imagine that you are asked to have a serious conversation about human euthanasia in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
      "isRequired": false,
@@ -1934,7 +1934,7 @@
 
     {
      "type": "matrix",
-     "name": "question13PreGender",
+     "name": "gender-offending-reason",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Imagine that you are asked to have a serious conversation about gender inequality in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
      "isRequired": false,
@@ -2014,7 +2014,7 @@
 
     {
      "type": "matrix",
-     "name": "question13PreHealthcare",
+     "name": "healthcare-offending-reason",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Imagine that you are asked to have a serious conversation about the role of the U.S. government in healthcare with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
      "isRequired": false,
@@ -2094,7 +2094,7 @@
 
     {
      "type": "matrix",
-     "name": "question13PreBombings",
+     "name": "bombing-offending-reason",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Imagine that you are asked to have a serious conversation about the atomic bombings of Hiroshima and Nagasaki with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
      "isRequired": false,
@@ -2174,7 +2174,7 @@
 
     {
      "type": "matrix",
-     "name": "question13PreVaccines",
+     "name": "vaccines-offending-reason",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Imagine that you are asked to have a serious conversation about mandating vaccines in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
      "isRequired": false,
@@ -2254,7 +2254,7 @@
 
     {
      "type": "matrix",
-     "name": "question13PreCriminal",
+     "name": "criminal-offending-reason",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Imagine that you are asked to have a serious conversation about criminal justice reform in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
      "isRequired": false,
@@ -2334,9 +2334,9 @@
 
     {
      "type": "matrix",
-     "name": "question13PreMarriage",
+     "name": "same-sex-offending-reason",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Imagine that you are asked to have a serious conversation about gay marriage in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
+     "title": "Imagine that you are asked to have a serious conversation about same-sex marriage in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
      "isRequired": false,
      "columns": [
       {
@@ -2527,7 +2527,7 @@
             elements: [
     {
      "type": "matrix",
-     "name": "question9Post",
+     "name": "rating-republicans-post",
      "visibleIf": "{political-affiliation} <> 'Item 1'",
      "title": "How strongly do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -2590,7 +2590,7 @@
     },
     {
      "type": "matrix",
-     "name": "question5b",
+     "name": "rating-democrats-post",
      "visibleIf": "{political-affiliation} <> 'Item 2'",
      "title": "How strongly do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -2653,7 +2653,7 @@
     },
     {
      "type": "matrix",
-     "name": "question10Post",
+     "name": "interacting-with-republicans-post",
      "visibleIf": "{political-affiliation} <> 'Item 1'",
      "title": "To what extent do these statements apply to you?",
      "isRequired": false,
@@ -2704,7 +2704,7 @@
     },
     {
      "type": "matrix",
-     "name": "question17PostDemocrat",
+     "name": "interacting-with-democrats-post",
      "visibleIf": "{political-affiliation} <> 'Item 2'",
      "title": "To what extent do these statements apply to you?",
      "isRequired": false,
@@ -2755,7 +2755,7 @@
     },
     {
      "type": "matrix",
-     "name": "question30Euthanasia",
+     "name": "euthanasia-openmindedness",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -2814,7 +2814,7 @@
     },
     {
      "type": "matrix",
-     "name": "question30Gender",
+     "name": "gender-openmindedness",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -2874,7 +2874,7 @@
 
     {
      "type": "matrix",
-     "name": "question30Healthcare",
+     "name": "healthcare-openmindedness",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -2934,7 +2934,7 @@
 
     {
      "type": "matrix",
-     "name": "question30Bombings",
+     "name": "bombing-openmindedness",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -2994,7 +2994,7 @@
 
     {
      "type": "matrix",
-     "name": "question30Vaccines",
+     "name": "vaccines-openmindedness",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -3054,7 +3054,7 @@
 
     {
      "type": "matrix",
-     "name": "question30Criminal",
+     "name": "criminal-openmindedness",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -3114,7 +3114,7 @@
 
     {
      "type": "matrix",
-     "name": "question30Marriage",
+     "name": "same-sex-openmindedness",
      "visibleIf": "{topic-choice} = 'Item 7'",
      "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
      "isRequired": false,
@@ -3151,11 +3151,11 @@
      "rows": [
       {
        "value": "Row 1",
-       "text": "I had little patience for arguments about gay marriage in the U.S. that I disagree with"
+       "text": "I had little patience for arguments about same-sex marriage in the U.S. that I disagree with"
       },
       {
        "value": "Row 2",
-       "text": "I avoided messages about gay marriage in the U.S. that I disagree with"
+       "text": "I avoided messages about same-sex marriage in the U.S. that I disagree with"
       },
       {
        "value": "Row 3",
@@ -3163,7 +3163,7 @@
       },
       {
        "value": "Row 4",
-       "text": "I was open to considering other political viewpoints about gay marriage in the U.S."
+       "text": "I was open to considering other political viewpoints about same-sex marriage in the U.S."
       },
       {
        "value": "Row 5",
@@ -3173,56 +3173,56 @@
     },
     {
      "type": "comment",
-     "name": "question29Euthanasia",
+     "name": "euthanasia-free-response",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about human euthanasia in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question29Gender",
+     "name": "gender-free-response",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about gender inequality in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question29Healthcare",
+     "name": "healthcare-free-response",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about the role of the U.S. government in healthcare? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question29Bombings",
+     "name": "bombing-free-response",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about the atomic bombings of Hiroshima and Nagasaki? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question29Vaccines",
+     "name": "vaccines-free-response",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about mandating vaccines in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question29Criminal",
+     "name": "criminal-free-response",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about criminal justice reform in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question29Marriage",
+     "name": "same-sex-free-response",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about gay marriage in the U.S.? Please freely reflect in the space below.",
+     "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about same-sex marriage in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     }, 
     {
      "type": "matrix",
-     "name": "question31Euthanasia",
+     "name": "euthanasia-willing-to-converse-likert-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Rate this conversation's effect on your willingness to converse with others about human euthanasia in the U.S.",
      "isRequired": false,
@@ -3258,7 +3258,7 @@
     },
     {
      "type": "matrix",
-     "name": "question31Gender",
+     "name": "gender-willing-to-converse-likert-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Rate this conversation's effect on your willingness to converse with others about gender inequality in the U.S.",
      "isRequired": false,
@@ -3294,7 +3294,7 @@
     },
     {
      "type": "matrix",
-     "name": "question31Healthcare",
+     "name": "healthcare-willing-to-converse-likert-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Rate this conversation's effect on your willingness to converse with others about the role of the U.S. government in healthcare",
      "isRequired": false,
@@ -3330,7 +3330,7 @@
     },
     {
      "type": "matrix",
-     "name": "question31Bombings",
+     "name": "bombing-willing-to-converse-likert-post",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Rate this conversation's effect on your willingness to converse about the atomic bombings of Hiroshima and Nagasaki with others",
      "isRequired": false,
@@ -3366,7 +3366,7 @@
     },
     {
      "type": "matrix",
-     "name": "question31Vaccines",
+     "name": "vaccines-willing-to-converse-likert-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Rate this conversation's effect on your willingness to converse with others about mandating vaccines in the U.S.",
      "isRequired": false,
@@ -3402,7 +3402,7 @@
     },
     {
      "type": "matrix",
-     "name": "question31Criminal",
+     "name": "criminal-willing-to-converse-likert-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Rate this conversation's effect on your willingness to converse with others about criminal justice reform in the U.S.",
      "isRequired": false,
@@ -3438,9 +3438,9 @@
     },
     {
      "type": "matrix",
-     "name": "question31Marriage",
+     "name": "same-sex-willing-to-converse-likert-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Rate this conversation's effect on your willingness to converse with others about gay marriage in the U.S.",
+     "title": "Rate this conversation's effect on your willingness to converse with others about same-sex marriage in the U.S.",
      "isRequired": false,
      "choices": [
       {
@@ -3474,154 +3474,154 @@
     },
     {
      "type": "comment",
-     "name": "question32Euthanasia",
+     "name": "euthanasia-what-affected-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on euthanasia?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question32Gender",
+     "name": "gender-what-affected-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on gender inequality?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question32Healthcare",
+     "name": "healthcare-what-affected-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on the role of the government in healthcare?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question32Bombings",
+     "name": "bombing-what-affected-post",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on the atomic bombings?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question32Vaccines",
+     "name": "vaccine-what-affected-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on mandating vaccines in the U.S.?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question32Criminal",
+     "name": "criminal-what-affected-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on criminal justice reform in the U.S.?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question32Marriage",
+     "name": "same-sex-what-affected-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on gay marriage in the U.S.?",
+     "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on same-sex marriage in the U.S.?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question33Euthanasia",
+     "name": "euthanasia-new-perspective-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about human euthanasia? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question33Gender",
+     "name": "gender-new-perspective-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about gender inequality in the U.S.? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question33Healthcare",
+     "name": "healthcare-new-perspective-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about the role of the U.S. government in healthcare? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question33Bombings",
+     "name": "bombing-new-perspective-post",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about the atomic bombings? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question33Vaccines",
+     "name": "vaccines-new-perspective-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about mandating vaccines in the U.S.? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question33Criminal",
+     "name": "criminal-new-perspective-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about criminal justice reform? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question33Marriage",
+     "name": "same-sex-new-perspective-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about gay marriage in the U.S.? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
+     "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about same-sex marriage in the U.S.? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
      "isRequired": false
     }, 
     {
      "type": "comment",
-     "name": "question14PostEuthanasia",
+     "name": "euthanasia-still-contributes-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "What still contributes to your willingness or unwillingness to converse with others about human euthanasia in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question14PostGender",
+     "name": "gender-still-contributes-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "What still contributes to your willingness or unwillingness to converse with others about gender inequality in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question14PostHealthcare",
+     "name": "healthcare-still-contributes-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "What still contributes to your willingness or unwillingness to converse with others about the role of the U.S. government in healthcare? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question14PostBombings",
+     "name": "bombing-still-contributes-post",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "What still contributes to your willingness or unwillingness to converse with others about the atomic bombings of Hiroshima and Nagasaki? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question14PostVaccines",
+     "name": "vaccines-still-contributes-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "What still contributes to your willingness or unwillingness to converse with others about mandating vaccines in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question14PostCriminal",
+     "name": "criminal-still-contributes-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "What still contributes to your willingness or unwillingness to converse with others about criminal justice reform in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "comment",
-     "name": "question14PostMarriage",
+     "name": "same-sex-still-contributes-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "What still contributes to your willingness or unwillingness to converse with others about gay marriage in the U.S.? Please freely reflect in the space below.",
+     "title": "What still contributes to your willingness or unwillingness to converse with others about same-sex marriage in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     },
     {
      "type": "matrix",
-     "name": "question7Pre",
+     "name": "euthanasia-polarization1-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Please indicate whether you would support or oppose the following proposals about human euthanasia in the U.S.",
      "isRequired": false,
@@ -3689,7 +3689,7 @@
     },
     {
      "type": "matrix",
-     "name": "question15PostGender",
+     "name": "gender-polarization1-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Please indicate whether you would support or oppose the following proposals about gender inequality in the U.S.",
      "isRequired": false,
@@ -3757,7 +3757,7 @@
     },
     {
      "type": "matrix",
-     "name": "question16PostHealthcare",
+     "name": "healthcare-polarization1-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Please indicate whether you would support or oppose the following proposals about the role of the U.S. government in healthcare",
      "isRequired": false,
@@ -3825,7 +3825,7 @@
     },
     {
      "type": "matrix",
-     "name": "question20PostVaccines",
+     "name": "vaccines-polarization1-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Please indicate whether you would support or oppose the following proposals about mandating vaccines in the U.S.",
      "isRequired": false,
@@ -3889,7 +3889,7 @@
     },
     {
      "type": "matrix",
-     "name": "question21PostCriminal",
+     "name": "criminal-polarization1-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Please indicate whether you would support or oppose the following proposals about criminal justice reform in the U.S.",     
      "isRequired": false,
@@ -3953,9 +3953,9 @@
     },
     {
      "type": "matrix",
-     "name": "question22PostMarriage",
+     "name": "same-sex-polarization1-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Please indicate whether you would support or oppose the following proposals about gay marriage",
+     "title": "Please indicate whether you would support or oppose the following proposals about same-sex marriage",
      "isRequired": false,
      "columns": [
       {
@@ -4017,7 +4017,7 @@
     },
     {
      "type": "matrix",
-     "name": "question8Post",
+     "name": "euthanasia-polarization2-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "How much do you agree or disagree with the following statements on human euthanasia in the U.S.? ",
      "isRequired": false,
@@ -4072,7 +4072,7 @@
     },
     {
      "type": "matrix",
-     "name": "question23PostGender",
+     "name": "gender-polarization2-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "How much do you agree or disagree with the following statements on gender inequality in the U.S.? ",
      "isRequired": false,
@@ -4127,7 +4127,7 @@
     },
     {
      "type": "matrix",
-     "name": "question24PostHealthcare",
+     "name": "healthcare-polarization2-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "How much do you agree or disagree with the following statements on the role of the U.S. government in healthcare? ",
      "isRequired": false,
@@ -4182,7 +4182,7 @@
     },
     {
      "type": "matrix",
-     "name": "question25PostBombings",
+     "name": "bombing-polarization1-post",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "How much do you agree or disagree with the following statements on the atomic bombings of Hiroshima and Nagasaki? ",
      "isRequired": false,
@@ -4265,7 +4265,7 @@
     },
     {
      "type": "matrix",
-     "name": "question26PostVaccines",
+     "name": "vaccines-polarization2-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "How much do you agree or disagree with the following statements on vaccine mandates in the U.S.? ",
      "isRequired": false,
@@ -4320,7 +4320,7 @@
     },
     {
      "type": "matrix",
-     "name": "question27PostCriminal",
+     "name": "criminal-polarization2-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "How much do you agree or disagree with the following statements on criminal justice reform in the U.S.? ",
      "isRequired": false,
@@ -4375,9 +4375,9 @@
     },
     {
      "type": "matrix",
-     "name": "question28PostMarriage",
+     "name": "same-sex-polarization2-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "How much do you agree or disagree with the following statements on gay marriage in the U.S.? ",
+     "title": "How much do you agree or disagree with the following statements on same-sex marriage in the U.S.? ",
      "isRequired": false,
      "columns": [
       {
@@ -4430,52 +4430,52 @@
     },
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "euthanasia-slider1-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about human euthanasia in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderFive",
+     "name": "euthanasia-slider1-post-placeholder-placeholder",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about human euthanasia in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "euthanasia-slider2-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSix",
+     "name": "euthanasia-slider2-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "euthanasia-slider3-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSeven",
+     "name": "euthanasia-slider3-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "euthanasia-slider4-post",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderEight",
+     "name": "euthanasia-slider4-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 1'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -4483,52 +4483,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "gender-slider1-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gender inequality in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderFive",
+     "name": "gender-slider1-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gender inequality in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "gender-slider2-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSix",
+     "name": "gender-slider2-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "gender-slider3-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSeven",
+     "name": "gender-slider3-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "gender-slider4-post",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderEight",
+     "name": "gender-slider4-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 2'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -4536,52 +4536,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "healthcare-slider1-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the role of the government in U.S. healthcare, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderFive",
+     "name": "healthcare-slider1-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the role of the government in U.S. healthcare, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "healthcare-slider2-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSix",
+     "name": "healthcare-slider2-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "healthcare-slider3-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSeven",
+     "name": "healthcare-slider3-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "healthcare-slider4-post",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderEight",
+     "name": "healthcare-slider4-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 3'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -4589,52 +4589,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "bombing-slider1-post",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the atomic bombings of Hiroshima and Nagasaki, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderFive",
+     "name": "bombing-slider1-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the atomic bombings of Hiroshima and Nagasaki, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "bombing-slider2-post",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSix",
+     "name": "bombing-slider2-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "bombing-slider3-post",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSeven",
+     "name": "bombing-slider3-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "bombing-slider4-post",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderEight",
+     "name": "bombing-slider4-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 4'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -4642,52 +4642,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "vaccines-slider1-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about mandating vaccines in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderFive",
+     "name": "vaccines-slider1-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about mandating vaccines in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "vaccines-slider2-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSix",
+     "name": "vaccines-slider2-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "vaccines-slider3-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSeven",
+     "name": "vaccines-slider3-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "vaccines-slider4-post",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderEight",
+     "name": "vaccines-slider4-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 5'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -4695,52 +4695,52 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "criminal-slider1-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about criminal justice reform in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderFive",
+     "name": "criminal-slider1-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about criminal justice reform in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "criminal-slider2-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSix",
+     "name": "criminal-slider2-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "criminal-slider3-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSeven",
+     "name": "criminal-slider3-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "criminal-slider4-post",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderEight",
+     "name": "criminal-slider4-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 6'",
      "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
@@ -4748,54 +4748,54 @@
 
     {
      "type": "expression",
-     "name": "sliderOneQuestion",
+     "name": "same-sex-slider1-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gay marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about same-sex marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     },
     {
      "type": "html",
-     "name": "sliderFive",
+     "name": "same-sex-slider1-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gay marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about same-sex marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
      "html": '<div id="sliderOne"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderTwoQuestion",
+     "name": "same-sex-slider2-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSix",
+     "name": "same-sex-slider2-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderThreeQuestion",
+     "name": "same-sex-slider3-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderSeven",
+     "name": "same-sex-slider3-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderThree"></div>' // Placeholder for the slider
     },
     {
      "type": "expression",
-     "name": "sliderFourQuestion",
+     "name": "same-sex-slider4-post",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
     {
      "type": "html",
-     "name": "sliderEight",
+     "name": "same-sex-slider4-post-placeholder",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gay marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
+     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
      "html": '<div id="sliderFour"></div>' // Placeholder for the slider
     },
     {
@@ -5282,7 +5282,7 @@
      "type": "matrix",
      "name": "question13PostMarriage",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "Imagine that you are asked to have a serious conversation about gay marriage in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
+     "title": "Imagine that you are asked to have a serious conversation about same-sex marriage in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
      "isRequired": false,
      "columns": [
       {
@@ -5403,7 +5403,7 @@
      "type": "comment",
      "name": "question14PreMarriage",
      "visibleIf": "{topic-choice} = 'Item 7'",
-     "title": "What else contributes to your willingness or unwillingness to converse with others about gay marriage in the U.S.? Please freely reflect in the space below.",
+     "title": "What else contributes to your willingness or unwillingness to converse with others about same-sex marriage in the U.S.? Please freely reflect in the space below.",
      "isRequired": false
     }]
 };
