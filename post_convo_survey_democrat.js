@@ -1,4 +1,4 @@
-var post_convo_democrat_survey = {
+var post_convo_survey_democrat = {
             elements: [
                 {
                     "type": "matrix",

@@ -1,4 +1,4 @@
-var post_convo_republican_survey = {
+var post_convo_survey_republican = {
             elements: [
                 
                 {
