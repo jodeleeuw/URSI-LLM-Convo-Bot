@@ -1422,7 +1422,7 @@ var pre_convo_survey_json = {
     "name": "euthanasia-slider1-placeholder",
     "visibleIf": "{topic-choice} = 'Item 1'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about human euthanasia in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+    "html": '<div id="euthanasia-slider1-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1435,7 +1435,7 @@ var pre_convo_survey_json = {
     "name": "euthanasia-slider2-placeholder",
     "visibleIf": "{topic-choice} = 'Item 1'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+    "html": '<div id="euthanasia-slider2-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1448,7 +1448,7 @@ var pre_convo_survey_json = {
     "name": "euthanasia-slider3-placeholder",
     "visibleIf": "{topic-choice} = 'Item 1'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+    "html": '<div id="euthanasia-slider3-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1461,7 +1461,7 @@ var pre_convo_survey_json = {
     "name": "euthanasia-slider4-placeholder",
     "visibleIf": "{topic-choice} = 'Item 1'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in human euthanasia in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+    "html": '<div id="euthanasia-slider4-placeholder"></div>' // Placeholder for the slider
 },
 
 {
@@ -1475,7 +1475,7 @@ var pre_convo_survey_json = {
     "name": "gender-slider1-placeholder",
     "visibleIf": "{topic-choice} = 'Item 2'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gender inequality in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+    "html": '<div id="gender-slider1-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1488,7 +1488,7 @@ var pre_convo_survey_json = {
     "name": "gender-slider2-placeholder",
     "visibleIf": "{topic-choice} = 'Item 2'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+    "html": '<div id="gender-slider2-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1501,7 +1501,7 @@ var pre_convo_survey_json = {
     "name": "gender-slider3-placeholder",
     "visibleIf": "{topic-choice} = 'Item 2'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+    "html": '<div id="gender-slider3-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1514,7 +1514,7 @@ var pre_convo_survey_json = {
     "name": "gender-slider4-placeholder",
     "visibleIf": "{topic-choice} = 'Item 2'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+    "html": '<div id="gender-slider4-placeholder"></div>' // Placeholder for the slider
 },
 
 {
@@ -1528,7 +1528,7 @@ var pre_convo_survey_json = {
     "name": "healthcare-slider1-placeholder",
     "visibleIf": "{topic-choice} = 'Item 3'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the role of the government in U.S. healthcare, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+    "html": '<div id="healthcare-slider1-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1541,7 +1541,7 @@ var pre_convo_survey_json = {
     "name": "healthcare-slider2-placeholder",
     "visibleIf": "{topic-choice} = 'Item 3'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+    "html": '<div id="healthcare-slider2-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1554,7 +1554,7 @@ var pre_convo_survey_json = {
     "name": "healthcare-slider3-placeholder",
     "visibleIf": "{topic-choice} = 'Item 3'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+    "html": '<div id="healthcare-slider3-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1567,7 +1567,7 @@ var pre_convo_survey_json = {
     "name": "healthcare-slider4-placeholder",
     "visibleIf": "{topic-choice} = 'Item 3'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+    "html": '<div id="healthcare-slider4-placeholder"></div>' // Placeholder for the slider
 },
 
 {
@@ -1581,7 +1581,7 @@ var pre_convo_survey_json = {
     "name": "bombing-slider1-placeholder",
     "visibleIf": "{topic-choice} = 'Item 4'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the atomic bombings of Hiroshima and Nagasaki, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+    "html": '<div id="bombing-slider1-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1594,7 +1594,7 @@ var pre_convo_survey_json = {
     "name": "bombing-slider2-placeholder",
     "visibleIf": "{topic-choice} = 'Item 4'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+    "html": '<div id="bombing-slider2-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1607,7 +1607,7 @@ var pre_convo_survey_json = {
     "name": "bombing-slider3-placeholder",
     "visibleIf": "{topic-choice} = 'Item 4'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+    "html": '<div id="bombing-slider3-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1620,7 +1620,7 @@ var pre_convo_survey_json = {
     "name": "bombing-slider4-placeholder",
     "visibleIf": "{topic-choice} = 'Item 4'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+    "html": '<div id="bombing-slider4-placeholder"></div>' // Placeholder for the slider
 },
 
 {
@@ -1634,7 +1634,7 @@ var pre_convo_survey_json = {
     "name": "vaccines-slider1-placeholder",
     "visibleIf": "{topic-choice} = 'Item 5'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about mandating vaccines in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+    "html": '<div id="vaccines-slider1-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1647,7 +1647,7 @@ var pre_convo_survey_json = {
     "name": "vaccines-slider2-placeholder",
     "visibleIf": "{topic-choice} = 'Item 5'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+    "html": '<div id="vaccines-slider2-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1660,7 +1660,7 @@ var pre_convo_survey_json = {
     "name": "vaccines-slider3-placeholder",
     "visibleIf": "{topic-choice} = 'Item 5'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+    "html": '<div id="vaccines-slider3-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1673,7 +1673,7 @@ var pre_convo_survey_json = {
     "name": "vaccines-slider4-placeholder",
     "visibleIf": "{topic-choice} = 'Item 5'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+    "html": '<div id="vaccines-slider4-placeholder"></div>' // Placeholder for the slider
 },
 
 {
@@ -1687,7 +1687,7 @@ var pre_convo_survey_json = {
     "name": "criminal-slider1-placeholder",
     "visibleIf": "{topic-choice} = 'Item 6'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about criminal justice reform in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+    "html": '<div id="criminal-slider1-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1700,7 +1700,7 @@ var pre_convo_survey_json = {
     "name": "criminal-slider2-placeholder",
     "visibleIf": "{topic-choice} = 'Item 6'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+    "html": '<div id="criminal-slider2-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1713,7 +1713,7 @@ var pre_convo_survey_json = {
     "name": "criminal-slider3-placeholder",
     "visibleIf": "{topic-choice} = 'Item 6'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+    "html": '<div id="criminal-slider3-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1726,7 +1726,7 @@ var pre_convo_survey_json = {
     "name": "criminal-slider4-placeholder",
     "visibleIf": "{topic-choice} = 'Item 6'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+    "html": '<div id="criminal-slider4-placeholder"></div>' // Placeholder for the slider
 },
 
 {
@@ -1740,7 +1740,7 @@ var pre_convo_survey_json = {
     "name": "same-sex-slider1-placeholder",
     "visibleIf": "{topic-choice} = 'Item 7'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about same-sex marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+    "html": '<div id="same-sex-slider1-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1753,7 +1753,7 @@ var pre_convo_survey_json = {
     "name": "same-sex-slider2-placeholder",
     "visibleIf": "{topic-choice} = 'Item 7'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+    "html": '<div id="same-sex-slider2-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1766,7 +1766,7 @@ var pre_convo_survey_json = {
     "name": "same-sex-slider3-placeholder",
     "visibleIf": "{topic-choice} = 'Item 7'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+    "html": '<div id="same-sex-slider3-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "expression",
@@ -1779,7 +1779,7 @@ var pre_convo_survey_json = {
     "name": "same-sex-slider4-placeholder",
     "visibleIf": "{topic-choice} = 'Item 7'",
     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+    "html": '<div id="same-sex-slider4-placeholder"></div>' // Placeholder for the slider
 },
 {
     "type": "matrix",
