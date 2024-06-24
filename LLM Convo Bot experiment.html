@@ -23,6 +23,7 @@
     <script src="post_convo_survey_gender.js"></script>
     <script src="post_convo_survey_same_sex.js"></script>
     <script src="post_convo_survey_criminal.js"></script>
+    <script src="experimental_group_last_question.js"></script>
     <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
@@ -80,7 +81,7 @@
         // TURN ALL ISREQUIRED: FALSE TO :TRUE BEFORE POSTING EXPERIMENT. IT IS TURNED TO FALSE FOR CONVENIENCE OF TESTING RIGHT NOW
 
         /* slider constant */
-        const initializeSlider = (survey) => {
+        const initializePreSlider = (survey) => {
             const sliderQuestions = new Set([
                 "euthanasia-slider1-placeholder",
                 "euthanasia-slider2-placeholder",
@@ -117,9 +118,10 @@
                 const name = options.question.name;
                 // console.log(optios.question.sliderID);
                 // if (options.question.sliderID !== ""){
+                console.log(name);
                 if (sliderQuestions.has(name)) {
-                    var slider = document.getElementById(options.question.name);
-
+                    var slider = document.getElementById(name);
+                    console.log(slider);
                     noUiSlider.create(slider, {
                         start: [50],
                         range: {
@@ -140,7 +142,7 @@
         const pre_convo_survey_trial = {
             type: jsPsychSurvey,
             survey_json: pre_convo_survey_json,
-            survey_function: initializeSlider,
+            survey_function: initializePreSlider,
             data: {
                 phase: "pre-convo-survey",
             },
@@ -228,11 +230,40 @@
         };
         timeline.push(convo_complete);
 
+        
+        /* slider constant for post-convo survey */
+        const initializePostSlider = (survey) => {
+            const sliderQuestions = [
+                "sliderFive",
+                "sliderSix",
+                "sliderSeven",
+                "sliderEight",
+            ]; // use this as array to keep track of slider questions
+
+            survey.onAfterRenderQuestion.add(function (survey, options) {
+                if (sliderQuestions.includes(options.question.name)) {
+                    var slider = document.getElementById(options.question.name);
+                    noUiSlider.create(slider, {
+                        start: [50],
+                        range: {
+                            min: 0,
+                            max: 100,
+                        },
+                        step: 1,
+                        tooltips: true,
+                    });
+                    slider.noUiSlider.on("set", function () {
+                        options.question.value = slider.noUiSlider.get();
+                    });
+                }
+            });
+        };
+
         /*
         const post_convo_survey_trial = {
             type: jsPsychSurvey,
             survey_json: post_convo_survey_json,
-            survey_function: initializeSlider,
+            survey_function: initializePostSlider,
         };
         timeline.push(post_convo_survey_trial);
 
@@ -245,7 +276,6 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_republican,
-                    survey_function: initializeSlider,
                 }
             ],
             conditional_function: () => {
@@ -262,7 +292,6 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_democrat,
-                    survey_function: initializeSlider,
                 }
             ],
             conditional_function: () => {
@@ -279,12 +308,11 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_republican,
-                    survey_function: initializeSlider,
                 },
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_democrat,
-                    survey_function: initializeSlider,
+               
                 }
             ],
             conditional_function: () => {
@@ -301,12 +329,10 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_republican,
-                    survey_function: initializeSlider,
                 },
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_democrat,
-                    survey_function: initializeSlider,
                 }
             ],
             conditional_function: () => {
@@ -326,7 +352,7 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_euthanasia,
-                    survey_function: initializeSlider,
+                    survey_function: initializePostSlider,
                 }
             ],
             conditional_function: () => {
@@ -343,7 +369,7 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_gender,
-                    survey_function: initializeSlider,
+                    survey_function: initializePostSlider,
                 }
             ],
             conditional_function: () => {
@@ -361,7 +387,7 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_healthcare,
-                    survey_function: initializeSlider,
+                    survey_function: initializePostSlider,
                 }
             ],
             conditional_function: () => {
@@ -380,7 +406,7 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_bombing,
-                    survey_function: initializeSlider,
+                    survey_function: initializePostSlider,
                 }
             ],
             conditional_function: () => {
@@ -397,7 +423,7 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_vaccines,
-                    survey_function: initializeSlider,
+                    survey_function: initializePostSlider,
                 },
             ],
             conditional_function: () => {
@@ -415,7 +441,7 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_criminal,
-                    survey_function: initializeSlider,
+                    survey_function: initializePostSlider,
                 }
             ],
             conditional_function: () => {
@@ -433,7 +459,7 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_same_sex,
-                    survey_function: initializeSlider,
+                    survey_function: initializePostSlider,
                 }
             ],
             conditional_function: () => {
@@ -445,6 +471,12 @@
         };
         timeline.push(same_sex_post_survey);
 
+        var last_question = {
+                    type: jsPsychSurvey,
+                    survey_json: experimental_group_last_question,
+                    survey_function: initializePostSlider,
+                };
+        timeline.push(last_question);
 
 
         const save_data = {

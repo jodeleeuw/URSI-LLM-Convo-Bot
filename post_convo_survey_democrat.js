@@ -3,7 +3,6 @@ var post_convo_survey_democrat = {
                 {
                     "type": "matrix",
                     "name": "rating-republicans-post",
-                    "visibleIf": "{political-affiliation} <> 'Item 1'",
                     "title": "How strongly do you agree or disagree with the following statements?",
                     "isRequired": false,
                     "columns": [
@@ -66,7 +65,6 @@ var post_convo_survey_democrat = {
                 {
                     "type": "matrix",
                     "name": "interacting-with-republicans-post",
-                    "visibleIf": "{political-affiliation} <> 'Item 1'",
                     "title": "To what extent do these statements apply to you?",
                     "isRequired": false,
                     "columns": [
