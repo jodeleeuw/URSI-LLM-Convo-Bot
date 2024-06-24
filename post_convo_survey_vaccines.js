@@ -3,8 +3,7 @@ var post_convo_survey_vaccines = {
                 {
                     "type": "matrix",
                     "name": "vaccines-openmindedness",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
-                    "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
+                    "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements? Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -62,15 +61,13 @@ var post_convo_survey_vaccines = {
                 {
                     "type": "comment",
                     "name": "vaccines-free-response",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about mandating vaccines in the U.S.? Please freely reflect in the space below.",
                     "isRequired": false
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "vaccines-willing-to-converse-likert-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
-                    "title": "Rate this conversation's effect on your willingness to converse with others about mandating vaccines in the U.S.",
+                    "title": "Rate this conversation's effect on your willingness to converse with others about mandating vaccines in the U.S. Rate on the 7 point scale.",
                     "isRequired": false,
                     "choices": [
                         {
@@ -105,29 +102,25 @@ var post_convo_survey_vaccines = {
                 {
                     "type": "comment",
                     "name": "vaccine-what-affected-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on mandating vaccines in the U.S.?",
                     "isRequired": false
                 },
                 {
                     "type": "comment",
                     "name": "vaccines-new-perspective-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about mandating vaccines in the U.S.? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
                     "isRequired": false
                 },
                 {
                     "type": "comment",
                     "name": "vaccines-still-contributes-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "What still contributes to your willingness or unwillingness to converse with others about mandating vaccines in the U.S.? Please freely reflect in the space below.",
                     "isRequired": false
                 },
                 {
                     "type": "matrix",
                     "name": "vaccines-polarization1-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
-                    "title": "Please indicate whether you would support or oppose the following proposals about mandating vaccines in the U.S.",
+                    "title": "Please indicate whether you would support or oppose the following proposals about mandating vaccines in the U.S. Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -190,8 +183,7 @@ var post_convo_survey_vaccines = {
                 {
                     "type": "matrix",
                     "name": "vaccines-polarization2-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
-                    "title": "How much do you agree or disagree with the following statements on vaccine mandates in the U.S.? ",
+                    "title": "How much do you agree or disagree with the following statements on vaccine mandates in the U.S.? Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -227,60 +219,51 @@ var post_convo_survey_vaccines = {
                 {
                     "type": "expression",
                     "name": "vaccines-slider1-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about mandating vaccines in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
                 },
                 {
                     "type": "html",
                     "name": "vaccines-slider1-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about mandating vaccines in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
                     "html": '<div id="sliderOne"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
                     "name": "vaccines-slider2-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                 },
                 {
                     "type": "html",
                     "name": "vaccines-slider2-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                     "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
                     "name": "vaccines-slider3-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                 },
                 {
                     "type": "html",
                     "name": "vaccines-slider3-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                     "html": '<div id="sliderThree"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
                     "name": "vaccines-slider4-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                 },
                 {
                     "type": "html",
                     "name": "vaccines-slider4-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                     "html": '<div id="sliderFour"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "matrix",
                     "name": "vaccines-reason-of-avoidance-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
-                    "title": "Imagine that you are asked to have a serious conversation about mandating vaccines in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
+                    "title": "Imagine that you are asked to have a serious conversation about mandating vaccines in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation. Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -358,7 +341,6 @@ var post_convo_survey_vaccines = {
                 {
                     "type": "comment",
                     "name": "vaccines-other-willingness-post",
-                    "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "What else contributes to your willingness or unwillingness to converse with others about mandating vaccines in the U.S.? Please freely reflect in the space below.",
                     "isRequired": false
                 }]

@@ -1,10 +1,9 @@
 var post_convo_survey_healthcare = {
             elements: [
-                {
+                { 
                     "type": "matrix",
                     "name": "healthcare-openmindedness",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
-                    "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
+                    "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements? Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -62,15 +61,13 @@ var post_convo_survey_healthcare = {
                 {
                     "type": "comment",
                     "name": "healthcare-free-response",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about the role of the U.S. government in healthcare? Please freely reflect in the space below.",
                     "isRequired": false
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "healthcare-willing-to-converse-likert-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
-                    "title": "Rate this conversation's effect on your willingness to converse with others about the role of the U.S. government in healthcare",
+                    "title": "Rate this conversation's effect on your willingness to converse with others about the role of the U.S. government in healthcare. Rate on the 7 point scale.",
                     "isRequired": false,
                     "choices": [
                         {
@@ -105,29 +102,25 @@ var post_convo_survey_healthcare = {
                 {
                     "type": "comment",
                     "name": "healthcare-what-affected-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on the role of the government in healthcare?",
                     "isRequired": false
                 },
                 {
                     "type": "comment",
                     "name": "healthcare-new-perspective-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about the role of the U.S. government in healthcare? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
                     "isRequired": false
                 },
                 {
                     "type": "comment",
                     "name": "healthcare-still-contributes-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "What still contributes to your willingness or unwillingness to converse with others about the role of the U.S. government in healthcare? Please freely reflect in the space below.",
                     "isRequired": false
                 },
                 {
                     "type": "matrix",
                     "name": "healthcare-polarization1-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
-                    "title": "Please indicate whether you would support or oppose the following proposals about the role of the U.S. government in healthcare",
+                    "title": "Please indicate whether you would support or oppose the following proposals about the role of the U.S. government in healthcare. Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -194,8 +187,7 @@ var post_convo_survey_healthcare = {
                 {
                     "type": "matrix",
                     "name": "healthcare-polarization2-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
-                    "title": "How much do you agree or disagree with the following statements on the role of the U.S. government in healthcare? ",
+                    "title": "How much do you agree or disagree with the following statements on the role of the U.S. government in healthcare? Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -249,52 +241,44 @@ var post_convo_survey_healthcare = {
                 {
                     "type": "expression",
                     "name": "healthcare-slider1-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the role of the government in U.S. healthcare, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
                 },
                 {
                     "type": "html",
                     "name": "healthcare-slider1-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the role of the government in U.S. healthcare, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
                     "html": '<div id="sliderOne"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
                     "name": "healthcare-slider2-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
                 },
                 {
                     "type": "html",
                     "name": "healthcare-slider2-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
                     "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
                     "name": "healthcare-slider3-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
                 },
                 {
                     "type": "html",
                     "name": "healthcare-slider3-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
                     "html": '<div id="sliderThree"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
                     "name": "healthcare-slider4-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
                 },
                 {
                     "type": "html",
                     "name": "healthcare-slider4-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
                     "html": '<div id="sliderFour"></div>' // Placeholder for the slider
                 },
@@ -302,8 +286,7 @@ var post_convo_survey_healthcare = {
                 {
                     "type": "matrix",
                     "name": "healthcare-reason-of-avoidance-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
-                    "title": "Imagine that you are asked to have a serious conversation about the role of the U.S. government in healthcare with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
+                    "title": "Imagine that you are asked to have a serious conversation about the role of the U.S. government in healthcare with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation. Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -382,7 +365,6 @@ var post_convo_survey_healthcare = {
                 {
                     "type": "comment",
                     "name": "healthcare-other-willingness-post",
-                    "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "What else contributes to your willingness or unwillingness to converse with others about the role of the U.S. government in healthcare? Please freely reflect in the space below.",
                     "isRequired": false
                 },]

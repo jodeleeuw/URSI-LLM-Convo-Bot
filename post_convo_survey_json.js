@@ -696,7 +696,7 @@ var post_convo_survey_json = {
                     "isRequired": false
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "euthanasia-willing-to-converse-likert-post",
                     "visibleIf": "{topic-choice} = 'Item 1'",
                     "title": "Rate this conversation's effect on your willingness to converse with others about human euthanasia in the U.S.",
@@ -732,7 +732,7 @@ var post_convo_survey_json = {
                         }]
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "gender-willing-to-converse-likert-post",
                     "visibleIf": "{topic-choice} = 'Item 2'",
                     "title": "Rate this conversation's effect on your willingness to converse with others about gender inequality in the U.S.",
@@ -768,7 +768,7 @@ var post_convo_survey_json = {
                         }]
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "healthcare-willing-to-converse-likert-post",
                     "visibleIf": "{topic-choice} = 'Item 3'",
                     "title": "Rate this conversation's effect on your willingness to converse with others about the role of the U.S. government in healthcare",
@@ -804,7 +804,7 @@ var post_convo_survey_json = {
                         }]
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "bombing-willing-to-converse-likert-post",
                     "visibleIf": "{topic-choice} = 'Item 4'",
                     "title": "Rate this conversation's effect on your willingness to converse about the atomic bombings of Hiroshima and Nagasaki with others",
@@ -840,7 +840,7 @@ var post_convo_survey_json = {
                         }]
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "vaccines-willing-to-converse-likert-post",
                     "visibleIf": "{topic-choice} = 'Item 5'",
                     "title": "Rate this conversation's effect on your willingness to converse with others about mandating vaccines in the U.S.",
@@ -876,7 +876,7 @@ var post_convo_survey_json = {
                         }]
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "criminal-willing-to-converse-likert-post",
                     "visibleIf": "{topic-choice} = 'Item 6'",
                     "title": "Rate this conversation's effect on your willingness to converse with others about criminal justice reform in the U.S.",
@@ -912,7 +912,7 @@ var post_convo_survey_json = {
                         }]
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "same-sex-willing-to-converse-likert-post",
                     "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Rate this conversation's effect on your willingness to converse with others about same-sex marriage in the U.S.",

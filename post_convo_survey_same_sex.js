@@ -3,8 +3,7 @@ var post_convo_survey_same_sex = {
                 {
                     "type": "matrix",
                     "name": "same-sex-openmindedness",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
-                    "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements?",
+                    "title": "Regarding your experience conversing with the chat bot, how much do you agree or disagree with the following statements? Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -62,15 +61,13 @@ var post_convo_survey_same_sex = {
                 {
                     "type": "comment",
                     "name": "same-sex-free-response",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "After your conversation with the chat bot, do you feel more willing to have a conversation with others about same-sex marriage in the U.S.? Please freely reflect in the space below.",
                     "isRequired": false
                 },
                 {
-                    "type": "matrix",
+                    "type": "radiogroup",
                     "name": "same-sex-willing-to-converse-likert-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
-                    "title": "Rate this conversation's effect on your willingness to converse with others about same-sex marriage in the U.S.",
+                    "title": "Rate this conversation's effect on your willingness to converse with others about same-sex marriage in the U.S. Rate on the 7 point scale.",
                     "isRequired": false,
                     "choices": [
                         {
@@ -105,29 +102,25 @@ var post_convo_survey_same_sex = {
                 {
                     "type": "comment",
                     "name": "same-sex-what-affected-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on same-sex marriage in the U.S.?",
                     "isRequired": false
                 },
                 {
                     "type": "comment",
                     "name": "same-sex-new-perspective-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about same-sex marriage in the U.S.? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
                     "isRequired": false
                 },
                 {
                     "type": "comment",
                     "name": "same-sex-still-contributes-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "What still contributes to your willingness or unwillingness to converse with others about same-sex marriage in the U.S.? Please freely reflect in the space below.",
                     "isRequired": false
                 },
                 {
                     "type": "matrix",
                     "name": "same-sex-polarization1-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
-                    "title": "Please indicate whether you would support or oppose the following proposals about same-sex marriage",
+                    "title": "Please indicate whether you would support or oppose the following proposals about same-sex marriage. Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -190,8 +183,7 @@ var post_convo_survey_same_sex = {
                 {
                     "type": "matrix",
                     "name": "same-sex-polarization2-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
-                    "title": "How much do you agree or disagree with the following statements on same-sex marriage in the U.S.? ",
+                    "title": "How much do you agree or disagree with the following statements on same-sex marriage in the U.S.? Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -245,52 +237,44 @@ var post_convo_survey_same_sex = {
                 {
                     "type": "expression",
                     "name": "same-sex-slider1-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about same-sex marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
                 },
                 {
                     "type": "html",
                     "name": "same-sex-slider1-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about same-sex marriage in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
                     "html": '<div id="sliderOne"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
                     "name": "same-sex-slider2-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                 },
                 {
                     "type": "html",
                     "name": "same-sex-slider2-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                     "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
                     "name": "same-sex-slider3-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                 },
                 {
                     "type": "html",
                     "name": "same-sex-slider3-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                     "html": '<div id="sliderThree"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
                     "name": "same-sex-slider4-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                 },
                 {
                     "type": "html",
                     "name": "same-sex-slider4-post-placeholder",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
                     "html": '<div id="sliderFour"></div>' // Placeholder for the slider
                 },
@@ -298,8 +282,7 @@ var post_convo_survey_same_sex = {
                 {
                     "type": "matrix",
                     "name": "same-sex-reason-of-avoidance-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
-                    "title": "Imagine that you are asked to have a serious conversation about same-sex marriage in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation.",
+                    "title": "Imagine that you are asked to have a serious conversation about same-sex marriage in the U.S. with a group of people. Please rate how much each of the following reasons might make you less willing to participate in the conversation. Rate on the 7 point scale.",
                     "isRequired": false,
                     "columns": [
                         {
@@ -377,7 +360,6 @@ var post_convo_survey_same_sex = {
                 {
                     "type": "comment",
                     "name": "same-sex-other-willingness-post",
-                    "visibleIf": "{topic-choice} = 'Item 7'",
                     "title": "What else contributes to your willingness or unwillingness to converse with others about same-sex marriage in the U.S.? Please freely reflect in the space below.",
                     "isRequired": false
                 }]
