@@ -82,46 +82,44 @@
 
         /* slider constant */
         const initializePreSlider = (survey) => {
-            const sliderQuestions = new Set([
-                "euthanasia-slider1-placeholder",
-                "euthanasia-slider2-placeholder",
-                "euthanasia-slider3-placeholder",
-                "euthanasia-slider4-placeholder",
-                "gender-slider1-placeholder",
-                "gender-slider2-placeholder",
-                "gender-slider3-placeholder",
-                "gender-slider4-placeholder",
-                "healthcare-slider1-placeholder",
-                "healthcare-slider2-placeholder",
-                "healthcare-slider3-placeholder",
-                "healthcare-slider4-placeholder",
-                "bombing-slider1-placeholder",
-                "bombing-slider2-placeholder",
-                "bombing-slider3-placeholder",
-                "bombing-slider4-placeholder",
-                "vaccines-slider1-placeholder",
-                "vaccines-slider2-placeholder",
-                "vaccines-slider3-placeholder",
-                "vaccines-slider4-placeholder",
-                "criminal-slider1-placeholder",
-                "criminal-slider2-placeholder",
-                "criminal-slider3-placeholder",
-                "criminal-slider4-placeholder",
-                "same-sex-slider1-placeholder",
-                "same-sex-slider2-placeholder",
-                "same-sex-slider3-placeholder",
-                "same-sex-slider4-placeholder",
-            ]);
+            // const sliderQuestions = new Set([
+            //     "euthanasia-slider1-placeholder",
+            //     "euthanasia-slider2-placeholder",
+            //     "euthanasia-slider3-placeholder",
+            //     "euthanasia-slider4-placeholder",
+            //     "gender-slider1-placeholder",
+            //     "gender-slider2-placeholder",
+            //     "gender-slider3-placeholder",
+            //     "gender-slider4-placeholder",
+            //     "healthcare-slider1-placeholder",
+            //     "healthcare-slider2-placeholder",
+            //     "healthcare-slider3-placeholder",
+            //     "healthcare-slider4-placeholder",
+            //     "bombing-slider1-placeholder",
+            //     "bombing-slider2-placeholder",
+            //     "bombing-slider3-placeholder",
+            //     "bombing-slider4-placeholder",
+            //     "vaccines-slider1-placeholder",
+            //     "vaccines-slider2-placeholder",
+            //     "vaccines-slider3-placeholder",
+            //     "vaccines-slider4-placeholder",
+            //     "criminal-slider1-placeholder",
+            //     "criminal-slider2-placeholder",
+            //     "criminal-slider3-placeholder",
+            //     "criminal-slider4-placeholder",
+            //     "same-sex-slider1-placeholder",
+            //     "same-sex-slider2-placeholder",
+            //     "same-sex-slider3-placeholder",
+            //     "same-sex-slider4-placeholder",
+            // ]);
 
             survey.onAfterRenderQuestion.add(function (survey, options) {
-                // const result = regex.exec(options.questions.name);
                 const name = options.question.name;
-                // console.log(optios.question.sliderID);
-                // if (options.question.sliderID !== ""){
-                console.log(name);
-                if (sliderQuestions.has(name)) {
+
+                // if (sliderQuestions.has(name)) {
+                if (name.includes("-placeholder")) {
+
                     var slider = document.getElementById(name);
-                    console.log(slider);
                     noUiSlider.create(slider, {
                         start: [50],
                         range: {
