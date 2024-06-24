@@ -248,7 +248,7 @@ var post_convo_survey_gender = {
                     "type": "html",
                     "name": "gender-slider1-post-placeholder",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about gender inequality in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-                    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+                    "html": '<div id="gender-slider1-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
@@ -259,7 +259,7 @@ var post_convo_survey_gender = {
                     "type": "html",
                     "name": "gender-slider2-post-placeholder",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-                    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+                    "html": '<div id="gender-slider2-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
@@ -270,7 +270,7 @@ var post_convo_survey_gender = {
                     "type": "html",
                     "name": "gender-slider3-post-placeholder",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-                    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+                    "html": '<div id="gender-slider3-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
@@ -281,7 +281,7 @@ var post_convo_survey_gender = {
                     "type": "html",
                     "name": "gender-slider4-post-placeholder",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in gender inequality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-                    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+                    "html": '<div id="gender-slider4-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "matrix",

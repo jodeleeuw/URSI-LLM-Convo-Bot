@@ -253,7 +253,7 @@ var post_convo_survey_criminal = {
                     "name": "criminal-slider1-post-placeholder",
                      
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about criminal justice reform in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-                    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+                    "html": '<div id="criminal-slider1-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
@@ -266,7 +266,7 @@ var post_convo_survey_criminal = {
                     "name": "criminal-slider2-post-placeholder",
                      
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-                    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+                    "html": '<div id="criminal-slider2-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
@@ -279,7 +279,7 @@ var post_convo_survey_criminal = {
                     "name": "criminal-slider3-post-placeholder",
                      
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-                    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+                    "html": '<div id="criminal-slider3-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
@@ -292,7 +292,7 @@ var post_convo_survey_criminal = {
                     "name": "criminal-slider4-post-placeholder",
                      
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in criminal justice reform in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-                    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+                    "html": '<div id="criminal-slider4-post-placeholder"></div>' // Placeholder for the slider
                 },
 
                 {

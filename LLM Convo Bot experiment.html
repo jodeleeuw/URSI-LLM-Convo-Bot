@@ -228,8 +228,29 @@
         };
         timeline.push(convo_complete);
 
-        
-        /* slider constant for post-convo survey */
+        const initializePostSlider = (survey) => {
+            survey.onAfterRenderQuestion.add(function (survey, options) {
+                const name = options.question.name;
+                
+                if (name.includes("-placeholder")) {
+
+                    var slider = document.getElementById(name);
+                    noUiSlider.create(slider, {
+                        start: [50],
+                        range: {
+                            min: 0,
+                            max: 100,
+                        },
+                        step: 1,
+                        tooltips: true,
+                    });
+                    slider.noUiSlider.on("set", function () {
+                        options.question.value = slider.noUiSlider.get();
+                    });
+                }
+            });
+        };
+        /* slider constant for post-convo survey
         const initializePostSlider = (survey) => {
             const sliderQuestions = [
                 "sliderFive",
@@ -256,16 +277,8 @@
                 }
             });
         };
-
-        /*
-        const post_convo_survey_trial = {
-            type: jsPsychSurvey,
-            survey_json: post_convo_survey_json,
-            survey_function: initializePostSlider,
-        };
-        timeline.push(post_convo_survey_trial);
-
         */
+
 
         //PARTY SPECIFIC POST CHAT SURVEYS 
 

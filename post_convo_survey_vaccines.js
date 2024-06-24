@@ -225,7 +225,7 @@ var post_convo_survey_vaccines = {
                     "type": "html",
                     "name": "vaccines-slider1-post-placeholder",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about mandating vaccines in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
-                    "html": '<div id="sliderOne"></div>' // Placeholder for the slider
+                    "html": '<div id="vaccines-slider1-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
@@ -236,7 +236,7 @@ var post_convo_survey_vaccines = {
                     "type": "html",
                     "name": "vaccines-slider2-post-placeholder",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-                    "html": '<div id="sliderTwo"></div>' // Placeholder for the slider
+                    "html": '<div id="vaccines-slider2-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
@@ -247,7 +247,7 @@ var post_convo_survey_vaccines = {
                     "type": "html",
                     "name": "vaccines-slider3-post-placeholder",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-                    "html": '<div id="sliderThree"></div>' // Placeholder for the slider
+                    "html": '<div id="vaccines-slider3-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "expression",
@@ -258,7 +258,7 @@ var post_convo_survey_vaccines = {
                     "type": "html",
                     "name": "vaccines-slider4-post-placeholder",
                     "title": "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in mandating vaccines in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
-                    "html": '<div id="sliderFour"></div>' // Placeholder for the slider
+                    "html": '<div id="vaccines-slider4-post-placeholder"></div>' // Placeholder for the slider
                 },
                 {
                     "type": "matrix",
