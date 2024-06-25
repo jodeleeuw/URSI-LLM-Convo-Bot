@@ -3,15 +3,14 @@
 
 <head>
     <title>URSI LLM Convo Bot Experiment</title>
-    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.3"></script>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.1"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/jspsych@7.3.4"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.3"></script>
     <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
     <script src="pre_convo_survey_json.js"></script>
     <script src="post_convo_survey_json.js"></script>
     <script src="post_convo_survey_republican.js"></script>
@@ -29,8 +28,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css" />
     <link href="https://unpkg.com/browse/nouislider@15.8.0/package.json" />
-    <!-- <link href="nouislider.min.css" rel="stylesheet" /> -->
-    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
     <style>
         /* slider format */
         .slider {
@@ -45,10 +42,12 @@
     <script>
         /* initialize jsPsych */
         var jsPsych = initJsPsych({
+            show_progress_bar: true, //want to show a progress bar for users because they aren't aware of how many pages they'll be shown in the post-convo phase and we can't manually number the pages because the number of pages varies dependending on whether they are registered as independent and whether they are experimental or control group
             on_finish: function () {
                 jsPsych.data.displayData();
             },
         });
+
 
         const subject_id = jsPsych.randomization.randomID(10);
         const filename = `${subject_id}.csv`;
@@ -80,7 +79,7 @@
         /* pre-chat survey with different topic options implemented via SurveyJS */
         // TURN ALL ISREQUIRED: FALSE TO :TRUE BEFORE POSTING EXPERIMENT. IT IS TURNED TO FALSE FOR CONVENIENCE OF TESTING RIGHT NOW
 
-        /* slider constant */
+        /* slider constant for pre-convo survey */
         const initializePreSlider = (survey) => {
             // const sliderQuestions = new Set([
             //     "euthanasia-slider1-placeholder",
@@ -136,6 +135,36 @@
             });
         };
 
+        //creating function that extracts rows for which the rating is either column 1 or column 7
+        let surveyResponses = [];
+
+        function extractRelevantRows(responses) {
+            let relevantRows = [];
+            // Assuming each response is an object with question names as keys
+            // and arrays of responses as values
+            for (let row in responses) {
+                let columnValue = responses[row];
+
+                // Check if the column value is "Column 1" or "Column 7"
+                if (columnValue === "Column 1" || columnValue === "Column 7") {
+                    relevantRows.push({ row, columnValue });
+                    break;
+                } else if (columnValue === "Column 2" || columnValue === "Column 6") {
+                    relevantRows.push({ row, columnValue });
+                    break;
+                } else if
+                    (columnValue === "Column 3" || columnValue === "Column 5") {
+                    relevantRows.push({ row, columnValue });
+                    break;
+                } else if (columnValue === "Column 4") {
+                    relevantRows.push({ row, columnValue });
+                    break;
+                }
+            }
+
+            return relevantRows;
+        }
+
         /* pushing survey in timeline with both slider and non-slider questions */
         const pre_convo_survey_trial = {
             type: jsPsychSurvey,
@@ -145,8 +174,40 @@
                 phase: "pre-convo-survey",
             },
             on_finish: (data) => {
+                // debugging line
+                console.log('Pre-convo survey data:', data);
+                // for post-survey party questions
                 data.response["political-affiliation"];
-            },
+                // extract issue-specific polarization survey responses from the data object
+                // need to iterate through the possible questions
+                // first, create a constant that lists the possible questions
+                const possibleQuestions = [
+                    "euthanasia-polarization",
+                    "gender-polarization",
+                    "healthcare-polarization",
+                    "bombing-polarization",
+                    "vaccines-polarization",
+                    "criminal-polarization",
+                    "same-sex-polarization"
+                ];
+                // then extract and process each row's responses
+                possibleQuestions.forEach(row => {
+                    let surveyResponses = data.response[row];
+                    if (surveyResponses) {
+                        console.log('Survey responses', surveyResponses);  // Debugging line
+                        // extract relevant rows
+                        let relevantRows = extractRelevantRows(surveyResponses);
+                        console.log('Relevant rows', relevantRows);  // Debugging line
+                        relevantRows.forEach(rowObj => {
+                            let rowAsString = rowObj.row.toString();
+                            console.log('Row as string:', rowAsString);  // Debugging line
+                            // Now you can use rowAsString as needed
+                        });
+                    } else {
+                        console.log('No responses');  // Debugging line
+                    };
+                });
+            }
         };
         timeline.push(pre_convo_survey_trial);
 
@@ -221,17 +282,18 @@
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
         <p> You have completed the conversation! Feel free to take a short break. <p>
-        <p> Before you return to Prolific, please complete a post-conversation questionnaire. <p> 
+        <p> Before you return to Prolific, please complete a post-conversation questionnaire. <p>
         <p> Press any key to proceed to the questionnaire.  <p>
       `,
             post_trial_gap: 1000,
         };
         timeline.push(convo_complete);
 
+
         const initializePostSlider = (survey) => {
             survey.onAfterRenderQuestion.add(function (survey, options) {
                 const name = options.question.name;
-                
+
                 if (name.includes("-placeholder")) {
 
                     var slider = document.getElementById(name);
@@ -250,34 +312,6 @@
                 }
             });
         };
-        /* slider constant for post-convo survey
-        const initializePostSlider = (survey) => {
-            const sliderQuestions = [
-                "sliderFive",
-                "sliderSix",
-                "sliderSeven",
-                "sliderEight",
-            ]; // use this as array to keep track of slider questions
-
-            survey.onAfterRenderQuestion.add(function (survey, options) {
-                if (sliderQuestions.includes(options.question.name)) {
-                    var slider = document.getElementById(options.question.name);
-                    noUiSlider.create(slider, {
-                        start: [50],
-                        range: {
-                            min: 0,
-                            max: 100,
-                        },
-                        step: 1,
-                        tooltips: true,
-                    });
-                    slider.noUiSlider.on("set", function () {
-                        options.question.value = slider.noUiSlider.get();
-                    });
-                }
-            });
-        };
-        */
 
 
         //PARTY SPECIFIC POST CHAT SURVEYS 
@@ -286,7 +320,7 @@
             timeline: [
                 {
                     type: jsPsychSurvey,
-                    survey_json: post_convo_survey_republican,
+                    survey_json: post_convo_survey_republican
                 }
             ],
             conditional_function: () => {
@@ -323,7 +357,7 @@
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_democrat,
-               
+
                 }
             ],
             conditional_function: () => {
@@ -334,6 +368,7 @@
             },
         };
         timeline.push(neutral_survey);
+
 
         var other_survey = {
             timeline: [
@@ -410,8 +445,6 @@
         };
         timeline.push(healthcare_post_survey);
 
-
-
         var bombing_post_survey = {
             timeline: [
                 {
@@ -483,10 +516,10 @@
         timeline.push(same_sex_post_survey);
 
         var last_question = {
-                    type: jsPsychSurvey,
-                    survey_json: experimental_group_last_question,
-                    survey_function: initializePostSlider,
-                };
+            type: jsPsychSurvey,
+            survey_json: experimental_group_last_question,
+            survey_function: initializePostSlider,
+        };
         timeline.push(last_question);
 
 
