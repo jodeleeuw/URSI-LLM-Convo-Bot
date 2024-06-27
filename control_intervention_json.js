@@ -1,7 +1,7 @@
-var control_free_response_question_json = {
+var control_intervention_json = {
     elements: [{
                     "type": "comment",
                     "name": "control-free-response",
-                    "title": "Please freely reflect in the space below on the statement: <relevantRow>",
-                    "isRequired": false
+                    "title": 'Please freely reflect for at least three minutes in the space below on the following statement: relevantRowString ${relevantRowString}',
+                    "isRequired": false,
     }]}

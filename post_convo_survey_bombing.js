@@ -324,8 +324,20 @@ var post_convo_survey_bombing = {
                 },
                 {
                     "type": "comment",
-                    "name": "bombing-other-willingness-post",
-                    "title": "What else contributes to your willingness or unwillingness to converse with others about the atomic bombings of Hiroshima and Nagasaki? Please freely reflect in the space below.",
+                    "name": "bombings-other-willingness-post",
+                    "title": "What still contributes to your willingness or unwillingness to converse with others about the atomic bombings of Hiroshima and Nagasaki? Please freely reflect in the space below.",
+                    "isRequired": false
+                },
+                {
+                    "type": "comment",
+                    "name": "bombings-convo-effect-on-willingness-post",
+                    "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views the atomic bombings of Hiroshima and Nagasaki? What made you feel like the conversation was or was not productive?",
+                    "isRequired": false
+                },
+                {
+                    "type": "comment",
+                    "name": "bombings-convo-effect-on-perspectives-post",
+                    "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about the atomic bombings of Hiroshima and Nagasaki? If so, what occurred in these moments?",
                     "isRequired": false
                 }]
         };

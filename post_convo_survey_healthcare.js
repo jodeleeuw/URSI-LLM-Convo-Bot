@@ -361,11 +361,22 @@ var post_convo_survey_healthcare = {
                         },
                     ]
                 },
-
                 {
                     "type": "comment",
                     "name": "healthcare-other-willingness-post",
-                    "title": "What else contributes to your willingness or unwillingness to converse with others about the role of the U.S. government in healthcare? Please freely reflect in the space below.",
+                    "title": "What still contributes to your willingness or unwillingness to converse with others about the role of the U.S. government in healthcare? Please freely reflect in the space below.",
+                    "isRequired": false
+                },
+                {
+                    "type": "comment",
+                    "name": "healthcare-convo-effect-on-willingness-post",
+                    "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on the role of the U.S. government in healthcare? What made you feel like the conversation was or was not productive?",
+                    "isRequired": false
+                },
+                {
+                    "type": "comment",
+                    "name": "healthcare-convo-effect-on-perspectives-post",
+                    "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about the role of the U.S. government in healthcare? If so, what occurred in these moments?",
                     "isRequired": false
                 },]
         };

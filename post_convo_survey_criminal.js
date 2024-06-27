@@ -377,8 +377,19 @@ var post_convo_survey_criminal = {
                 {
                     "type": "comment",
                     "name": "criminal-other-willingness-post",
-                     
-                    "title": "What else contributes to your willingness or unwillingness to converse with others about criminal justice reform in the U.S.? Please freely reflect in the space below.",
+                    "title": "What still contributes to your willingness or unwillingness to converse with others about criminal justice reform in the U.S.? Please freely reflect in the space below.",
+                    "isRequired": false
+                },
+                {
+                    "type": "comment",
+                    "name": "criminal-convo-effect-on-willingness-post",
+                    "title": "What parts of this conversation, if any, affected your willingness to talk with someone who has different views on criminal justice reform in the U.S.? What made you feel like the conversation was or was not productive?",
+                    "isRequired": false
+                },
+                {
+                    "type": "comment",
+                    "name": "criminal-convo-effect-on-perspectives-post",
+                    "title": "Throughout this conversation, were there any moments that opened you up to a new perspective about criminal justice reform in the U.S.? If so, what occurred in these moments?",
                     "isRequired": false
                 },
             ]

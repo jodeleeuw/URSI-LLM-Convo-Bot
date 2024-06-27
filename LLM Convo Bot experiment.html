@@ -3,31 +3,38 @@
 
 <head>
     <title>URSI LLM Convo Bot Experiment</title>
-    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <script src="https://unpkg.com/jspsych@7.3.4"></script> <!-- jsPsych library -->
     <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
-    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.1"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- jsPsych library -->
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.1"></script> <!-- for data pipe -->
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script> <!-- condition assignment using data pipe -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script> <!--  -->
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script> <!--  -->
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
-    <script src="pre_convo_survey_json.js"></script>
-    <script src="post_convo_survey_json.js"></script>
-    <script src="post_convo_survey_republican.js"></script>
-    <script src="post_convo_survey_democrat.js"></script>
-    <script src="post_convo_survey_euthanasia.js"></script>
-    <script src="post_convo_survey_healthcare.js"></script>
-    <script src="post_convo_survey_vaccines.js"></script>
-    <script src="post_convo_survey_bombing.js"></script>
-    <script src="post_convo_survey_gender.js"></script>
-    <script src="post_convo_survey_same_sex.js"></script>
-    <script src="post_convo_survey_criminal.js"></script>
-    <script src="experimental_group_last_question.js"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
+    <!-- for instructions and breaks -->
+    <script src="control_intervention_json.js"></script> <!-- survey -->
+    <script src="pre_convo_survey_json.js"></script> <!-- survey -->
+    <script src="post_convo_survey_json.js"></script> <!-- survey -->
+    <script src="post_convo_survey_republican.js"></script> <!-- survey -->
+    <script src="post_convo_survey_democrat.js"></script> <!-- survey -->
+    <script src="post_convo_survey_euthanasia.js"></script> <!-- survey -->
+    <script src="post_convo_survey_healthcare.js"></script> <!-- survey -->
+    <script src="post_convo_survey_vaccines.js"></script> <!-- survey -->
+    <script src="post_convo_survey_bombing.js"></script> <!-- survey -->
+    <script src="post_convo_survey_gender.js"></script> <!-- survey -->
+    <script src="post_convo_survey_same_sex.js"></script> <!-- survey -->
+    <script src="post_convo_survey_criminal.js"></script> <!-- survey -->
+    <script src="experimental_group_last_question.js"></script> <!-- survey -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
+    <!-- for slider questions -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
+    <!-- for slider questions -->
+    <link href="https://unpkg.com/browse/nouislider@15.8.0/package.json" /> <!-- for slider questions -->
+    <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.3"></script> <!-- for slider questions -->
     <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css" />
-    <link href="https://unpkg.com/browse/nouislider@15.8.0/package.json" />
+    <!-- for plugging in survey jsons -->
+    <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script> <!-- for plugging in survey jsons -->
+    <!-- <script src="js/serverComm.js" type="text/javascript"></script> <!-- for condition assignment -->
     <style>
         /* slider format */
         .slider {
@@ -40,27 +47,48 @@
 
 <body>
     <script>
+
+/// PRIOR TO LAUNCHING PILOT ADD JSPSYCH PIPE IN THE ASYNC FUNCTION AND CHANGE ALL JSON ISREQUIREDS TO TRUE 
+
+
+
         /* initialize jsPsych */
         var jsPsych = initJsPsych({
-            show_progress_bar: true, //want to show a progress bar for users because they aren't aware of how many pages they'll be shown in the post-convo phase and we can't manually number the pages because the number of pages varies dependending on whether they are registered as independent and whether they are experimental or control group
+            // PROGRESS BAR DOESN'T WORK!!!!!!!   show_progress_bar: true, //want to show a progress bar for users because they aren't aware of how many pages they'll be shown in the post-convo phase and we can't manually number the pages because the number of pages varies dependending on whether they are registered as independent and whether they are experimental or control group
             on_finish: function () {
                 jsPsych.data.displayData();
             },
         });
 
+        // timelines for conditions
+        var counter_timeline = [];
+        var crux_timeline = [];
+        var empathy_timeline = [];
+        var control_timeline = [];
 
+        var timeline = [];
+        // condition assignment 
+        async function createExperiment() {
+            const condition = 3 //await jsPsychPipe.getCondition("P09AXWX5b5t6"); 
+            if (condition == 0) { timeline = counter_timeline; }
+            if (condition == 1) { timeline = crux_timeline; }
+            if (condition == 2) { timeline = empathy_timeline; }
+            if (condition == 3) { timeline = control_timeline; }
+
+            jsPsych.run(timeline);
+        }
+        createExperiment();
+
+        // setting subject_id and filename for confidential data analysis 
         const subject_id = jsPsych.randomization.randomID(10);
         const filename = `${subject_id}.csv`;
-
-        /* create timeline */
-        var timeline = [];
 
         /*  welcome message  */
         var welcome = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: "Welcome to the experiment. Press any key to begin.",
         };
-        timeline.push(welcome);
+    //    timeline.push(welcome);
 
         /* brief instructions */
         var instructions = {
@@ -74,7 +102,7 @@
   `,
             post_trial_gap: 500,
         };
-        timeline.push(instructions);
+    //    timeline.push(instructions);
 
         /* pre-chat survey with different topic options implemented via SurveyJS */
         // TURN ALL ISREQUIRED: FALSE TO :TRUE BEFORE POSTING EXPERIMENT. IT IS TURNED TO FALSE FOR CONVENIENCE OF TESTING RIGHT NOW
@@ -138,8 +166,8 @@
         //creating function that extracts rows for which the rating is either column 1 or column 7
         let surveyResponses = [];
 
-        function extractRelevantRows(responses) {
-            let relevantRows = [];
+        function extractrelevantRow(responses) {
+            let relevantRow = [];
             // Assuming each response is an object with question names as keys
             // and arrays of responses as values
             for (let row in responses) {
@@ -147,22 +175,23 @@
 
                 // Check if the column value is "Column 1" or "Column 7"
                 if (columnValue === "Column 1" || columnValue === "Column 7") {
-                    relevantRows.push({ row, columnValue });
+                    //let relevantRow = row.toString()
+                    relevantRow.push({ row });
                     break;
                 } else if (columnValue === "Column 2" || columnValue === "Column 6") {
-                    relevantRows.push({ row, columnValue });
+                    relevantRow.push({ row });
                     break;
                 } else if
                     (columnValue === "Column 3" || columnValue === "Column 5") {
-                    relevantRows.push({ row, columnValue });
+                    relevantRow.push({ row });
                     break;
                 } else if (columnValue === "Column 4") {
-                    relevantRows.push({ row, columnValue });
+                    relevantRow.push({ row });
                     break;
                 }
             }
 
-            return relevantRows;
+            return relevantRow;
         }
 
         /* pushing survey in timeline with both slider and non-slider questions */
@@ -196,20 +225,27 @@
                     if (surveyResponses) {
                         console.log('Survey responses', surveyResponses);  // Debugging line
                         // extract relevant rows
-                        let relevantRows = extractRelevantRows(surveyResponses);
-                        console.log('Relevant rows', relevantRows);  // Debugging line
-                        relevantRows.forEach(rowObj => {
-                            let rowAsString = rowObj.row.toString();
-                            console.log('Row as string:', rowAsString);  // Debugging line
-                            // Now you can use rowAsString as needed
+                        let relevantRow = extractrelevantRow(surveyResponses);
+                        console.log('Relevant rows', relevantRow);  // Debugging line
+
+                        // relevantRow.forEach(rowObj => {
+                        //     let rowAsString = rowObj.row.toString();
+                        //     console.log('Row as string:', rowAsString);  // Debugging line
+                        // });
+
+                        // convert relevant row into a string so we can feed it into chat later
+                        relevantRow.forEach(rowObj => {
+                            let rowAsString = JSON.stringify(rowObj);
+                            console.log('Row as string:', rowAsString);
                         });
+
                     } else {
                         console.log('No responses');  // Debugging line
                     };
                 });
             }
         };
-        timeline.push(pre_convo_survey_trial);
+       // timeline.push(pre_convo_survey_trial);
 
         /* break inbetween pre-convo survey and conversation */
         var pre_convo_break = {
@@ -219,66 +255,18 @@
         <p> Feel free to take a short break if needed. <p> 
         <p> Press any key when you are ready to begin with the conversation. <p>
       `,
-            post_trial_gap: 1000, //what does this do?
+            post_trial_gap: 1000,
         };
-        timeline.push(pre_convo_break);
+      //  timeline.push(pre_convo_break);
 
-        // RANDOM ASSIGNMENT TO EXPERIMENTAL OR CONTROL GROUP, WITH MAX CAPS ON EACH GROUP
-        // Defining experimental group timeline (chatbot) and control group timeline (free response textbox)
-        // var timeline1 = {chat_bot};  // Experimental group
-        // var timeline2 = {control_free_response};  // Control group
 
-        // var timeline1Count = 0;
-        // var timeline2Count = 0;
 
-        // var maxParticipantsPerTimeline = 100; // Number should be half of our intended sample size
-
-        // var assignTimeline = function() {
-        //     if (timeline1Count < maxParticipantsPerTimeline && timeline2Count < maxParticipantsPerTimeline) {
-        //         // Randomly assign until max reached for either timeline
-        //         if (Math.random() < 0.5) { // Pick a random number from 0 to 1, and if it's less than 0.5, pick timeline 1
-        //             timeline1Count++; // Increase the timeline 1 count by 1
-        //             return timeline1; // Pick timeline 1
-        //         } else {  // If the random number is 0.5 or greater, pick timeline 2
-        //             timeline2Count++; // Increase timeline 2 count by 1
-        //             return timeline2; // Pick timeline 2
-        //         }   } else if (timeline1Count == maxParticipantsPerTimeline) {
-        //         // Assign to timeline1 if timeline2 is full
-        //         timeline2Count++;
-        //         return timeline2;
-        //     } else if (timeline2Count == maxParticipantsPerTimeline) {
-        //         // Assign to timeline2 if timeline1 is full
-        //         timeline1Count++;
-        //         return timeline1;
-        //     } else {
-        //         // To see if something went wrong while we check the code
-        //         throw new Error("Both timelines are full!");
-        //     }
-        // };
-
-        // var chat_bot = {
-        //             type: jsPsychHtmlKeyboardResponse,
-        //             stimulus: `
-        //         <p> typing random stuff to test whether the randomization thing works. <p>
-        //       `,
-        //             post_trial_gap: 1000
-        //         };
-        //         timeline.push(chat_bot);
-
-        // var control_free_response = {
-        //             type: jsPsychHtmlKeyboardResponse,
-        //             stimulus: `
-        //         <p> typing MORE random stuff to test whether the randomization thing works. <p>
-        //       `,
-        //             post_trial_gap: 1000
-        //         };
-        //         timeline.push(control_free_response);
-        //         /* define post-chatinstructions, add post-chat survey */
+        /* define post-chatinstructions, add post-chat survey */
 
         /* post-convo message and break before questionnaire */
         let polaffiliation = "UNIDENTIFIED";
 
-        var convo_complete = {
+        var post_convo_break = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
         <p> You have completed the conversation! Feel free to take a short break. <p>
@@ -287,7 +275,7 @@
       `,
             post_trial_gap: 1000,
         };
-        timeline.push(convo_complete);
+      //  timeline.push(post_convo_break);
 
 
         const initializePostSlider = (survey) => {
@@ -313,8 +301,46 @@
             });
         };
 
+        // placeholder interventions 
 
-        //PARTY SPECIFIC POST CHAT SURVEYS 
+        var counter_bot = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> counter bot stimulus <p>
+      `,
+            post_trial_gap: 1000,
+
+        }
+
+        var crux_bot = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> crux bot stimulus <p>
+      `,
+            post_trial_gap: 1000,
+
+        }
+
+        var empathy_bot = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> empathy bot stimulus <p>
+      `,
+            post_trial_gap: 1000,
+
+        }
+
+        var control_intervention = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> control interventionstimulus <p>
+      `,
+          //  lifetime: 10,
+            post_trial_gap: 1000,
+
+        }
+
+        // PARTY SPECIFIC POST CHAT SURVEYS 
 
         var republican_survey = {
             timeline: [
@@ -330,7 +356,7 @@
                 );
             },
         };
-        timeline.push(republican_survey);
+       // timeline.push(republican_survey);
 
         var democrat_survey = {
             timeline: [
@@ -346,7 +372,7 @@
                 );
             },
         };
-        timeline.push(democrat_survey);
+      //  timeline.push(democrat_survey);
 
         var neutral_survey = {
             timeline: [
@@ -367,7 +393,7 @@
                 );
             },
         };
-        timeline.push(neutral_survey);
+     //   timeline.push(neutral_survey);
 
 
         var other_survey = {
@@ -389,11 +415,11 @@
                 );
             },
         };
-        timeline.push(other_survey);
+      //  timeline.push(other_survey);
 
         //TOPIC SPECIFIC POST CHAT SURVEY
 
-        var euthanasia_survey = {
+        var euthanasia_post_survey = {
             timeline: [
                 {
                     type: jsPsychSurvey,
@@ -408,9 +434,9 @@
                 );
             },
         };
-        timeline.push(euthanasia_survey);
+      //  timeline.push(euthanasia_post_survey);
 
-        var gender_survey = {
+        var gender_post_survey = {
             timeline: [
                 {
                     type: jsPsychSurvey,
@@ -425,7 +451,7 @@
                 );
             },
         };
-        timeline.push(gender_survey);
+      //  timeline.push(gender_post_survey);
 
 
         var healthcare_post_survey = {
@@ -443,9 +469,9 @@
                 );
             },
         };
-        timeline.push(healthcare_post_survey);
+      //  timeline.push(healthcare_post_survey);
 
-        var bombing_post_survey = {
+        var bombings_post_survey = {
             timeline: [
                 {
                     type: jsPsychSurvey,
@@ -460,7 +486,7 @@
                 );
             },
         };
-        timeline.push(bombing_post_survey);
+      //  timeline.push(bombings_post_survey);
 
         var vaccines_post_survey = {
             timeline: [
@@ -477,7 +503,7 @@
                 );
             },
         };
-        timeline.push(vaccines_post_survey);
+      //  timeline.push(vaccines_post_survey);
 
 
         var criminal_post_survey = {
@@ -495,7 +521,7 @@
                 );
             },
         };
-        timeline.push(criminal_post_survey);
+     //   timeline.push(criminal_post_survey);
 
 
         var same_sex_post_survey = {
@@ -513,22 +539,102 @@
                 );
             },
         };
-        timeline.push(same_sex_post_survey);
+      //  timeline.push(same_sex_post_survey);
 
         var last_question = {
             type: jsPsychSurvey,
             survey_json: experimental_group_last_question,
             survey_function: initializePostSlider,
         };
-        timeline.push(last_question);
+      //  timeline.push(last_question);
 
+
+      counter_timeline.push(
+            welcome,
+            instructions,
+            pre_convo_survey_trial,
+            pre_convo_break,
+            counter_bot,
+            post_convo_break,
+            republican_survey,
+            democrat_survey,
+            neutral_survey,
+            other_survey,
+            euthanasia_post_survey,
+            gender_post_survey,
+            healthcare_post_survey,
+            bombings_post_survey,
+            vaccines_post_survey,
+            criminal_post_survey,
+            same_sex_post_survey,
+            last_question)
+
+        crux_timeline.push(
+            welcome,
+            instructions,
+            pre_convo_survey_trial,
+            pre_convo_break,
+            crux_bot,
+            post_convo_break,
+            republican_survey,
+            democrat_survey,
+            neutral_survey,
+            other_survey,
+            euthanasia_post_survey,
+            gender_post_survey,
+            healthcare_post_survey,
+            bombings_post_survey,
+            vaccines_post_survey,
+            criminal_post_survey,
+            same_sex_post_survey,
+            last_question)
+
+        empathy_timeline.push(
+            welcome,
+            instructions,
+            pre_convo_survey_trial,
+            pre_convo_break,
+            empathy_bot,
+            post_convo_break,
+            republican_survey,
+            democrat_survey,
+            neutral_survey,
+            other_survey,
+            euthanasia_post_survey,
+            gender_post_survey,
+            healthcare_post_survey,
+            bombings_post_survey,
+            vaccines_post_survey,
+            criminal_post_survey,
+            same_sex_post_survey,
+            last_question)
+
+        control_timeline.push(
+            //welcome,
+            //instructions,
+            //pre_convo_survey_trial,
+            pre_convo_break,
+            control_intervention,
+            post_convo_break,
+            //republican_survey,
+            //democrat_survey,
+            //neutral_survey,
+            // other_survey,
+            // euthanasia_post_survey,
+            // gender_post_survey,
+            // healthcare_post_survey,
+            // bombings_post_survey,
+            // vaccines_post_survey,
+            // criminal_post_survey,
+            // same_sex_post_survey
+            )
 
         const save_data = {
             type: jsPsychPipe,
             action: "save",
-            experiment_id: "desVih9f2BAf", //is that the id we want??
+            experiment_id: "P09AXWX5b5t6",
             filename: filename,
-            data_string: () => jsPsych.data.get().csv(),
+            data_string: () => jsPsych.data.get().csv()
         };
 
         /* redirect to Prolific experiment page NEED TO INSERT CORRECT LINK */
