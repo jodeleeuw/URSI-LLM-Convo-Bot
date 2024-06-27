@@ -48,8 +48,7 @@
 <body>
     <script>
 
-/// PRIOR TO LAUNCHING PILOT ADD JSPSYCH PIPE IN THE ASYNC FUNCTION AND CHANGE ALL JSON ISREQUIREDS TO TRUE 
-
+        /// PRIOR TO LAUNCHING PILOT ADD JSPSYCH PIPE IN THE ASYNC FUNCTION AND CHANGE ALL JSON ISREQUIREDS TO TRUE 
 
 
         /* initialize jsPsych */
@@ -69,7 +68,7 @@
         var timeline = [];
         // condition assignment 
         async function createExperiment() {
-            const condition = 3 //await jsPsychPipe.getCondition("P09AXWX5b5t6"); 
+            const condition = 0 //await jsPsychPipe.getCondition("P09AXWX5b5t6"); 
             if (condition == 0) { timeline = counter_timeline; }
             if (condition == 1) { timeline = crux_timeline; }
             if (condition == 2) { timeline = empathy_timeline; }
@@ -86,23 +85,37 @@
         /*  welcome message  */
         var welcome = {
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: "Welcome to the experiment. Press any key to begin.",
+            stimulus: "Welcome to the experiment! Press any key to begin.",
         };
-    //    timeline.push(welcome);
+        //    timeline.push(welcome);
 
-        /* brief instructions */
-        var instructions = {
+        /* brief instructions for people in convo timelines */
+        var preliminary_convo_instructions = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
-    <p> In this experiment, you will have a short conversation with a chat bot about a disputed topic in America. </p>
-    <p> Before you chat with the bot, there is a questionnaire for you to fill out. </p>
+    <p> In this experiment, you will have a short conversation with an AI chatbot about a disputed topic in America. </p>
+    <p> Before you chat with the bot, there is a survey for you to fill out. </p>
     <div style='width: 700px;'>
     </div>
     <p>Press any key to proceed to the questionnaire. </p>
   `,
             post_trial_gap: 500,
         };
-    //    timeline.push(instructions);
+        //    timeline.push(preliminary_convo_instructions);
+
+        /* brief instructions for people in control timeline */
+        var preliminary_control_instructions = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+    <p> In this experiment, you will be asked to freely reflect on a disputed topic in America. </p>
+    <p> Before this reflection, there is a survey for you to fill out. </p>
+    <div style='width: 700px;'>
+    </div>
+    <p>Press any key to proceed to the questionnaire. </p>
+  `,
+            post_trial_gap: 500,
+        };
+        //    timeline.push(preliminary_convo_instructions);
 
         /* pre-chat survey with different topic options implemented via SurveyJS */
         // TURN ALL ISREQUIRED: FALSE TO :TRUE BEFORE POSTING EXPERIMENT. IT IS TURNED TO FALSE FOR CONVENIENCE OF TESTING RIGHT NOW
@@ -245,20 +258,43 @@
                 });
             }
         };
-       // timeline.push(pre_convo_survey_trial);
+        // timeline.push(pre_convo_survey_trial);
 
-        /* break inbetween pre-convo survey and conversation */
-        var pre_convo_break = {
+
+        /* break inbetween pre-intervention survey and counter_bot conversation */
+        var pre_bot_instructions_break = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
-        <p> You have now completed the pre-conversation questionnaire. <p>
-        <p> Feel free to take a short break if needed. <p> 
-        <p> Press any key when you are ready to begin with the conversation. <p>
+        <p> You have now completed the pre-conversation questionnaire. </p>
+        <p> Feel free to take a short break if needed. </p>
+        <p> Press any key to proceed. </p>
       `,
             post_trial_gap: 1000,
         };
-      //  timeline.push(pre_convo_break);
+        //  timeline.push(pre_counter_convo_break);
 
+        var pre_convo_instructions = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> You will be chatting with Adorabot, a chatbot designed for conversations about disputed topics. </p>
+        <p> The conversation is a safe space for you. There is no right or wrong answer, no good or bad response. </p>
+        <p> Press any key when you are ready to begin the conversation. </p>
+      `,
+            post_trial_gap: 1000,
+        };
+        //  timeline.push(pre__convo_instructins);
+
+        /* break inbetween pre-intervention survey and counter_bot conversation */
+        var pre_control_break = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> Good work! You have now completed the pre-reflection questionnaire. </p>
+        <p> Feel free to take a short break if needed. </p> 
+        <p> Press any key when you are ready to proceed to the free reflection. </p>
+      `,
+            post_trial_gap: 1000,
+        };
+        //  timeline.push(pre_control_break);
 
 
         /* define post-chatinstructions, add post-chat survey */
@@ -269,14 +305,24 @@
         var post_convo_break = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
-        <p> You have completed the conversation! Feel free to take a short break. <p>
-        <p> Before you return to Prolific, please complete a post-conversation questionnaire. <p>
+        <p> Great job! You have completed the conversation. Feel free to take a short break. <p>
+        <p> Before we send you back to Prolific, please complete a post-conversation questionnaire. <p>
         <p> Press any key to proceed to the questionnaire.  <p>
       `,
             post_trial_gap: 1000,
         };
-      //  timeline.push(post_convo_break);
+        //  timeline.push(post_convo_break);
 
+        var post_control_break = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> You have completed the free reflection! Feel free to take another short break. <p>
+        <p> Before we send you back to Prolific, please complete a post-reflection questionnaire. <p>
+        <p> Press any key to proceed to the questionnaire.  <p>
+      `,
+            post_trial_gap: 1000,
+        };
+        //  timeline.push(post_control_break);
 
         const initializePostSlider = (survey) => {
             survey.onAfterRenderQuestion.add(function (survey, options) {
@@ -335,7 +381,7 @@
             stimulus: `
         <p> control interventionstimulus <p>
       `,
-          //  lifetime: 10,
+            //  lifetime: 10,
             post_trial_gap: 1000,
 
         }
@@ -356,7 +402,7 @@
                 );
             },
         };
-       // timeline.push(republican_survey);
+        // timeline.push(republican_survey);
 
         var democrat_survey = {
             timeline: [
@@ -372,7 +418,7 @@
                 );
             },
         };
-      //  timeline.push(democrat_survey);
+        //  timeline.push(democrat_survey);
 
         var neutral_survey = {
             timeline: [
@@ -393,7 +439,7 @@
                 );
             },
         };
-     //   timeline.push(neutral_survey);
+        //   timeline.push(neutral_survey);
 
 
         var other_survey = {
@@ -415,7 +461,7 @@
                 );
             },
         };
-      //  timeline.push(other_survey);
+        //  timeline.push(other_survey);
 
         //TOPIC SPECIFIC POST CHAT SURVEY
 
@@ -434,7 +480,7 @@
                 );
             },
         };
-      //  timeline.push(euthanasia_post_survey);
+        //  timeline.push(euthanasia_post_survey);
 
         var gender_post_survey = {
             timeline: [
@@ -451,7 +497,7 @@
                 );
             },
         };
-      //  timeline.push(gender_post_survey);
+        //  timeline.push(gender_post_survey);
 
 
         var healthcare_post_survey = {
@@ -469,7 +515,7 @@
                 );
             },
         };
-      //  timeline.push(healthcare_post_survey);
+        //  timeline.push(healthcare_post_survey);
 
         var bombings_post_survey = {
             timeline: [
@@ -486,7 +532,7 @@
                 );
             },
         };
-      //  timeline.push(bombings_post_survey);
+        //  timeline.push(bombings_post_survey);
 
         var vaccines_post_survey = {
             timeline: [
@@ -503,7 +549,7 @@
                 );
             },
         };
-      //  timeline.push(vaccines_post_survey);
+        //  timeline.push(vaccines_post_survey);
 
 
         var criminal_post_survey = {
@@ -521,7 +567,7 @@
                 );
             },
         };
-     //   timeline.push(criminal_post_survey);
+        //   timeline.push(criminal_post_survey);
 
 
         var same_sex_post_survey = {
@@ -539,21 +585,39 @@
                 );
             },
         };
-      //  timeline.push(same_sex_post_survey);
+        //  timeline.push(same_sex_post_survey);
 
         var last_question = {
             type: jsPsychSurvey,
             survey_json: experimental_group_last_question,
             survey_function: initializePostSlider,
         };
-      //  timeline.push(last_question);
+        //  timeline.push(last_question);
 
+        var goodbye = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> You have completed the experiment! Thank you for your contribution to our research. </p>
+        <div style='width: 700px;'>
+        </div>
+        <p> We are exploring conversational LLMs as tools for increasing the willingness </p>
+        <p> of Americans to converse about highly disputed topics. </p>
+        <p> By interacting with one of our chatbots or performing a free reflection, </p>
+        <p> you have helped us learn how we can improve our LLMs. </p>
+        <div style='width: 700px;'>
+        </div>
+        <p> Press any key to return to Prolific.  <p>
+      `,
+            post_trial_gap: 1000,
+        };         
+       //  timeline.push(goodbye);
 
-      counter_timeline.push(
+        counter_timeline.push(
             welcome,
-            instructions,
+            preliminary_convo_instructions,
             pre_convo_survey_trial,
-            pre_convo_break,
+            pre_bot_instructions_break,
+            pre_convo_instructions,
             counter_bot,
             post_convo_break,
             republican_survey,
@@ -571,9 +635,10 @@
 
         crux_timeline.push(
             welcome,
-            instructions,
+            preliminary_convo_instructions,
             pre_convo_survey_trial,
-            pre_convo_break,
+            pre_bot_instructions_break,
+            pre_convo_instructions,
             crux_bot,
             post_convo_break,
             republican_survey,
@@ -591,9 +656,10 @@
 
         empathy_timeline.push(
             welcome,
-            instructions,
+            preliminary_convo_instructions,
             pre_convo_survey_trial,
-            pre_convo_break,
+            pre_bot_instructions_break,
+            pre_convo_instructions,
             empathy_bot,
             post_convo_break,
             republican_survey,
@@ -607,27 +673,29 @@
             vaccines_post_survey,
             criminal_post_survey,
             same_sex_post_survey,
-            last_question)
+            last_question,
+            goodbye)
 
         control_timeline.push(
-            //welcome,
-            //instructions,
-            //pre_convo_survey_trial,
-            pre_convo_break,
+            welcome,
+            preliminary_control_instructions,
+            pre_convo_survey_trial,
+            pre_control_break,
             control_intervention,
-            post_convo_break,
-            //republican_survey,
-            //democrat_survey,
-            //neutral_survey,
-            // other_survey,
-            // euthanasia_post_survey,
-            // gender_post_survey,
-            // healthcare_post_survey,
-            // bombings_post_survey,
-            // vaccines_post_survey,
-            // criminal_post_survey,
-            // same_sex_post_survey
-            )
+            post_control_break,
+            republican_survey,
+            democrat_survey,
+            neutral_survey,
+            other_survey,
+            euthanasia_post_survey,
+            gender_post_survey,
+            healthcare_post_survey,
+            bombings_post_survey,
+            vaccines_post_survey,
+            criminal_post_survey,
+            same_sex_post_survey,
+            goodbye
+        )
 
         const save_data = {
             type: jsPsychPipe,
