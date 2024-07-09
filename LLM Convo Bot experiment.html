@@ -8,11 +8,11 @@
     <!-- jsPsych library -->
     <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.1"></script> <!-- for data pipe -->
     <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script> <!-- condition assignment using data pipe -->
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-chat"></script> <!-- chat plug-in -->
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script> <!--  -->
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script> <!--  -->
     <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
     <!-- for instructions and breaks -->
-    <script src="control_intervention_json.js"></script> <!-- survey -->
     <script src="pre_convo_survey_json.js"></script> <!-- survey -->
     <script src="post_convo_survey_json.js"></script> <!-- survey -->
     <script src="post_convo_survey_republican.js"></script> <!-- survey -->
@@ -62,7 +62,7 @@
         // timelines for conditions
         var counter_timeline = [];
         var crux_timeline = [];
-        var empathy_timeline = [];
+        var viewpoint_timeline = [];
         var control_timeline = [];
 
         var timeline = [];
@@ -71,7 +71,7 @@
             const condition = 0 //await jsPsychPipe.getCondition("P09AXWX5b5t6"); 
             if (condition == 0) { timeline = counter_timeline; }
             if (condition == 1) { timeline = crux_timeline; }
-            if (condition == 2) { timeline = empathy_timeline; }
+            if (condition == 2) { timeline = viewpoint_timeline; }
             if (condition == 3) { timeline = control_timeline; }
 
             jsPsych.run(timeline);
@@ -207,6 +207,8 @@
             return relevantRow;
         }
 
+        let rowAsString;
+
         /* pushing survey in timeline with both slider and non-slider questions */
         const pre_convo_survey_trial = {
             type: jsPsychSurvey,
@@ -232,6 +234,8 @@
                     "criminal-polarization",
                     "same-sex-polarization"
                 ];
+
+                
                 // then extract and process each row's responses
                 possibleQuestions.forEach(row => {
                     let surveyResponses = data.response[row];
@@ -248,8 +252,8 @@
 
                         // convert relevant row into a string so we can feed it into chat later
                         relevantRow.forEach(rowObj => {
-                            let rowAsString = JSON.stringify(rowObj);
-                            console.log('Row as string:', rowAsString);
+                            data.rowAsString = rowObj;
+                            console.log(data.rowAsString);
                         });
 
                     } else {
@@ -367,23 +371,70 @@
 
         }
 
-        var empathy_bot = {
+        var viewpoint_bot = {
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
-        <p> empathy bot stimulus <p>
+        <p> viewpoint bot stimulus <p>
       `,
             post_trial_gap: 1000,
 
         }
 
-        var control_intervention = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: `
-        <p> control interventionstimulus <p>
-      `,
-            //  lifetime: 10,
-            post_trial_gap: 1000,
 
+//   // Declaring the prompts necessary for viewpoint bot
+//   viewpoint_prompts = [
+//     {
+//       message: "Welcome to the chatroom!",
+//       role: "system-prompt",
+//       message_trigger: 0
+//     },
+
+//     //timer trigger in ms
+//     //"chatbot" = chatbot will say the thing typed in the prompt
+//     {
+//       message: "Hey there! I'm Adorabot, here to chat about a disputed topic in the U.S. Which topic would you like to discuss: human euthanasia, gender inequality, the role of government in healthcare, the atomic bombing of Hiroshima and Nagasaki, mandating vaccines, criminal justice reforms, or same-sex marriage?",
+//       role: "chatbot-message",
+//       message_trigger: 0
+//     },
+
+//     {
+//       prompt: "blah blah blah",
+//       role: "chatbot-prompt",
+//       message_trigger: 1,
+//     }
+//   ]
+
+//   continue_button = {
+//     message_trigger: 10,
+//     message: "You have completed your six rounds of messages with Adorabot! Click continue to proceed with the experiment.",
+//   }
+
+//   const viewpoint_bot = {
+//     type: jsPsychChat,
+    // ai_prompt: "Give a 1 sentence comment on the complexity of the <topic> then say: “Could you explain your view on whether '${row}' to get the conversation started?“ Match your response to the user's response length. If the user talks about a topic that is not human euthanasia, gender inequality, the role of government in healthcare, atomic bombing, vaccine mandate, criminal justice reform, or same-sex marriage, remind the user that you are here to talk about the above topics without asking a question.",
+//     continue_button: continue_button,
+//     chat_field_placeholder: "Share your perspective...",
+//     additional_prompts: viewpoint_prompts,
+//   }
+
+//   //jsPsych.run([viewpoint_bot]);
+
+        var control_intervention = {
+                    type: jsPsychSurvey,
+                    survey_json: () => {
+                        const row = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                        .rowAsString["row"]
+
+                        var control_intervention_json = {
+    elements: [{
+                    "type": "comment",
+                    "name": "control-free-response",
+                    "title": `Please freely reflect in the space below on the following statement: "${row}"`,
+                    "isRequired": false,
+    }]}
+                    return control_intervention_json
+                    },
+                    survey_function: initializePostSlider,
         }
 
         // PARTY SPECIFIC POST CHAT SURVEYS 
@@ -654,13 +705,13 @@
             same_sex_post_survey,
             last_question)
 
-        empathy_timeline.push(
+        viewpoint_timeline.push(
             welcome,
             preliminary_convo_instructions,
             pre_convo_survey_trial,
             pre_bot_instructions_break,
             pre_convo_instructions,
-            empathy_bot,
+            viewpoint_bot,
             post_convo_break,
             republican_survey,
             democrat_survey,
@@ -674,7 +725,8 @@
             criminal_post_survey,
             same_sex_post_survey,
             last_question,
-            goodbye)
+            goodbye,
+            redirect)
 
         control_timeline.push(
             welcome,
@@ -694,7 +746,8 @@
             vaccines_post_survey,
             criminal_post_survey,
             same_sex_post_survey,
-            goodbye
+            goodbye,
+            redirect
         )
 
         const save_data = {
@@ -706,7 +759,7 @@
         };
 
         /* redirect to Prolific experiment page NEED TO INSERT CORRECT LINK */
-        var jsPsych = initJsPsych({
+        var redirect = initJsPsych({
             on_finish: function () {
                 //window.location = "https://openguessr.com/"
                 jsPsych.data.displayData();

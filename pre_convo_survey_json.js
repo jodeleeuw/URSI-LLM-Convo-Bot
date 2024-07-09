@@ -166,15 +166,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -182,15 +182,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -245,7 +245,7 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
+            "text": "Disagree strongly"
         },
         {
             "value": "Column 2",
@@ -253,7 +253,7 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -261,15 +261,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -308,15 +308,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -324,15 +324,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -472,15 +472,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -488,15 +488,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -611,15 +611,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -627,15 +627,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -668,8 +668,8 @@ var pre_convo_survey_json = {
             "text": "It is not right for family members to request euthanasia on behalf of incapacitated patients"
         },
         {
-            "value": "Euthanasia can be performed only if the patient has received a psychological evaluation",
-            "text": "Euthanasia can be performed only if the patient has received a psychological evaluation"
+            "value": "Euthanasia should only be allowed if the patient has received a psychological evaluation",
+            "text": "Euthanasia should only be allowed if the patient has received a psychological evaluation"
         },
         {
             "value": "Euthanasia should be banned for patients with non-terminal conditions",
@@ -680,8 +680,8 @@ var pre_convo_survey_json = {
             "text": "Euthanasia should be banned for all patients"
         },
         {
-            "value": "Allowing euthanasia to be performed at home",
-            "text": "Allowing euthanasia to be performed at home"
+            "value": "Euthanasia should not be performed at home",
+            "text": "Euthanasia should not be performed at home"
         }
     ],
     "rowsOrder": "random"
@@ -695,15 +695,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -711,15 +711,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -779,15 +779,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -795,15 +795,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -863,15 +863,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -879,15 +879,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -947,15 +947,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -963,15 +963,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -1027,15 +1027,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -1043,15 +1043,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -1107,15 +1107,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -1123,15 +1123,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -1557,15 +1557,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -1573,15 +1573,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -1637,15 +1637,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -1653,15 +1653,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -1717,15 +1717,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -1733,15 +1733,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -1797,15 +1797,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -1813,15 +1813,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -1877,15 +1877,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -1893,15 +1893,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -1957,15 +1957,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -1973,15 +1973,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
@@ -2037,15 +2037,15 @@ var pre_convo_survey_json = {
     "columns": [
         {
             "value": "Column 1",
-            "text": "Disagree very strongly"
-        },
-        {
-            "value": "Column 2",
             "text": "Disagree strongly"
         },
         {
+            "value": "Column 2",
+            "text": "Disagree moderately"
+        },
+        {
             "value": "Column 3",
-            "text": "Disagree somewhat"
+            "text": "Disagree a little"
         },
         {
             "value": "Column 4",
@@ -2053,15 +2053,15 @@ var pre_convo_survey_json = {
         },
         {
             "value": "Column 5",
-            "text": "Agree somewhat"
+            "text": "Agree a little"
         },
         {
             "value": "Column 6",
-            "text": "Agree strongly"
+            "text": "Agree moderately"
         },
         {
             "value": "Column 7",
-            "text": "Agree very strongly"
+            "text": "Agree strongly"
         }
     ],
     "rows": [
