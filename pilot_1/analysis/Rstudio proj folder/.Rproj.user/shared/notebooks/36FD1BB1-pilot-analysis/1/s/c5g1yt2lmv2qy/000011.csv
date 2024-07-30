@@ -1,0 +1,56 @@
+"0","#| label: Create data frames that are just for the conversation transcripts and free reflections to make them more readable. Remove columns that aren't necessary. Export as csv's"
+"0","#| echo: false"
+"0",""
+"0","## make raw conversations df with subject_id and condition. this includes the keypresslog "
+"0","conversations_raw_df <- raw_df %>%"
+"0","  filter(trial_type == ""chat"") %>%"
+"0","  select(prolific_subject_id, logs, condition)"
+"0",""
+"0","## add which round of the pilot it was by reading in demographics files so we know completion dates"
+"0","#read in prolific demographics files "
+"0","demo1 <- read_csv(""prolific_export_6697dedd0a9f0e1820436c12.csv"")"
+"1","[1mRows: [22m[34m13[39m [1mColumns: [22m[34m23[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (17): Submission id, Participant id, Status, Custom study tncs accepte...
+[32mdbl[39m   (2): Time taken, Total approvals
+[34mdttm[39m  (4): Started at, Completed at, Reviewed at, Archived at
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","demo2 <- read_csv(""prolific_export_6699817273833cff743f502e.csv"")"
+"1","[1mRows: [22m[34m4[39m [1mColumns: [22m[34m24[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (17): Submission id, Participant id, Status, Custom study tncs accepte...
+[32mdbl[39m   (3): Time taken, Total approvals, Age
+[34mdttm[39m  (4): Started at, Completed at, Reviewed at, Archived at
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","demo3 <- read_csv(""prolific_export_6690246c6dba4b8beab3c615.csv"")"
+"1","[1mRows: [22m[34m4[39m [1mColumns: [22m[34m23[39m
+"
+"1","[36m──[39m [1mColumn specification[22m [36m───────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (16): Submission id, Participant id, Status, Custom study tncs accepte...
+[32mdbl[39m   (3): Time taken, Total approvals, Age
+[34mdttm[39m  (4): Started at, Completed at, Reviewed at, Archived at
+"
+"1","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message.
+"
+"0","# compile prolific demographics files into one df, filter out people who returned the experiment, and convert time into minutes for readability "
+"0","prolific_demographics_df <- bind_rows(demo1, demo2) "
+"1","[1m[33mError[39m in `bind_rows()`:[22m
+[33m![39m Can't combine `..1$Age` <character> and `..2$Age` <double>.
+Backtrace:
+[90m 1. [39m[1m[94mdplyr::bind_rows([39m[22mdemo1, demo2[1m[94m)[39m[22m
+"
