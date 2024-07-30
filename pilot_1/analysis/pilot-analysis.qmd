@@ -2419,7 +2419,7 @@ prolific_demographics_df <- prolific_demographics_df %>%
 rename("prolific_subject_id" = "Participant id") %>%
 filter(Status != "RETURNED") %>%
 mutate(`Time taken (minutes)` = as.numeric(`Time taken`) / 60) %>%
-select(- "Time taken")
+select(- "Time taken")bbb
 
 # merge with conversations df 
 conversations_raw_df <-  conversations_raw_df %>%
