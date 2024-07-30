@@ -1,7 +1,0 @@
-"0","#| label: For full experiment code- Run paired t-tests on each pre- and post- intervention political party mean to look for significant differences "
-"0","#| include: false"
-"0",""
-"0","t_test_republicans <- t.test(pre_republicans_df$pre_mean_score, post_republicans_df$post_mean_score, paired = TRUE)"
-"0",""
-"0","t_test_democrats <- t.test(pre_democrats_df$pre_mean_score, post_democrats_df$post_mean_score, paired = TRUE)"
-"0",""

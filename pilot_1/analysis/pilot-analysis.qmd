@@ -3,7 +3,9 @@ title: "Pilot data"
 format: html
 editor: visual
 ---
+
 # Getting set up
+
 ```{r}
 #| label: Data Fetching. Load R packages
 #| include: false 
@@ -93,8 +95,8 @@ raw_df <- raw_df %>%
  # full_join(demographics_df, by = "prolific_subject_id")
 ```
 
+# Survey data
 
-# Survey data 
 ```{r}
 #| label: Create a data frame that is just for surveys and clean it up a bit
 #| include: false
@@ -740,7 +742,6 @@ post_sliders_df <- sliders_df %>%
 
 ```
 
-
 ```{r}
 #| label: Get pre- and post- intervention mean scores for political party questions
 #| include: false
@@ -772,920 +773,1405 @@ post_politics_df <- reverse_coded_scores_df %>%
 ```
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Get pre-intervention aggregate scores for individual political party questions -->
+
 <!-- #| include: false -->
 
 <!--  pre_republicans_df <- reverse_coded_scores_df %>% -->
+
 <!--     group_by(prolific_subject_id) %>% -->
+
 <!--    filter(grepl("pre-rating-republicans", question) | grepl("pre-interacting-with-republicans", question)) %>% -->
+
 <!--    filter(condition != 'control free reflection') %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--    summarize( -->
+
 <!--      total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--      pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--      min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--    ) -->
 
 <!--  pre_democrats_df <- reverse_coded_scores_df %>% -->
+
 <!--     group_by(prolific_subject_id) %>% -->
+
 <!--    filter(grepl("pre-rating-democrats", question) | grepl("pre-interacting-with-democrats", question)) %>% -->
+
 <!--    filter(condition != 'control free reflection') %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--    summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--      pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--      min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--      max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--    ) -->
 
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Get pre-intervention aggregate scores for general polarization questions only -->
+
 <!-- #| include: false -->
 
 <!-- pre_euthanasia_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-euthanasia-polarization-general", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_gender_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-gender-polarization-general", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_bombing_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-bombing-polarization-general", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_healthcare_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-healthcare-polarization-general", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_vaccines_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-vaccines-polarization-general", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_criminal_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-criminal-polarization-general", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_same_sex_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-same-sex-polarization-general", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- ``` -->
 
-# ```{r}
-# #| label: For full experiment code- Get pre-intervention mean scores for regular polarization questions for each topic
-# #| include: false
-# 
-# pre_euthanasia_depolarization_statements_df <- reverse_coded_scores_df %>%
-#   group_by(prolific_subject_id) %>%
-#   filter(grepl("Euthanasia should be allowed for terminally ill patients who request it", question) |
-#            grepl("Legal protections should be provided for doctors who perform euthanasia", question) | 
-#            grepl("It is not right for family members to request euthanasia on behalf of incapacitated patients", question) | 
-#            grepl("Euthanasia should only be allowed if the patient has received a psychological evaluation", question) |
-#            grepl("Euthanasia should be banned for patients with non-terminal conditions", question) |
-#            grepl("Euthanasia should be banned for all patients", question) |
-#            grepl("Euthanasia should not be performed at home", question)) %>%
-#   filter(phase == 'pre-convo-survey') %>%
-#   filter(condition != 'control free reflection') %>%
-#   group_by(prolific_subject_id) %>%
-#   summarize(
-#     total_score = sum(as.numeric(answer), na.rm = TRUE),
-#     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
-#     min_score = min(as.numeric(answer), na.rm = TRUE),
-#     max_score = max(as.numeric(answer), na.rm = TRUE)
-#   )
-# 
-# pre_gender_depolarization_statements_df <- reverse_coded_scores_df %>%
-#   group_by(prolific_subject_id) %>%
-#   filter(grepl("Gender quotas should be implemented in corporate boards and executive positions", question)  |
-#          grepl("Mandating equal pay for equal work regardless of gender would improve gender equality", question) |
-#          grepl("Both mothers and fathers should be provided with parental leave", question) |
-#          grepl("Free childcare services should be provided to support working parents", question) |
-#          grepl("Funding for programs aimed at reducing gender-based violence should be increased", question) |
-#          grepl("Gender diversity should be encouraged in STEM fields through scholarships and grant", question) |
-#          grepl("Gender should be disregarded when selecting candidates for career advancement opportunities", question)
-#            ) %>%
-#   filter(phase == 'pre-convo-survey') %>%
-#   filter(condition != 'control free reflection') %>%
-#   group_by(prolific_subject_id) %>%
-#   summarize(
-#     total_score = sum(as.numeric(answer), na.rm = TRUE),
-#     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
-#     min_score = min(as.numeric(answer), na.rm = TRUE),
-#     max_score = max(as.numeric(answer), na.rm = TRUE)
-#   )
-# 
-# pre_healthcare_depolarization_statements_df <- reverse_coded_scores_df %>%
-#   group_by(prolific_subject_id) %>%
-#   filter(grepl("A universal healthcare system should be implemented in the U.S.", question)  |
-#          grepl("Medicaid should be expanded to cover more low-income individuals", question) |
-#          grepl("Prescription drug prices should be regulated to make them more affordable", question) |
-#          grepl("Government subsidies should be provided for private health insurance", question) |
-#          grepl("The government should negotiate drug prices with pharmaceutical companies", question) |
-#          grepl("Government funding should be increased for mental health services", question) |
-#          grepl("The competitive market should drive healthcare prices", question)
-#            ) %>%
-#   filter(phase == 'pre-convo-survey') %>%
-#   filter(condition != 'control free reflection') %>%
-#   group_by(prolific_subject_id) %>%
-#   summarize(
-#     total_score = sum(as.numeric(answer), na.rm = TRUE),
-#     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
-#     min_score = min(as.numeric(answer), na.rm = TRUE),
-#     max_score = max(as.numeric(answer), na.rm = TRUE)
-#   )
-# 
-# 
-# pre_bombing_depolarization_statements_df <- reverse_coded_scores_df %>%
-#   group_by(prolific_subject_id) %>%
-#   filter(grepl("A memorial should be established in the U.S. to honor the victims of the bombings", question)  |
-#          grepl("The U.S. government should provide financial reparations to the survivors and their families", question) |
-#          grepl("The bombings were justified to bring a swift end to the war", question) |
-#          grepl("The bombings were morally wrong", question) |
-#          grepl("Learning about the atomic bombings of Hiroshima and Nagasaki is essential for understanding the consequences of nuclear warfare", question) |
-#          grepl("The U.S. should take responsibility for the humanitarian impact of the bombings", question) |
-#          grepl("The U.S. should participate in international efforts to promote nuclear disarmament and non-proliferation", question)
-#            ) %>%
-#   filter(phase == 'pre-convo-survey') %>%
-#   filter(condition != 'control free reflection') %>%
-#   group_by(prolific_subject_id) %>%
-#   summarize(
-#     total_score = sum(as.numeric(answer), na.rm = TRUE),
-#     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
-#     min_score = min(as.numeric(answer)),
-#     max_score = max(as.numeric(answer))
-#   )
-# 
-# pre_vaccines_depolarization_statements_df <- reverse_coded_scores_df %>%
-#   group_by(prolific_subject_id) %>%
-#   filter(grepl("Preventing people without vaccinations from entering public spaces and transportation would do more harm than good", question)  |
-#          grepl("Vaccines should be mandated for healthcare workers", question) |
-#          grepl("Businesses should be allowed to require proof of vaccination for entry", question) |
-#          grepl("Businesses and institutions should be barred from discriminating based on vaccination status", question) |
-#          grepl("Schools should be allowed to require vaccinations for attendance", question) |
-#          grepl("All government-approved vaccines should be mandated", question)           
-#          ) %>%
-#   filter(phase == 'pre-convo-survey') %>%
-#   filter(condition != 'control free reflection') %>%
-#   group_by(prolific_subject_id) %>%
-#   summarize(
-#     total_score = sum(as.numeric(answer), na.rm = TRUE),
-#     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
-#     min_score = min(as.numeric(answer), na.rm = TRUE),
-#     max_score = max(as.numeric(answer), na.rm = TRUE)
-#   )
-# 
-# 
-# pre_criminal_depolarization_statements_df <- reverse_coded_scores_df %>%
-#   group_by(prolific_subject_id) %>%
-#   filter(grepl("Implementing comprehensive background checks for all individuals entering the criminal justice system is necessary", question)  |
-#          grepl("Enhancing mental health support services for incarcerated individuals would be worth the cost and resources", question) |
-#          grepl("The use of solitary confinement as a punishment should be banned", question) |
-#          grepl("Inmates should have greater access to educational programs", question) |
-#          grepl("Non-violent offenders should be permitted to serve sentences through community service or house arrest", question) |
-#          grepl("The use of private prisons should be restricted", question)
-#            ) %>%
-#   filter(phase == 'pre-convo-survey') %>%
-#   filter(condition != 'control free reflection') %>%
-#   group_by(prolific_subject_id) %>%
-#   summarize(
-#     total_score = sum(as.numeric(answer), na.rm = TRUE),
-#     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
-#     min_score = min(as.numeric(answer), na.rm = TRUE),
-#     max_score = max(as.numeric(answer), na.rm = TRUE)
-#   )
-# 
-# pre_same_sex_depolarization_statements_df <- reverse_coded_scores_df %>%
-#   group_by(prolific_subject_id) %>%
-#   filter(grepl("Same-sex marriage should remain legalized nationwide", question)  |
-#          grepl("Adoption rights should be granted to married same-sex couples", question) |
-#          grepl("Employment non-discrimination protections should be provided for gay and lesbian individuals", question) |
-#          grepl("Same-sex couples should receive spousal benefits (e.g. health insurance; survivor benefits)", question) |
-#          grepl("It is not right to provide the same federal rights and support for same-sex couples as opposite-sex couples", question) |
-#          grepl("Discrimination against same-sex couples in housing and public accommodations should be banned", question)
-#            ) %>%
-#   filter(phase == 'pre-convo-survey') %>%
-#   filter(condition != 'control free reflection') %>%
-#   group_by(prolific_subject_id) %>%
-#   summarize(
-#     total_score = sum(as.numeric(answer), na.rm = TRUE),
-#     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
-#     min_score = min(as.numeric(answer), na.rm = TRUE),
-#     max_score = max(as.numeric(answer), na.rm = TRUE)
-#   )
-# 
-# ```
-
+# `{r} # #| label: For full experiment code- Get pre-intervention mean scores for regular polarization questions for each topic # #| include: false #  # pre_euthanasia_depolarization_statements_df <- reverse_coded_scores_df %>% #   group_by(prolific_subject_id) %>% #   filter(grepl("Euthanasia should be allowed for terminally ill patients who request it", question) | #            grepl("Legal protections should be provided for doctors who perform euthanasia", question) |  #            grepl("It is not right for family members to request euthanasia on behalf of incapacitated patients", question) |  #            grepl("Euthanasia should only be allowed if the patient has received a psychological evaluation", question) | #            grepl("Euthanasia should be banned for patients with non-terminal conditions", question) | #            grepl("Euthanasia should be banned for all patients", question) | #            grepl("Euthanasia should not be performed at home", question)) %>% #   filter(phase == 'pre-convo-survey') %>% #   filter(condition != 'control free reflection') %>% #   group_by(prolific_subject_id) %>% #   summarize( #     total_score = sum(as.numeric(answer), na.rm = TRUE), #     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), #     min_score = min(as.numeric(answer), na.rm = TRUE), #     max_score = max(as.numeric(answer), na.rm = TRUE) #   ) #  # pre_gender_depolarization_statements_df <- reverse_coded_scores_df %>% #   group_by(prolific_subject_id) %>% #   filter(grepl("Gender quotas should be implemented in corporate boards and executive positions", question)  | #          grepl("Mandating equal pay for equal work regardless of gender would improve gender equality", question) | #          grepl("Both mothers and fathers should be provided with parental leave", question) | #          grepl("Free childcare services should be provided to support working parents", question) | #          grepl("Funding for programs aimed at reducing gender-based violence should be increased", question) | #          grepl("Gender diversity should be encouraged in STEM fields through scholarships and grant", question) | #          grepl("Gender should be disregarded when selecting candidates for career advancement opportunities", question) #            ) %>% #   filter(phase == 'pre-convo-survey') %>% #   filter(condition != 'control free reflection') %>% #   group_by(prolific_subject_id) %>% #   summarize( #     total_score = sum(as.numeric(answer), na.rm = TRUE), #     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), #     min_score = min(as.numeric(answer), na.rm = TRUE), #     max_score = max(as.numeric(answer), na.rm = TRUE) #   ) #  # pre_healthcare_depolarization_statements_df <- reverse_coded_scores_df %>% #   group_by(prolific_subject_id) %>% #   filter(grepl("A universal healthcare system should be implemented in the U.S.", question)  | #          grepl("Medicaid should be expanded to cover more low-income individuals", question) | #          grepl("Prescription drug prices should be regulated to make them more affordable", question) | #          grepl("Government subsidies should be provided for private health insurance", question) | #          grepl("The government should negotiate drug prices with pharmaceutical companies", question) | #          grepl("Government funding should be increased for mental health services", question) | #          grepl("The competitive market should drive healthcare prices", question) #            ) %>% #   filter(phase == 'pre-convo-survey') %>% #   filter(condition != 'control free reflection') %>% #   group_by(prolific_subject_id) %>% #   summarize( #     total_score = sum(as.numeric(answer), na.rm = TRUE), #     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), #     min_score = min(as.numeric(answer), na.rm = TRUE), #     max_score = max(as.numeric(answer), na.rm = TRUE) #   ) #  #  # pre_bombing_depolarization_statements_df <- reverse_coded_scores_df %>% #   group_by(prolific_subject_id) %>% #   filter(grepl("A memorial should be established in the U.S. to honor the victims of the bombings", question)  | #          grepl("The U.S. government should provide financial reparations to the survivors and their families", question) | #          grepl("The bombings were justified to bring a swift end to the war", question) | #          grepl("The bombings were morally wrong", question) | #          grepl("Learning about the atomic bombings of Hiroshima and Nagasaki is essential for understanding the consequences of nuclear warfare", question) | #          grepl("The U.S. should take responsibility for the humanitarian impact of the bombings", question) | #          grepl("The U.S. should participate in international efforts to promote nuclear disarmament and non-proliferation", question) #            ) %>% #   filter(phase == 'pre-convo-survey') %>% #   filter(condition != 'control free reflection') %>% #   group_by(prolific_subject_id) %>% #   summarize( #     total_score = sum(as.numeric(answer), na.rm = TRUE), #     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), #     min_score = min(as.numeric(answer)), #     max_score = max(as.numeric(answer)) #   ) #  # pre_vaccines_depolarization_statements_df <- reverse_coded_scores_df %>% #   group_by(prolific_subject_id) %>% #   filter(grepl("Preventing people without vaccinations from entering public spaces and transportation would do more harm than good", question)  | #          grepl("Vaccines should be mandated for healthcare workers", question) | #          grepl("Businesses should be allowed to require proof of vaccination for entry", question) | #          grepl("Businesses and institutions should be barred from discriminating based on vaccination status", question) | #          grepl("Schools should be allowed to require vaccinations for attendance", question) | #          grepl("All government-approved vaccines should be mandated", question)            #          ) %>% #   filter(phase == 'pre-convo-survey') %>% #   filter(condition != 'control free reflection') %>% #   group_by(prolific_subject_id) %>% #   summarize( #     total_score = sum(as.numeric(answer), na.rm = TRUE), #     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), #     min_score = min(as.numeric(answer), na.rm = TRUE), #     max_score = max(as.numeric(answer), na.rm = TRUE) #   ) #  #  # pre_criminal_depolarization_statements_df <- reverse_coded_scores_df %>% #   group_by(prolific_subject_id) %>% #   filter(grepl("Implementing comprehensive background checks for all individuals entering the criminal justice system is necessary", question)  | #          grepl("Enhancing mental health support services for incarcerated individuals would be worth the cost and resources", question) | #          grepl("The use of solitary confinement as a punishment should be banned", question) | #          grepl("Inmates should have greater access to educational programs", question) | #          grepl("Non-violent offenders should be permitted to serve sentences through community service or house arrest", question) | #          grepl("The use of private prisons should be restricted", question) #            ) %>% #   filter(phase == 'pre-convo-survey') %>% #   filter(condition != 'control free reflection') %>% #   group_by(prolific_subject_id) %>% #   summarize( #     total_score = sum(as.numeric(answer), na.rm = TRUE), #     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), #     min_score = min(as.numeric(answer), na.rm = TRUE), #     max_score = max(as.numeric(answer), na.rm = TRUE) #   ) #  # pre_same_sex_depolarization_statements_df <- reverse_coded_scores_df %>% #   group_by(prolific_subject_id) %>% #   filter(grepl("Same-sex marriage should remain legalized nationwide", question)  | #          grepl("Adoption rights should be granted to married same-sex couples", question) | #          grepl("Employment non-discrimination protections should be provided for gay and lesbian individuals", question) | #          grepl("Same-sex couples should receive spousal benefits (e.g. health insurance; survivor benefits)", question) | #          grepl("It is not right to provide the same federal rights and support for same-sex couples as opposite-sex couples", question) | #          grepl("Discrimination against same-sex couples in housing and public accommodations should be banned", question) #            ) %>% #   filter(phase == 'pre-convo-survey') %>% #   filter(condition != 'control free reflection') %>% #   group_by(prolific_subject_id) %>% #   summarize( #     total_score = sum(as.numeric(answer), na.rm = TRUE), #     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), #     min_score = min(as.numeric(answer), na.rm = TRUE), #     max_score = max(as.numeric(answer), na.rm = TRUE) #   ) #  #`
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Get pre-intervention aggregate scores for slider questions -->
+
 <!-- #| include: false -->
 
 <!-- pre_euthanasia_sliders_df <- reverse_coded_scores_df %>% -->
-<!--    group_by(prolific_subject_id) %>% -->
-<!--   filter(grepl("euthanasia-slider", question)) %>% -->
-<!--   filter(phase == 'pre-convo-survey') %>% -->
-<!--   filter(condition != 'control free reflection') %>% -->
-<!--   group_by(prolific_subject_id) %>% -->
-<!--   summarize( -->
-<!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
-<!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
-<!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
-<!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
-<!--   ) -->
 
+<!--    group_by(prolific_subject_id) %>% -->
+
+<!--   filter(grepl("euthanasia-slider", question)) %>% -->
+
+<!--   filter(phase == 'pre-convo-survey') %>% -->
+
+<!--   filter(condition != 'control free reflection') %>% -->
+
+<!--   group_by(prolific_subject_id) %>% -->
+
+<!--   summarize( -->
+
+<!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
+<!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
+<!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
+<!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
+<!--   ) -->
 
 <!-- pre_gender_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("gender-slider", question)) %>% -->
+
 <!--   filter(phase == 'pre-convo-survey') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
-
 <!-- pre_healthcare_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("healthcare-slider", question)) %>% -->
+
 <!--   filter(phase == 'pre-convo-survey') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_bombing_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("bombing-slider", question)) %>% -->
+
 <!--   filter(phase == 'pre-convo-survey') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_vaccines_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("vaccines-slider", question)) %>% -->
+
 <!--   filter(phase == 'pre-convo-survey') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_criminal_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("criminal-slider", question)) %>% -->
+
 <!--   filter(phase == 'pre-convo-survey') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_same_sex_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("same-sex-slider", question)) %>% -->
+
 <!--   filter(phase == 'pre-convo-survey') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
+
 <!-- ``` -->
+
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Get pre-intervention aggregate scores for willingness offending reason questions -->
+
 <!-- #| include: false -->
 
 <!-- pre_euthanasia_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-euthanasia-offending-reason", question)) %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_gender_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-gender-offending-reason", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_healthcare_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-healthcare-offending-reason", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_bombing_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-bombing-offending-reason", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_vaccines_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-vaccines-offending-reason", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_criminal_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-criminal-offending-reason", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- pre_same_sex_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("pre-same-sex-offending-reason", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Get post-intervention aggregate scores for political parties -->
+
 <!-- #| include: false -->
 
 <!-- post_republicans_df <- reverse_coded_scores_df %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("rating-republicans-post", question) | grepl("interacting-with-republicans-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_democrats_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("rating-democrats-post", question) | grepl("interacting-with-democrats-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
+
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Get post-intervention aggregate scores for general polarization questions  -->
+
 <!-- #| include: false -->
 
 <!-- post_euthanasia_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("euthanasia-polarization-general-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_gender_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("gender-polarization-general-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_bombing_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("bombing-polarization-general-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_healthcare_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("healthcare-polarization-general-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_vaccines_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("vaccines-polarization-general-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_criminal_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("criminal-polarization-general-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_same_sex_polarization_general_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("same-sex-polarization-general-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Get post-intervention aggregate scores for regular polarization questions -->
+
 <!-- #| include: false -->
 
 <!-- post_euthanasia_depolarization_statements_df <- reverse_coded_scores_df %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("Euthanasia should be allowed for terminally ill patients who request it", question) | -->
+
 <!--            grepl("Legal protections should be provided for doctors who perform euthanasia", question) |  -->
+
 <!--            grepl("It is not right for family members to request euthanasia on behalf of incapacitated patients", question) |  -->
+
 <!--            grepl("Euthanasia should only be allowed if the patient has received a psychological evaluation", question) | -->
+
 <!--            grepl("Euthanasia should be banned for patients with non-terminal conditions", question) | -->
+
 <!--            grepl("Euthanasia should be banned for all patients", question) | -->
+
 <!--            grepl("Euthanasia should not be performed at home", question)) %>% -->
+
 <!--   filter(phase == 'post-convo') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_gender_depolarization_statements_df <- reverse_coded_scores_df %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("Gender quotas should be implemented in corporate boards and executive positions", question)  | -->
+
 <!--          grepl("Mandating equal pay for equal work regardless of gender would improve gender equality", question) | -->
+
 <!--          grepl("Both mothers and fathers should be provided with parental leave", question) | -->
+
 <!--          grepl("Free childcare services should be provided to support working parents", question) | -->
+
 <!--          grepl("Funding for programs aimed at reducing gender-based violence should be increased", question) | -->
+
 <!--          grepl("Gender diversity should be encouraged in STEM fields through scholarships and grant", question) | -->
+
 <!--          grepl("Gender should be disregarded when selecting candidates for career advancement opportunities", question) -->
+
 <!--            ) %>% -->
+
 <!--   filter(phase == 'post-convo') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_healthcare_depolarization_statements_df <- reverse_coded_scores_df %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("A universal healthcare system should be implemented in the U.S.", question)  | -->
+
 <!--          grepl("Medicaid should be expanded to cover more low-income individuals", question) | -->
+
 <!--          grepl("Prescription drug prices should be regulated to make them more affordable", question) | -->
+
 <!--          grepl("Government subsidies should be provided for private health insurance", question) | -->
+
 <!--          grepl("The government should negotiate drug prices with pharmaceutical companies", question) | -->
+
 <!--          grepl("Government funding should be increased for mental health services", question) | -->
+
 <!--          grepl("The competitive market should drive healthcare prices", question) -->
+
 <!--            ) %>% -->
+
 <!--   filter(phase == 'post-convo') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_bombing_depolarization_statements_df <- reverse_coded_scores_df %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("A memorial should be established in the U.S. to honor the victims of the bombings", question)  | -->
+
 <!--          grepl("The U.S. government should provide financial reparations to the survivors and their families", question) | -->
+
 <!--          grepl("The bombings were justified to bring a swift end to the war", question) | -->
+
 <!--          grepl("The bombings were morally wrong", question) | -->
+
 <!--          grepl("Learning about the atomic bombings of Hiroshima and Nagasaki is essential for understanding the consequences of nuclear warfare", question) | -->
+
 <!--          grepl("The U.S. should take responsibility for the humanitarian impact of the bombings", question) | -->
+
 <!--          grepl("The U.S. should participate in international efforts to promote nuclear disarmament and non-proliferation", question) -->
+
 <!--            ) %>% -->
+
 <!--   filter(phase == 'post-convo') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer)), -->
+
 <!--     max_score = max(as.numeric(answer)) -->
+
 <!--   ) -->
 
 <!-- post_vaccines_depolarization_statements_df <- reverse_coded_scores_df %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("Preventing people without vaccinations from entering public spaces and transportation would do more harm than good", question)  | -->
+
 <!--          grepl("Vaccines should be mandated for healthcare workers", question) | -->
+
 <!--          grepl("Businesses should be allowed to require proof of vaccination for entry", question) | -->
+
 <!--          grepl("Businesses and institutions should be barred from discriminating based on vaccination status", question) | -->
+
 <!--          grepl("Schools should be allowed to require vaccinations for attendance", question) | -->
+
 <!--          grepl("All government-approved vaccines should be mandated", question)            -->
+
 <!--          ) %>% -->
+
 <!--   filter(phase == 'post-convo') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_criminal_depolarization_statements_df <- reverse_coded_scores_df %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("Implementing comprehensive background checks for all individuals entering the criminal justice system is necessary", question)  | -->
+
 <!--          grepl("Enhancing mental health support services for incarcerated individuals would be worth the cost and resources", question) | -->
+
 <!--          grepl("The use of solitary confinement as a punishment should be banned", question) | -->
+
 <!--          grepl("Inmates should have greater access to educational programs", question) | -->
+
 <!--          grepl("Non-violent offenders should be permitted to serve sentences through community service or house arrest", question) | -->
+
 <!--          grepl("The use of private prisons should be restricted", question) -->
+
 <!--            ) %>% -->
+
 <!--   filter(phase == 'post-convo') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_same_sex_depolarization_statements_df <- reverse_coded_scores_df %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("Same-sex marriage should remain legalized nationwide", question)  | -->
+
 <!--          grepl("Adoption rights should be granted to married same-sex couples", question) | -->
+
 <!--          grepl("Employment non-discrimination protections should be provided for gay and lesbian individuals", question) | -->
+
 <!--          grepl("Same-sex couples should receive spousal benefits (e.g. health insurance; survivor benefits)", question) | -->
+
 <!--          grepl("It is not right to provide the same federal rights and support for same-sex couples as opposite-sex couples", question) | -->
+
 <!--          grepl("Discrimination against same-sex couples in housing and public accommodations should be banned", question) -->
+
 <!--            ) %>% -->
+
 <!--   filter(phase == 'post-convo') %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
+
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Get post-intervention aggregate scores for slider questions -->
+
 <!-- #| include: false -->
 
 <!-- post_euthanasia_sliders_df <- reverse_coded_scores_df %>% -->
-<!--    group_by(prolific_subject_id) %>% -->
-<!--   filter(grepl("euthanasia-slider", question)) %>% -->
-<!--   filter(condition != 'control free reflection') %>% -->
-<!--   filter(grepl("post-convo", phase)) %>% -->
-<!--   group_by(prolific_subject_id) %>% -->
-<!--   summarize( -->
-<!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
-<!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
-<!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
-<!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
-<!--   ) -->
 
+<!--    group_by(prolific_subject_id) %>% -->
+
+<!--   filter(grepl("euthanasia-slider", question)) %>% -->
+
+<!--   filter(condition != 'control free reflection') %>% -->
+
+<!--   filter(grepl("post-convo", phase)) %>% -->
+
+<!--   group_by(prolific_subject_id) %>% -->
+
+<!--   summarize( -->
+
+<!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
+<!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
+<!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
+<!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
+<!--   ) -->
 
 <!-- post_gender_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("gender-slider", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   filter(grepl("post-convo", phase)) %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
-
 <!-- post_healthcare_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("healthcare-slider", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   filter(grepl("post-convo", phase)) %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_bombing_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("bombing-slider", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   filter(grepl("post-convo", phase)) %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_vaccines_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("vaccines-slider", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   filter(grepl("post-convo", phase)) %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_criminal_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("criminal-slider", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   filter(grepl("post-convo", phase)) %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_same_sex_sliders_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("same-sex-slider", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   filter(grepl("post-convo", phase)) %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Get post-intervention aggregate scores for willingness offending reason questin -->
+
 <!-- #| include: false -->
+
 <!-- #|  -->
+
 <!-- post_euthanasia_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("euthanasia-offending-reason-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_gender_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("gender-offending-reason-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_healthcare_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("healthcare-offending-reason-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_bombing_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("bombing-offending-reason-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_vaccines_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("vaccines-offending-reason-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_criminal_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("criminal-offending-reason-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_same_sex_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("same-sex-offending-reason-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- post_same_sex_offending_reason_df <- reverse_coded_scores_df %>% -->
+
 <!--    group_by(prolific_subject_id) %>% -->
+
 <!--   filter(grepl("same-sex-offending-reason-post", question)) %>% -->
+
 <!--   filter(condition != 'control free reflection') %>% -->
+
 <!--   group_by(prolific_subject_id) %>% -->
+
 <!--   summarize( -->
+
 <!--     total_score = sum(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     post_mean_score = mean(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     min_score = min(as.numeric(answer), na.rm = TRUE), -->
+
 <!--     max_score = max(as.numeric(answer), na.rm = TRUE) -->
+
 <!--   ) -->
 
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Run paired t-tests on each pre- and post- intervention political party mean to look for significant differences  -->
+
 <!-- #| include: false -->
 
 <!-- #t_test_republicans <- t.test(pre_republicans_df$pre_mean_score, post_republicans_df$post_mean_score, paired = TRUE) -->
@@ -1695,10 +2181,13 @@ post_politics_df <- reverse_coded_scores_df %>%
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Run paired t-tests on each pre- and post- intervention polarization mean to look for significant differences  -->
+
 <!-- #| include: false -->
 
 <!-- #not enough observations yet -->
+
 <!-- #t_test_euthanasia_polarization_general <- t.test(pre_euthanasia_polarization_general_df$pre_mean_score, post_euthanasia_polarization_general_df$post_mean_score, paired = TRUE) -->
 
 <!-- #t_test_gender_polarization_general <- t.test(pre_gender_polarization_general_df$pre_mean_score, post_gender_polarization_general_df$post_mean_score, paired = TRUE) -->
@@ -1716,10 +2205,13 @@ post_politics_df <- reverse_coded_scores_df %>%
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Run paired t-tests on each pre- and post- intervention slider mean to look for significant differences  -->
+
 <!-- #| include: false -->
 
 <!-- #not enough observations yet -->
+
 <!-- #t_test_euthanasia_sliders <- t.test(pre_euthanasia_sliders_df$pre_mean_score, post_euthanasia_sliders_df$post_mean_score, paired = TRUE) -->
 
 <!-- #t_test_gender_sliders <- t.test(pre_gender_sliders_df$pre_mean_score, post_gender_sliders_df$post_mean_score, paired = TRUE) -->
@@ -1733,13 +2225,17 @@ post_politics_df <- reverse_coded_scores_df %>%
 <!-- #t_test_criminal_sliders <- t.test(pre_criminal_sliders_df$pre_mean_score, post_criminal_sliders_df$post_mean_score, paired = TRUE) -->
 
 <!-- t_test_same_sex_sliders <- t.test(pre_same_sex_sliders_df$pre_mean_score, post_same_sex_sliders_df$post_mean_score, paired = TRUE) -->
+
 <!-- ``` -->
 
 <!-- ```{r} -->
+
 <!-- #| label: For full experiment code- Run paired t-tests on each pre- and post- intervention offending reason mean to look for significant differences  -->
+
 <!-- #| include: false -->
 
 <!-- #not enough observations yet -->
+
 <!-- #t_test_euthanasia_offending_reason <- t.test(pre_euthanasia_offending_reason_df$pre_mean_score, post_euthanasia_sliders_df$post_mean_score, paired = TRUE) -->
 
 <!-- #t_test_gender_offending_reason <- t.test(pre_gender_sliders_df$pre_mean_score, post_gender_sliders_df$post_mean_score, paired = TRUE) -->
@@ -1831,6 +2327,7 @@ polarization_scatterplot <- ggplot(merged_polarization_df, aes(x = pre_mean_scor
 print(polarization_scatterplot)
 
 ```
+
 ```{r}
 #| label: Offending reason graph
 #| echo: false
@@ -1849,6 +2346,7 @@ offending_reason_scatterplot <- ggplot(merged_offending_reason_df, aes(x = pre_m
 print(offending_reason_scatterplot)
 
 ```
+
 ```{r}
 #| label: Sliders graph
 #| echo: false
@@ -1888,6 +2386,7 @@ print(sliders_scatterplot)
 ```
 
 ## Feedback data
+
 ```{r}
 #| label: Wrangling feedback data for readability 
 #| include: false
@@ -1896,6 +2395,7 @@ print(sliders_scatterplot)
 ```
 
 # Transcripts
+
 ```{r}
 #| label: Create data frames that are just for the conversation transcripts and free reflections to make them more readable. Remove columns that aren't necessary. Export as csv's
 #| echo: false
@@ -1999,7 +2499,8 @@ write.csv(conversations_raw_df, "RAW_conversation_transcripts.csv", row.names = 
 
 ```
 
-## Analyze time spent on control free reflections 
+## Analyze time spent on control free reflections
+
 ```{r}
 #| include: false
 
@@ -2009,11 +2510,13 @@ write.csv(conversations_raw_df, "RAW_conversation_transcripts.csv", row.names = 
 ```
 
 ## Analyze keystroke log
+
 ```{r}
 #| label: Created automated process for flagging transcripts that might have been pasted in
 ```
 
 ## Tables for html
+
 ```{r}
 #| label: Make an example table of changes
 #| echo: false
@@ -2040,6 +2543,7 @@ example_table_of_changes <- part1_processing_example_table_of_changes %>%
 print(example_table_of_changes)
 
 ```
+
 ```{r}
 #| label: Create table of basic demographics. The current code is just a rough idea with commented out examples from an old project
 #| echo: false
