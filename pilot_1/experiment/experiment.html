@@ -26,8 +26,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
 
-    <!-- uploading survey question jsons -->
-    <script src="pre_convo_survey_json.js"></script> <!-- survey -->
+    <!-- uploading pre-convo survey question jsons -->
+    <script src="pre_convo_survey_json_testing.js"></script> <!-- survey -->
+    <script src="pre_euthanasia_json.js"></script> <!-- survey -->
+    <script src="pre_bombing_json.js"></script> <!-- survey -->
+    <script src="pre_criminal_json.js"></script> <!-- survey -->
+    <script src="pre_gender_json.js"></script> <!-- survey -->
+    <script src="pre_healthcare_json.js"></script> <!-- survey -->
+    <script src="pre_same_sex_json.js"></script> <!-- survey -->
+    <script src="pre_vaccines_json.js"></script> <!-- survey -->
+
+    <!-- uploading post-convo survey question jsons -->
     <script src="post_convo_survey_republican.js"></script> <!-- survey -->
     <script src="post_convo_survey_democrat.js"></script> <!-- survey -->
     <script src="post_convo_survey_euthanasia.js"></script> <!-- survey -->
@@ -115,7 +124,7 @@
         // sequential condition assignment using data pipe. pushing a condition timeline into the timeline variable
         var timeline = [];
         async function createExperiment() {
-            const condition = 4 // await jsPsychPipe.getCondition("P09AXWX5b5t6");
+            const condition = 1 // await jsPsychPipe.getCondition("P09AXWX5b5t6");
             if (condition == 0) { timeline = counter_timeline; }
             if (condition == 1) { timeline = question_timeline; }
             if (condition == 2) { timeline = viewpoint_timeline; }
@@ -198,13 +207,83 @@
             });
         };
 
-        let surveyResponses = [];
 
-        function extractRelevantRow(responses) {
-            let relevantRow = [];
+        /// EXTRACTING STRONGEST TOPIC CHOICE 
+
+        let topicChoiceResponse = [];
+        let topicChoiceAsString;
+
+        function extractRelevantTopicChoiceRow(responses) {
+            let relevantTopicChoiceRow = [];
 
             // Function to find a row with specific column values
-            function findRowWithValue(values) {
+            function findTopicChoiceRowWithValue(values) {
+                for (let row in responses) {
+                    let columnValue = responses[row];
+                    if (columnValue === values) {
+                        return [{ row }];
+                    }
+                }
+                return null;
+            }
+
+            // Loop to check i or 8-i)
+            for (let i = 1; i <= 7; i++) {
+                // Check for i
+                relevantTopicChoiceRow = findTopicChoiceRowWithValue(i);
+                if (relevantTopicChoiceRow !== null) {
+                    return relevantTopicChoiceRow;
+                }
+            }
+        }
+
+
+        let topicChoice;
+
+        /* pushing survey in timeline with both slider and non-slider questions */
+        const pre_convo_survey_trial = {
+            type: jsPsychSurvey,
+            survey_json: pre_convo_survey_json_testing,
+            survey_function: initializePreSlider,
+            data: {
+                phase: "pre-convo-survey-initial",
+            },
+            on_finish: (data) => {
+
+                // for post-survey party-specific questions (so republicans only answer question republicans, vice versa for democrat)
+                data.response["political-affiliation"];
+
+                // extract and process the responses for the specific question
+                let topicChoiceResponse = data.response["topicChoice"];
+                if (topicChoiceResponse) {
+                    // extract most uncomfortable topic
+                    let relevanttopicChoiceRow = extractRelevantTopicChoiceRow(topicChoiceResponse);
+
+                    // convert topic into a string so it can be fed into chat later
+                    relevanttopicChoiceRow.forEach(rowObj => {
+                        data.topicChoiceAsString = rowObj;
+                        console.log(data.topicChoiceAsString);
+                        console.log(data.topicChoiceAsString["row"]);
+                    });
+                    let topicChoice = data.topicChoiceAsString["row"] 
+                    console.log(topicChoice);
+
+                } else {
+                    console.log('No responses');  // debugging, won't ever get here because SurveyJS question all set to required
+                };
+            }
+        }
+
+        const topic = topicChoice;
+
+        /// EXTRACTING DEPOLARIZATION STRING FROM TOPIC-SPECIFIC PRE-CONVO SURVEYS
+        let polarizationResponses = [];
+
+        function extractRelevantPolarizationRow(responses) {
+            let relevantPolarizationRow = [];
+
+            // Function to find a row with specific column values
+            function findPolarizationRowWithValue(values) {
                 for (let row in responses) {
                     let columnValue = responses[row];
                     if (columnValue === values) {
@@ -217,84 +296,234 @@
             // Loop to check i or 8-i)
             for (let i = 1; i <= 4; i++) {
                 // Check for i
-                relevantRow = findRowWithValue(i);
-                if (relevantRow !== null) {
-                    return relevantRow;
+                relevantPolarizationRow = findPolarizationRowWithValue(i);
+                if (relevantPolarizationRow !== null) {
+                    return relevantPolarizationRow;
                 }
                 // Check for 8 - i
-                relevantRow = findRowWithValue(8 - i);
-                if (relevantRow !== null) {
-                    return relevantRow;
+                relevantPolarizationRow = findPolarizationRowWithValue(8 - i);
+                if (relevantPolarizationRow !== null) {
+                    return relevantPolarizationRow;
+                }
+            }
+            return relevantPolarizationRow;
+
+        }
+
+        // TOPIC SPECIFIC PRE-CONVERSATION SURVEYS 
+
+        let polarizedStatement; 
+
+        var pre_convo_euthanasia_survey = {
+            data: {
+                phase: "pre-convo-survey-euthanasia",
+            },
+            timeline: [
+                {
+                    type: jsPsychSurvey,
+                    survey_json: pre_euthanasia_json,
+                    survey_function: initializePreSlider
+                }
+            ],
+            conditional_function: () => {
+                topic === 'human euthanasia in the U.S.';
+            },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["euthanasia-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                        polarizedStatement = data.rowAsString["row"];
+                    });
                 }
             }
         }
 
-        //   return relevantRow;
-        // }
-
-
-        // check i and 8-i and then loop 
-        //creating variable for saving user response to use for conditional survey structure 
-        //(so user only answer question for the topic they selected)
-        let rowAsString;
-        let topicChoice;
-
-        /* pushing survey in timeline with both slider and non-slider questions */
-        const pre_convo_survey_trial = {
-            type: jsPsychSurvey,
-            survey_json: pre_convo_survey_json,
-            survey_function: initializePreSlider,
+        var pre_convo_gender_survey = {
             data: {
-                phase: "pre-convo-survey",
+                phase: "pre-convo-survey-gender",
+            },
+            timeline: [
+                {
+                    type: jsPsychSurvey,
+                    survey_json: pre_gender_json,
+                    survey_function: initializePreSlider
+                }
+            ],
+            conditional_function: () => {
+                topic === 'gender equality in the U.S.';
             },
             on_finish: (data) => {
-                /*
-                // check console for debugging
-                console.log('Pre-convo survey data:', data);
-                */
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["euthanasia-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
 
-                // for post-survey party-specific questions (so republicans only answer question republicans, vice versa for democrat)
-                data.response["political-affiliation"];
-
-                // get topic choice to feed into chat later
-                let topicChoice = data.response['topicChoice'];
-                console.log(topicChoice);
-
-                // extract issue-specific polarization survey responses from data object
-                // need to iterate through the possible questions
-                // first, create a constant that lists the possible questions...
-                const possibleQuestions = [
-                    "euthanasia-polarization",
-                    "gender-polarization",
-                    "healthcare-polarization",
-                    "bombing-polarization",
-                    "vaccines-polarization",
-                    "criminal-polarization",
-                    "same-sex-polarization"
-                ];
-
-                // ...then extract and process each row's responses
-                possibleQuestions.forEach(row => {
-                    let surveyResponses = data.response[row];
-                    if (surveyResponses) {
-                        //console.log('Survey responses', surveyResponses);  //check console for debugging
-
-                        // extract relevant rows
-                        let relevantRow = extractRelevantRow(surveyResponses);
-                        //console.log('Relevant rows', relevantRow);  //check console for debugging
-
-                        // convert relevant row into a string so we can feed it into chat later
-                        relevantRow.forEach(rowObj => {
-                            data.rowAsString = rowObj;
-                            console.log(data.rowAsString);
-                        });
-
-                    } else {
-                        console.log('No responses');  // debugging, won't ever get here because SurveyJS question all set to required
-                    };
-                });
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                    });
+                }
             }
-        };
+        }
+
+        var pre_convo_healthcare_survey = {
+            data: {
+                phase: "pre-convo-survey-healthcare",
+            },
+            timeline: [
+                {
+                    type: jsPsychSurvey,
+                    survey_json: pre_healthcare_json,
+                    survey_function: initializePreSlider
+                }
+            ],
+            conditional_function: () => {
+                topic === 'the role of the U.S. government in healthcare';
+            },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["euthanasia-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                    });
+                }
+            }
+        }
+
+        var pre_convo_bombing_survey = {
+            data: {
+                phase: "pre-convo-survey-bombing",
+            },
+            timeline: [
+                {
+                    type: jsPsychSurvey,
+                    survey_json: pre_bombing_json,
+                    survey_function: initializePreSlider
+                }
+            ],
+            conditional_function: () => {
+                topic === 'the atomic bombings of Hiroshima and Nagasaki';
+            },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["euthanasia-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                    });
+                }
+            }
+        }
+
+        var pre_convo_vaccines_survey = {
+            data: {
+                phase: "pre-convo-survey-vaccines",
+            },
+            timeline: [
+                {
+                    type: jsPsychSurvey,
+                    survey_json: pre_vaccines_json,
+                    survey_function: initializePreSlider
+                }
+            ],
+            conditional_function: () => {
+                topic === 'mandating vaccines in the U.S.';
+            },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["euthanasia-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                    });
+                }
+            }
+        }
+
+        var pre_convo_criminal_survey = {
+            data: {
+                phase: "pre-convo-survey-criminal",
+            },
+            timeline: [
+                {
+                    type: jsPsychSurvey,
+                    survey_json: pre_criminal_json,
+                    survey_function: initializePreSlider
+                }
+            ],
+            conditional_function: () => {
+                topic === 'the criminal justice system in the U.S.';
+            },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["euthanasia-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                    });
+                }
+            }
+        }
+
+        var pre_convo_same_sex_survey = {
+            data: {
+                phase: "pre-convo-survey-same-sex",
+            },
+            timeline: [
+                {
+                    type: jsPsychSurvey,
+                    survey_json: pre_same_sex_json,
+                    survey_function: initializePreSlider
+                }
+            ],
+            conditional_function: () => {
+                topic === 'same-sex marriage in the U.S.';
+            },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["euthanasia-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                    });
+                }
+            }
+        }
 
         /* break between pre-intervention survey and bot conversation */
         var pre_bot_instructions_break = {
@@ -413,10 +642,10 @@
                         return str.charAt(0).toLowerCase() + str.slice(1);
                     };
 
-                    const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .rowAsString["row"]; // extracting the depolarization statement again because it didn't work if i tried to use the string from earlier
                     const bot_row_formatted = lowercaseFirstLetter(bot_row); // use lowercase function
-                    const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0] // get topic choice
+                    const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0] // get topic choice
                         .response["topicChoice"];
                     return `Hey there! I'm here to chat about ${topicChoiceAsString}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether ${bot_row_formatted}?`;
                 },
@@ -457,7 +686,7 @@
                 Task: You should always respond to the other person's argument with a counterargument. Do not repeat the same arguments, but you can dive into more specific aspects or previous arguments. You should never dive into asking the user how they would implement their views. You should always concisely present a specific argument that counters the user's perspective. At the end of your response, you should always ask the user what they think. You should always ensure that your message includes a counterargument; and you should never simply agree with the user.`,
             continue_button: continue_button,
             chat_field_placeholder: "Share your perspective...",
-            //prompt_chain: prompt_chain, //previousl fed in chain prompting here.
+            //prompt_chain: prompt_chain, //previously fed in chain prompting here.
             additional_prompts: counter_prompts,
         };
         jsPsych.run([counter_trial]);
@@ -478,12 +707,15 @@
                         return str.charAt(0).toLowerCase() + str.slice(1);
                     };
 
-                    const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
-                        .rowAsString["row"]; //get survey response
-                    const bot_row_formatted = lowercaseFirstLetter(bot_row);
-                    const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0] //get topic choice
-                        .response["topicChoice"];
-                    return `Hey there! I'm here to chat about ${topicChoiceAsString}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether ${bot_row_formatted}?`;
+                   // const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
+                       // .rowAsString["row"]; //get survey response
+                    const topic = topicChoice;
+                    const statement = polarizedStatement;
+                    const statement_formatted = lowercaseFirstLetter(statement);
+                    console.log(topic);
+                    console.log(statement);
+                    console.log(statement_formatted);
+                    return `Hey there! I'm here to chat about ${topic}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether ?`;
                 },
                 role: "chatbot-message",
                 message_trigger: 0
@@ -524,14 +756,11 @@
                         if (!str) return str;  // return the string if it's empty or not a string
                         return str.charAt(0).toLowerCase() + str.slice(1);
                     };
-
-
-                    const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .rowAsString["row"]; // extracting the depolarization statement again because it didn't work if i tried to use the string from earlier
                     const bot_row_formatted = lowercaseFirstLetter(bot_row); // use lowercase function
-                    const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0] // get topic choice
-                        .response["topicChoice"];
-                    return `Hey there! I'm here to chat about ${topicChoiceAsString}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether ${bot_row_formatted}?`;
+                    const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0].response["topicChoice"];
+                    return `Hey there! I'm here to chat about ${topicChoiceAsString}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether `;
                 },
                 role: "chatbot-message",
                 message_trigger: 0
@@ -571,10 +800,10 @@
                         return str.charAt(0).toLowerCase() + str.slice(1);
                     };
 
-                    const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .rowAsString["row"]; //get survey response
                     const bot_row_formatted = lowercaseFirstLetter(bot_row);
-                    const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0] //get topic choice
+                    const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0] //get topic choice
                         .response["topicChoice"];
                     return `Hey there! I'm here to chat about ${topicChoiceAsString}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether ${bot_row_formatted}?`;
                 },
@@ -628,10 +857,10 @@ If the user says you are repeating yourself or that you didn't understand what t
                     return str.charAt(0).toLowerCase() + str.slice(1);
                 };
 
-                const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0].rowAsString["row"];
+                const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0].rowAsString["row"];
                 // extracting the depolarization statement again because it didn't work if i tried to use the string from earlier
                 const bot_row_formatted = lowercaseFirstLetter(bot_row); // use lowercase function
-                const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0].response["topicChoice"]; // get topic choice
+                const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0].response["topicChoice"]; // get topic choice
                 return `  
                 Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
 
@@ -691,7 +920,7 @@ If the user says you are repeating yourself or that you didn't understand what t
                 phase: "control-intervention",
             },
             preamble: function () {
-                const row = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0].rowAsString["row"];
+                const row = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0].rowAsString["row"];
 
                 var control_intervention_string = `Please freely reflect in the space below on the following statement for at least 3 minutes: 
                 "${row}"`
@@ -793,7 +1022,7 @@ If the user says you are repeating yourself or that you didn't understand what t
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["political-affiliation"] == "Republican"
                 );
             },
@@ -811,7 +1040,7 @@ If the user says you are repeating yourself or that you didn't understand what t
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["political-affiliation"] == "Democrat"
                 );
             },
@@ -834,7 +1063,7 @@ If the user says you are repeating yourself or that you didn't understand what t
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["political-affiliation"] == "Independent"
                 );
             },
@@ -858,7 +1087,7 @@ If the user says you are repeating yourself or that you didn't understand what t
             conditional_function: () => {
                 // Assuming there's a different or no specific filter condition for "other" affiliations
                 return !["Republican", "Democrat", "Independent"].includes(
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["political-affiliation"]
                 );
             },
@@ -874,12 +1103,12 @@ If the user says you are repeating yourself or that you didn't understand what t
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_euthanasia,
-                    survey_function: initializePostSlider,
+                    survey_function: initializePostSlider
                 }
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["topicChoice"] == "human euthanasia in the U.S."
                 );
             },
@@ -893,12 +1122,12 @@ If the user says you are repeating yourself or that you didn't understand what t
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_gender,
-                    survey_function: initializePostSlider,
+                    survey_function: initializePostSlider
                 }
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["topicChoice"] == "gender equality in the U.S."
                 );
             },
@@ -913,12 +1142,12 @@ If the user says you are repeating yourself or that you didn't understand what t
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_healthcare,
-                    survey_function: initializePostSlider,
+                    survey_function: initializePostSlider
                 }
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["topicChoice"] == "the role of the U.S. government in healthcare"
                 );
             },
@@ -932,12 +1161,12 @@ If the user says you are repeating yourself or that you didn't understand what t
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_bombing,
-                    survey_function: initializePostSlider,
+                    survey_function: initializePostSlider
                 }
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["topicChoice"] == "the atomic bombings of Hiroshima and Nagasaki"
                 );
             },
@@ -951,12 +1180,12 @@ If the user says you are repeating yourself or that you didn't understand what t
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_vaccines,
-                    survey_function: initializePostSlider,
+                    survey_function: initializePostSlider
                 },
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["topicChoice"] == "mandating vaccines in the U.S."
                 );
             },
@@ -971,12 +1200,12 @@ If the user says you are repeating yourself or that you didn't understand what t
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_criminal,
-                    survey_function: initializePostSlider,
+                    survey_function: initializePostSlider
                 }
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["topicChoice"] == "the criminal justice system in the U.S."
                 );
             },
@@ -990,12 +1219,12 @@ If the user says you are repeating yourself or that you didn't understand what t
                 {
                     type: jsPsychSurvey,
                     survey_json: post_convo_survey_same_sex,
-                    survey_function: initializePostSlider,
+                    survey_function: initializePostSlider
                 }
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
                         .response["topicChoice"] == "same-sex marriage in the U.S."
                 );
             },
@@ -1007,7 +1236,7 @@ If the user says you are repeating yourself or that you didn't understand what t
             },
             type: jsPsychSurvey,
             survey_json: () => {
-                const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0] // get topic choice
+                const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0] // get topic choice
                     .response["topicChoice"];
                 var experimental_group_last_questions = {
                     elements: [
@@ -1087,7 +1316,7 @@ If the user says you are repeating yourself or that you didn't understand what t
                 };
                 return experimental_group_last_questions
             },
-            survey_function: initializePostSlider,
+            survey_function: initializePostSlider
         };
 
         //goodbye message and brief explanation to user about our experimentation motive
@@ -1140,6 +1369,13 @@ If the user says you are repeating yourself or that you didn't understand what t
             welcome,
             preliminary_convo_instructions,
             pre_convo_survey_trial,
+            pre_convo_euthanasia_survey,
+            // pre_convo_gender_survey,
+            // pre_convo_healthcare_survey,
+            // pre_convo_bombing_survey,
+            // pre_convo_vaccines_survey,
+            // pre_convo_criminal_survey,
+            // pre_convo_same_sex_survey,
             pre_bot_instructions_break,
             pre_convo_instructions,
             question_trial,
