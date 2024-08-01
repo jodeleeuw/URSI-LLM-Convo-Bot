@@ -124,7 +124,7 @@
         // sequential condition assignment using data pipe. pushing a condition timeline into the timeline variable
         var timeline = [];
         async function createExperiment() {
-            const condition = 1 // await jsPsychPipe.getCondition("P09AXWX5b5t6");
+            const condition = await jsPsychPipe.getCondition("P09AXWX5b5t6");
             if (condition == 0) { timeline = counter_timeline; }
             if (condition == 1) { timeline = question_timeline; }
             if (condition == 2) { timeline = viewpoint_timeline; }
@@ -865,11 +865,6 @@ If the user says you are repeating yourself or that you didn't understand what t
                     if (!str) return str;  // return the string if it's empty or not a string
                     return str.charAt(0).toLowerCase() + str.slice(1);
                 };
-
-                const bot_row = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0].rowAsString["row"];
-                // extracting the depolarization statement again because it didn't work if i tried to use the string from earlier
-                const bot_row_formatted = lowercaseFirstLetter(bot_row); // use lowercase function
-                const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0].response["topicChoice"]; // get topic choice
                 return `  
                 Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
 
@@ -877,7 +872,7 @@ Style: You should be concise. You should match your response's length to the use
 
 Task: Briefly acknowledge the user's stance and then ask a question about the user's stance. Ask why the user thinks what they think or ask if there were any experiences that led to their views. Do not repeat questions, but you can dive deeper into previous questions if necessary. Do not repeat the same arguments or views that the assistant has already mentioned; instead, you can suggest new perspectives or dive into more specific ideas from prior points.
 If the user says you are repeating yourself or that you didn't understand what they're saying, apologize and ask them what they think without summarizing their stance.`
-                    ; //the ai_prompt shouldn't ever be used because the chain prompt is triggered on message 0, but we put the prompt here anyway in case, for some reason, it does get used
+                    ; //the ai_prompt shouldn't ever be used because the chain prompt is triggered on message 0, but we put a prompt here anyway in case, for some reason, it does get used
             },
             continue_button: continue_button,
             chat_field_placeholder: "Share your perspective...",
@@ -930,7 +925,6 @@ If the user says you are repeating yourself or that you didn't understand what t
             },
             preamble: function () {
                 const statement = polarizedStatement;
-
                 var control_intervention_string = `Please freely reflect in the space below on the following statement for at least 3 minutes: 
                 "${statement}"`
 
@@ -1231,22 +1225,21 @@ If the user says you are repeating yourself or that you didn't understand what t
             },
             type: jsPsychSurvey,
             survey_json: () => {
-                const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0] // get topic choice
-                    .response["topicChoice"];
+                const topic = topicChoice; // get topic choice
                 var experimental_group_last_questions = {
                     elements: [
                         {
                             type: "comment",
                             name: "free-response-After your conversation with the chat bot, do you feel more willing to have a conversation with others about ? Please freely reflect in the space below.",
                             title:
-                                `After your conversation with the chat bot, do you feel more willing to have a conversation with others about ${topicChoiceAsString}? Please freely reflect in the space below.`,
+                                `After your conversation with the chat bot, do you feel more willing to have a conversation with others about ${topic}? Please freely reflect in the space below.`,
                             isRequired: true,
                         },
                         {
                             type: "radiogroup",
                             name: "willing-to-converse-likert-post-Rate this conversation's effect on your willingness to converse about",
                             title:
-                                `Rate this conversation's effect on your willingness to converse about ${topicChoiceAsString} with others. Rate on the seven point scale.`,
+                                `Rate this conversation's effect on your willingness to converse about ${topic} with others. Rate on the seven point scale.`,
                             isRequired: true,
                             choices: [
                                 {
@@ -1283,21 +1276,21 @@ If the user says you are repeating yourself or that you didn't understand what t
                             type: "comment",
                             name: "convo-effect-on-willingness-post-what parts of this conversation, if any, affected your willingness to talk with someone who has different views about topic? What made you feel like the conversation was or was not productive?",
                             title:
-                                `What parts of this conversation, if any, affected your willingness to talk with someone who has different views about ${topicChoiceAsString}? What made you feel like the conversation was or was not productive?`,
+                                `What parts of this conversation, if any, affected your willingness to talk with someone who has different views about ${topic}? What made you feel like the conversation was or was not productive?`,
                             isRequired: true,
                         },
                         {
                             type: "comment",
                             name: "new-perspective-post-Throughout this conversation, were there any moments that opened you up to a new perspective about topic? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
                             title:
-                                `Throughout this conversation, were there any moments that opened you up to a new perspective about ${topicChoiceAsString}? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?`,
+                                `Throughout this conversation, were there any moments that opened you up to a new perspective about ${topic}? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?`,
                             isRequired: true,
                         },
                         {
                             type: "comment",
                             name: "still-contributes-post- What still contributes to your willingness or unwillingness to converse with others about topic? Please freely reflect in the space below",
                             title:
-                                `What still contributes to your willingness or unwillingness to converse with others about ${topicChoiceAsString}? Please freely reflect in the space below.`,
+                                `What still contributes to your willingness or unwillingness to converse with others about ${topic}? Please freely reflect in the space below.`,
                             isRequired: true,
                         },
                         {
@@ -1340,7 +1333,6 @@ If the user says you are repeating yourself or that you didn't understand what t
         counter_timeline.push(
             welcome,
             preliminary_convo_instructions,
-            pre_convo_survey_trial,
             pre_convo_survey_trial,
             pre_convo_euthanasia_survey,
             pre_convo_gender_survey,
@@ -1402,7 +1394,6 @@ If the user says you are repeating yourself or that you didn't understand what t
             welcome,
             preliminary_convo_instructions,
             pre_convo_survey_trial,
-            pre_convo_survey_trial,
             pre_convo_euthanasia_survey,
             pre_convo_gender_survey,
             pre_convo_healthcare_survey,
@@ -1433,6 +1424,13 @@ If the user says you are repeating yourself or that you didn't understand what t
             welcome,
             preliminary_convo_instructions,
             pre_convo_survey_trial,
+            pre_convo_euthanasia_survey,
+            pre_convo_gender_survey,
+            pre_convo_healthcare_survey,
+            pre_convo_bombing_survey,
+            pre_convo_vaccines_survey,
+            pre_convo_criminal_survey,
+            pre_convo_same_sex_survey,
             pre_bot_instructions_break,
             pre_convo_instructions,
             combination_trial,
@@ -1456,6 +1454,13 @@ If the user says you are repeating yourself or that you didn't understand what t
             welcome,
             preliminary_control_instructions,
             pre_convo_survey_trial,
+            pre_convo_euthanasia_survey,
+            pre_convo_gender_survey,
+            pre_convo_healthcare_survey,
+            pre_convo_bombing_survey,
+            pre_convo_vaccines_survey,
+            pre_convo_criminal_survey,
+            pre_convo_same_sex_survey,
             pre_control_break,
             control_intervention,
             post_control_break,
