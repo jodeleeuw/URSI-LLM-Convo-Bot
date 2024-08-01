@@ -1,3 +1,5 @@
+data analysis 
+
 ---
 title: "Pilot data"
 format: html
@@ -72,28 +74,6 @@ raw_df <- raw_df %>%
 
 ```
 
-```{r}
-#| label: Read in demographics csv and merge it with the raw df based on subject id
-#| include: false
-
-#read in data
-
-#raw_demographics_tibbles <- map(demographics_csv_filenames, ~read_csv(file.path("data/", .)))
-#raw_df <- bind_rows(raw_demographics_tibbles)
-
-#demographics_df <- read_csv("prolific_export_6690246c6dba4b8beab3c615.csv") %>%
-#read_csv("prolific_export_6690246c6dba4b8beab3c615.csv") %>%
-#  read_csv("prolific_export_6690246c6dba4b8beab3c615.csv") %>%
- # read_csv("prolific_export_6690246c6dba4b8beab3c615.csv") %>%
-#add a merge 
-
-#rename subject id column to match our name so that we can merge by it
-#names(demographics_df)[names(demographics_df) == 'Participant id'] <- 'prolific_subject_id'
-
-#merge
-#full_raw_df <- raw_df %>%
- # full_join(demographics_df, by = "prolific_subject_id")
-```
 
 # Survey data
 
@@ -102,7 +82,7 @@ raw_df <- raw_df %>%
 #| include: false
 
 surveys_cleaning_df <- raw_df %>%
-  # Remove the first four subjects of the pilot who participant in the experiment before Jackie made the code easier to perform data analysis on 
+  # Remove the first four subjects of the pilot who participant in the experiment before we made the code easier to perform data analysis on 
   filter(prolific_subject_id != "5ff3b5986d65c5a24eebd036") %>%
   filter(prolific_subject_id != "663ceae2f9337d71cfe99679") %>%
   filter(prolific_subject_id != "6550dd527fede9c068b3a08b") %>% 
@@ -2385,14 +2365,7 @@ print(sliders_scatterplot)
 
 ```
 
-## Feedback data
 
-```{r}
-#| label: Wrangling feedback data for readability 
-#| include: false
-
-
-```
 
 # Transcripts
 
@@ -2407,23 +2380,34 @@ conversations_raw_df <- raw_df %>%
 
 ## add which round of the pilot it was by reading in demographics files so we know completion dates
 #read in prolific demographics files 
-demo1 <- read_csv("prolific_export_6697dedd0a9f0e1820436c12.csv") 
+demo1 <- read_csv("prolific_export_6697dedd0a9f0e1820436c12.csv")  %>%
+  mutate(Age = as.numeric(Age))
 demo2 <- read_csv("prolific_export_6699817273833cff743f502e.csv") %>%
   select(-'U.s. political affiliation') %>%
-  
-demo3 <- read_csv("prolific_export_6690246c6dba4b8beab3c615.csv")
+  mutate(Age = as.numeric(Age))
+demo3 <- read_csv("prolific_export_6690246c6dba4b8beab3c615.csv") %>%
+  mutate(Age = as.numeric(Age))
 
 # compile prolific demographics files into one df, filter out people who returned the experiment, and convert time into minutes for readability 
-prolific_demographics_df <- bind_rows(demo1, demo2) 
-prolific_demographics_df <- prolific_demographics_df %>%
+full_prolific_demographics_df <- bind_rows(demo1, demo2, demo3) 
+full_prolific_demographics_df <- full_prolific_demographics_df %>%
 rename("prolific_subject_id" = "Participant id") %>%
 filter(Status != "RETURNED") %>%
 mutate(`Time taken (minutes)` = as.numeric(`Time taken`) / 60) %>%
-select(- "Time taken")bbb
+select(- "Time taken")
 
 # merge with conversations df 
 conversations_raw_df <-  conversations_raw_df %>%
-  left_join(sixteen_demographics_df)
+  left_join(full_prolific_demographics_df) %>%
+  rename("start" = "Started at") %>%
+  mutate(round = case_when(
+    grepl("2024-07-14", start) ~ "Round 1 (Original prompts)",
+    grepl("2024-07-17", start) ~ "Round 2 (Original prompts)",
+    grepl("2024-07-18", start) ~ "Round 3 (Original prompts; conservative only)",
+    grepl("2024-07-26", start) ~ "Round 4 (Modified prompts + combo bot)",
+    TRUE ~ NA_character_
+  )) %>%
+  select(prolific_subject_id, logs, condition, round)
 
 ## make a cleaned df for readability 
 conversations_df <- conversations_raw_df %>%
@@ -2483,6 +2467,35 @@ conversations_df <- conversations_df %>%
   separate_rows(logs, sep = "\\|") %>%
   filter(logs != "") # Remove any empty rows that might have been created
 
+define_chain_prompts <- data.frame(
+  question = c("THE SYSTEM CHAIN LINK PROMPTS",
+    'LINK 1 PROMPT: Context: You are being fed a conversation log. The last paragraph following {"role", "user", "content"} is the most recent message that the user has input. This is the message that you should be responding to.
+
+              Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+
+Goal: Your goal is to make the user more willing to have conversations about their topic with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
+
+Style: You should be concise. You should match the length of your response to the length of the most recent message from the user.
+
+Task 1: You should consider the most recent message from the user and determine which of the three following approaches would most effectively accomplish your goal: 
+
+        {1. Briefly acknowledge the stance of the user and then respond to the argument with a counterargument. Do not repeat the same arguments, but you can dive into more specific aspects or previous arguments if necessary. Never dive into asking the user how they would implement their views. Concisely present a specific argument that counters the perspective of the user. Ask the user what they think. Ensure that your message includes a counterargument; never simply agree with the user.} 
+        {2. Briefly acknowledge the stance of the user and then ask a question about the stance of the user. Ask why the user thinks what they think or ask if there were any experiences that led to their views. Do not repeat questions, but you can dive deeper into previous questions if necessary.}
+        {3. Briefly acknowledge the stance of the user and then identify a specific group of people who may have differing opinions from the user. Explain, in detail, their experiences and why they may disagree with the beliefs of the user. Provide these alternative perspectives held by people with different jobs, positions in society, beliefs, etc. Give uniquely different perspectives in each message. Do not repeat viewpoints, but you can dive deeper into previously mentioned viewpoints if necessary. End your response with a question that asks the user what they think about those alternative stances. Provide only one viewpoint per response.}
+        
+
+Task 2: Very briefly summarize the arguments that the "system" has already made so that, when you pass these to the next "system", the "system" knows what arguments to not repeat.
+
+What you should output: You are passing your output to another "system" that is going to write a response to the user. Thus, you should output your summary of the arguments that have already been made, the user's most recent message, and the approach that you selected. Ensure that you output the entirety of the approach, not just its number, so that the next bot knows what to do.',
+  "LINK 2 PROMPT (link 1's output is appended to this): ",
+  "CONVERSATIONS"
+  ),
+  stringsAsFactors = FALSE
+)
+
+#merge them 
+bot_feedback <- bind_rows(define_bot_feedback_questions, bot_feedback)
+
 # Export the modified data frame to CSV
 write.csv(conversations_df, "conversation_transcripts_spaced.csv", row.names = FALSE)
 
@@ -2494,8 +2507,59 @@ write.csv(conversations_raw_df, "RAW_conversation_transcripts.csv", row.names = 
 
 ```
 
-```{r}
+## Feedback data
 
+```{r}
+#| label: Wrangling feedback data for readability. Make csv
+#| include: false
+
+# make demographics df with just the 16 subs that are good for data analysis. need demo data so we can define the round that the people were in (so we know whether they chatted with an older bot)
+
+good_data_prolific_demographics_df <- bind_rows(demo1, demo2) 
+good_data_prolific_demographics_df <- good_data_prolific_demographics_df %>%
+rename("prolific_subject_id" = "Participant id") %>%
+filter(Status != "RETURNED") %>%
+mutate(`Time taken (minutes)` = as.numeric(`Time taken`) / 60) %>%
+select(- "Time taken")
+
+# make df
+bot_feedback <- surveys_df %>%
+  left_join(good_data_prolific_demographics_df) %>%
+  rename("start" = "Started at") %>%
+  filter(!any(condition == "control free reflection")) %>%
+  mutate("round_of_pilot" = case_when(
+    grepl("2024-07-14", start) ~ "Round 1 (Original prompts)",
+    grepl("2024-07-17", start) ~ "Round 2 (Original prompts)",
+    grepl("2024-07-18", start) ~ "Round 3 (Original prompts; conservative only)",
+    grepl("2024-07-26", start) ~ "Round 4 (Modified prompts + combo bot)",
+    TRUE ~ NA_character_
+  )) %>%
+  mutate(question = ifelse(str_detect(question, "free-response"), "free-response", question)) %>%
+    mutate(question = ifelse(str_detect(question, "convo-effect-on-willingness"), "convo-effect-on-willingness", question)) %>%
+    mutate(question = ifelse(str_detect(question, "new-perspective"), "new-perspective", question)) %>%
+    mutate(question = ifelse(str_detect(question, "still-contributes"), "still-contributes", question)) %>%
+    mutate(question = ifelse(str_detect(question, "feelings-about-bot"), "feelings-about-bot", question)) %>%
+  filter(question == "free-response" | question == "convo-effect-on-willingness" | question == "new-perspective" | question == "still-contributes" | question == "feelings-about-bot" | question == "topicChoice") %>%
+  arrange(desc(prolific_subject_id)) %>%
+  select(prolific_subject_id, question, answer, condition, round_of_pilot)
+
+# add some entries that explain what the questions were 
+define_bot_feedback_questions <- data.frame(
+  question = c("THE FULL QUESTIONS",
+    "free-response: After your conversation with the chat bot, do you feel more willing to have a conversation with others about ${topicChoiceAsString}? Please freely reflect in the space below.",
+  "convo-effect-on-willingness: What parts of this conversation, if any, affected your willingness to talk with someone who has different views about ${topicChoiceAsString}? What made you feel like the conversation was or was not productive?", 
+  "new-perspective: Throughout this conversation, were there any moments that opened you up to a new perspective about ${topicChoiceAsString}? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?", 
+  "still-contributes: What still contributes to your willingness or unwillingness to converse with others about ${topicChoiceAsString}? Please freely reflect in the space below.", 
+  "feelings-about-bot: We are still working on improving our chatbot. How did you like talking with the bot? What do you wish were different? Please provide any feedback regarding your conversation that we have not already covered.",
+  "DATA"
+  ),
+  stringsAsFactors = FALSE
+)
+
+#merge them 
+bot_feedback <- bind_rows(define_bot_feedback_questions, bot_feedback)
+
+write.csv(bot_feedback, "bot_feedback.csv", row.names = FALSE)
 
 ```
 
@@ -2557,10 +2621,9 @@ select(question, answer, prolific_subject_id, condition) %>%
 pivot_wider(names_from = question, values_from = answer)
 
 #merge our two demographics tables
-sixteen_demographics_df <- prolific_demographics_df %>%
+sixteen_sub_all_demographics_df <- full_prolific_demographics_df %>%
+  filter(pilot_round != 1) %>%
   left_join(survey_demographics_df, by = "prolific_subject_id", suffix = c("_prolific", ""))
-
-sixteen_demographics_df <- sixteen_demographics_df
 
 #make a region column because graphic each state is excessive
 sixteen_demographics_df$Region <- ifelse(sixteen_demographics_df$`Current u.s state of residence` %in% c("California (CA)", "Colorado (CO)", "Utah (UT)", "Utah(UT)", "Idaho (ID)", "Alaska (AK)", "Hawaii (HI)", "Washington (WA)", "Oregon (OR)", "Nevada (NV)", "New Mexico (NM)", "Montana (MT)", "Arizona (AZ)", "Wyoming (WY)"), "West",
