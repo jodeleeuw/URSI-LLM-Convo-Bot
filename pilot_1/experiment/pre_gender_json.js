@@ -38,35 +38,36 @@ var pre_gender_json = {
     ],
     rows: [
       {
-        value: "Gender quotas should be implemented in corporate boards and executive positions",
-        text: "Gender quotas should be implemented in corporate boards and executive positions",
+        value: "Gender quotas should be enforced in political positions to ensure equal representation of men and women in government",
+        text: "Gender quotas should be enforced in political positions to ensure equal representation of men and women in government",
       },
       {
         value:
-          "Mandating equal pay for equal work regardless of gender would improve gender equality",
-        text: "Mandating equal pay for equal work regardless of gender would improve gender equality",
+          "Policies that take gender into account often do more harm than good in achieving gender equality.",
+        text: "Policies that take gender into account often do more harm than good in achieving gender equality.",
       },
       {
-        value: "Both mothers and fathers should be provided with parental leave",
-        text: "Both mothers and fathers should be provided with parental leave",
+        value: "Companies should be required to have a minimum percentage of women in senior leadership roles",
+        text: "Companies should be required to have a minimum percentage of women in senior leadership roles",
       },
       {
-        value: "Free childcare services should be provided to support working parents",
-        text: "Free childcare services should be provided to support working parents",
-      },
-      {
-        value: "Funding for programs aimed at reducing gender-based violence should be increased",
-        text: "Funding for programs aimed at reducing gender-based violence should be increased",
+        value: "Businesses should receive tax incentives for implementing gender-based hiring practices",
+        text: "Businesses should receive tax incentives for implementing gender-based hiring practices",
       },
       {
         value:
-          "Gender diversity should be encouraged in STEM fields through scholarships and grant",
-        text: "Gender diversity should be encouraged in STEM fields through scholarships and grants",
+          "Gender should be disregarded when selecting candidates for career advancement opportunities to ensure that selections are based on merit",
+          
+        text: "Gender should be disregarded when selecting candidates for career advancement opportunities to ensure that selections are based on merit",
+      },
+      {
+        value: "Educational institutions should implement gender-based affirmative action policies to achieve balanced gender representation among faculty",
+        text: "Educational institutions should implement gender-based affirmative action policies to achieve balanced gender representation among faculty",
       },
       {
         value:
-          "Gender should be disregarded when selecting candidates for career advancement opportunities",
-        text: "Gender should be disregarded when selecting candidates for career advancement opportunities",
+          "Affirmative action policies for women in STEM fields should be implemented to address historical underrepresentation",
+        text: "Affirmative action policies for women in STEM fields should be implemented to address historical underrepresentation",
       },
     ],
     rowsOrder: "random",
@@ -110,23 +111,23 @@ var pre_gender_json = {
     rows: [
       {
         value:
-          "pre-gender-polarization-general-Efforts to reduce gender inequality benefit society as a whole",
+          "pre-gender-polarization-general-Efforts to reduce gender inequality through gender-based affirmative action benefit society as a whole",
         text: "Efforts to reduce gender inequality benefit society as a whole",
       },
       {
         value:
-          "pre-gender-polarization-general-The federal government should take more action to address gender inequality",
-        text: "The federal government should take more action to address gender inequality",
+          "pre-gender-polarization-general-The federal government should take more action to address gender inequality in institutions",
+        text: "The federal government should take more action to address gender inequality in institutions",
       },
       {
         value:
-          "pre-gender-polarization-general-Reducing gender inequality would lead to more opportunities for everyone",
-        text: "Reducing gender inequality would lead to more opportunities for everyone",
+          "pre-gender-polarization-general-Policies on gender lead to more career opportunities for everyone",
+        text: "Policies on gender lead to more career opportunities for everyone",
       },
       {
         value:
-          "pre-gender-polarization-general-Efforts to reduce inequality for women often create unfair advantages for women over men",
-        text: "Efforts to reduce inequality for women often create unfair advantages for women over men",
+          "pre-gender-polarization-general-Policies aimed at reducing inequality for women often create unfair advantages for women over men",
+        text: "Policies aimed at reducing inequality for women often create unfair advantages for women over men",
       },
     ],
     rowsOrder: "random",
@@ -221,6 +222,15 @@ var pre_gender_json = {
       "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about gender equality in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     html: '<div id="gender-slider2-placeholder"></div>', // Placeholder for the slider
   },
+  { type: "expression",
+    name: "attention-check-slider",
+    title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+},
+{ type: "html",
+    name: "attention-check-slider-pre-placeholder",
+    title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+    html: '<div id="attention-check-slider-pre-placeholder"></div>', // Placeholder for the slider
+}, 
   {
     type: "expression",
     name: "gender-slider3",

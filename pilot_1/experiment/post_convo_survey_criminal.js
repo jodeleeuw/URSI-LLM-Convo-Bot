@@ -223,6 +223,15 @@ var post_convo_survey_criminal = {
         "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the criminal justice system in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
       html: '<div id="criminal-slider2-post-placeholder"></div>', // Placeholder for the slider
     },
+    { type: "expression",
+    name: "attention-check-slider-post",
+    title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+},
+{ type: "html",
+    name: "attention-check-slider-post-placeholder",
+    title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+    html: '<div id="attention-check-slider-post-placeholder"></div>', // Placeholder for the slider
+}, 
     {
       type: "expression",
       name: "criminal-slider3-post",

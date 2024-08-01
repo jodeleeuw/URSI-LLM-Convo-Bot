@@ -925,7 +925,7 @@ If the user says you are repeating yourself or that you didn't understand what t
             },
             preamble: function () {
                 const statement = polarizedStatement;
-                var control_intervention_string = `Please freely reflect in the space below on the following statement for at least 3 minutes: 
+                var control_intervention_string = `Please freely reflect in the space below on the following statement for at least 10 minutes: 
                 "${statement}"`
 
                 return control_intervention_string;
@@ -939,7 +939,7 @@ If the user says you are repeating yourself or that you didn't understand what t
                 let button = document.getElementById('jspsych-survey-text-next'); // Get the continue button element
 
 
-                let countdown = 3 * 60; // Set initial countdown time in seconds
+                let countdown = 10 * 60; // Set initial countdown time in seconds
                 let inactivityLimit = 20; // Set inactivity limit in seconds
 
 
@@ -1006,7 +1006,7 @@ If the user says you are repeating yourself or that you didn't understand what t
         };
 
         // Run the experiment
-        jsPsych.run([control_intervention]);
+    //    jsPsych.run([control_intervention]);
 
 
         /* ---------- PARTY SPECIFIC POST CHAT SURVEYS ---------- */

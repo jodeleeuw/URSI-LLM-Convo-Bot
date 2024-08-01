@@ -219,6 +219,15 @@ var post_convo_survey_same_sex = {
         "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about same-sex marriage in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
       html: '<div id="same-sex-slider2-post-placeholder"></div>', // Placeholder for the slider
     },
+    { type: "expression",
+    name: "attention-check-slider-post",
+    title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+},
+{ type: "html",
+    name: "attention-check-slider-post-placeholder",
+    title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+    html: '<div id="attention-check-slider-post-placeholder"></div>', // Placeholder for the slider
+}, 
     {
       type: "expression",
       name: "same-sex-slider3-post",

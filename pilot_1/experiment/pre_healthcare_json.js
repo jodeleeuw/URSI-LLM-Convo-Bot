@@ -218,6 +218,15 @@ var pre_healthcare_json = {
           "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the role of the government in U.S. healthcare, where 0 is absolute unwillingness and 100 is absolute willingness.",
         html: '<div id="healthcare-slider2-placeholder"></div>', // Placeholder for the slider
       },
+      { type: "expression",
+        name: "attention-check-slider",
+        title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+    },
+    { type: "html",
+        name: "attention-check-slider-pre-placeholder",
+        title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+        html: '<div id="attention-check-slider-pre-placeholder"></div>', // Placeholder for the slider
+    }, 
       {
         type: "expression",
         name: "healthcare-slider3",
