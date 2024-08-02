@@ -4,7 +4,6 @@ var pre_criminal_json = {
 {
     type: "matrix",
     name: "criminal-polarization",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "How much do you agree or disagree with the following statements on the criminal justice system in the U.S.? ",
     isRequired: true,
@@ -72,7 +71,6 @@ var pre_criminal_json = {
   {
     type: "matrix",
     name: "criminal-polarization-general",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "How much do you agree or disagree with the following statements on the criminal justice system in the U.S.? ",
     isRequired: true,
@@ -133,7 +131,6 @@ var pre_criminal_json = {
   {
     type: "matrix",
     name: "pre-criminal-openmindedness",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Rate the following statements on the seven point scale: When I have conversations about the U.S. criminal justice system, I...",
     isRequired: true,
@@ -198,14 +195,12 @@ var pre_criminal_json = {
   {
     type: "expression",
     name: "criminal-slider1",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the criminal justice system in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
   },
   {
     type: "html",
     name: "criminal-slider1-placeholder",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about the criminal justice system in the U.S., where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
     html: '<div id="criminal-slider1-placeholder"></div>', // Placeholder for the slider
@@ -213,14 +208,12 @@ var pre_criminal_json = {
   {
     type: "expression",
     name: "criminal-slider2-placeholder",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the criminal justice system in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
   },
   {
     type: "html",
     name: "criminal-slider2-placeholder",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about the criminal justice system in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     html: '<div id="criminal-slider2-placeholder"></div>', // Placeholder for the slider
@@ -237,14 +230,12 @@ var pre_criminal_json = {
   {
     type: "expression",
     name: "criminal-slider3-placeholder",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the criminal justice system in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
   },
   {
     type: "html",
     name: "criminal-slider3-placeholder",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the criminal justice system in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     html: '<div id="criminal-slider3-placeholder"></div>', // Placeholder for the slider
@@ -252,14 +243,12 @@ var pre_criminal_json = {
   {
     type: "expression",
     name: "criminal-slider4",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the criminal justice system in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
   },
   {
     type: "html",
     name: "criminal-slider4-placeholder",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in the criminal justice system in the U.S., where 0 is absolute unwillingness and 100 is absolute willingness.",
     html: '<div id="criminal-slider4-placeholder"></div>', // Placeholder for the slider
@@ -267,7 +256,6 @@ var pre_criminal_json = {
   {
     type: "matrix",
     name: "criminal-offending-reason",
-    visibleIf: "{topicChoice} = 'the criminal justice system in the U.S.'",
     title:
       "Imagine that you are asked to have a serious conversation about the criminal justice system in the U.S. with a group of people. Rate the following statements: I would be less willing to join the conversation because...",
     isRequired: true,

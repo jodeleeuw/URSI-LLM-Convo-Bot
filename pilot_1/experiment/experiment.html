@@ -119,17 +119,16 @@
         var viewpoint_timeline = [];
         var control_timeline = [];
         var combination_timeline = [];
+        var selection_timeline = [];
 
 
         // sequential condition assignment using data pipe. pushing a condition timeline into the timeline variable
         var timeline = [];
         async function createExperiment() {
             const condition = await jsPsychPipe.getCondition("P09AXWX5b5t6");
-            if (condition == 0) { timeline = counter_timeline; }
-            if (condition == 1) { timeline = question_timeline; }
-            if (condition == 2) { timeline = viewpoint_timeline; }
-            if (condition == 3) { timeline = control_timeline; }
-            if (condition == 4) { timeline = combination_timeline; }
+            if (condition == 0) { timeline = combination_timeline; }
+            if (condition == 1) { timeline = selection_timeline; }
+            if (condition == 2) { timeline = control_timeline; }
             jsPsych.run([...timeline, save_data]);
         }
 
@@ -488,7 +487,7 @@
             },
             on_finish: (data) => {
                 // extract and process the responses for the specific question
-                let polarizationResponses = data.response["same-sex-polarization"];
+                let polarizationResponses = data.response["criminal-polarization"];
                 if (polarizationResponses) {
                     // extract relevant rows
                     let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
@@ -520,7 +519,7 @@
             },
             on_finish: (data) => {
                 // extract and process the responses for the specific question
-                let polarizationResponses = data.response["euthanasia-polarization"];
+                let polarizationResponses = data.response["same-sex-polarization"];
                 if (polarizationResponses) {
                     // extract relevant rows
                     let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
@@ -691,6 +690,7 @@
         // putting prompt into counter bot conversation trial (a trial is where the actual convo happens with all the UI implemented for the plug-in)
         const counter_trial = {
             type: jsPsychChat,
+            ai_model: "gpt-4o",
             ai_prompt: `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
                 Style: You should be conversational but use technically precise language. Be concise. You should match your response length to the user's input length.
                 Task: You should always respond to the other person's argument with a counterargument. Do not repeat the same arguments, but you can dive into more specific aspects or previous arguments. You should never dive into asking the user how they would implement their views. You should always concisely present a specific argument that counters the user's perspective. At the end of your response, you should always ask the user what they think. You should always ensure that your message includes a counterargument; and you should never simply agree with the user.`,
@@ -699,7 +699,7 @@
             //prompt_chain: prompt_chain, //previously fed in chain prompting here.
             additional_prompts: counter_prompts,
         };
-        jsPsych.run([counter_trial]);
+      //  jsPsych.run([counter_trial]);
 
         //creating prompt for question bot condition
         question_prompts = [
@@ -737,6 +737,7 @@
         ]
         const question_trial = {
             type: jsPsychChat,
+            ai_model: "gpt-4o",
             ai_prompt: `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
                 Style: You should be conversational but use technically precise language. Be concise. You should match your response length to the user's input length.
                 Task: You should always ask a question about the user's stance. You should always ask why the user thinks what they think or ask if there were any experiences that led to their views. Do not repeat questions, but you can dive deeper into previous questions.`,
@@ -744,7 +745,7 @@
             chat_field_placeholder: "Share your perspective...",
             additional_prompts: question_prompts,
         };
-        jsPsych.run([question_trial]);
+      //  jsPsych.run([question_trial]);
 
         //creating prompts for viewpoint bot condition
         viewpoint_prompts = [
@@ -785,6 +786,7 @@
         ]
         const viewpoint_trial = {
             type: jsPsychChat,
+            ai_model: "gpt-4o",
             //ai_prompt: "Always explain in detail the experiences of people with opposite views from the user without repeating the user's input. Provide the alternative viewpoints of people with different jobs, positions in society, beliefs, etc. Give different perspectives each time. Ask what the user thinks about those peoples' stances. Acknowledge the user's perpsective. Respond in 1 paragraph.",
             ai_prompt: `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
                 Style: You should be conversational but use technically precise language. Be concise. You should match your response length to the user's input length.
@@ -793,7 +795,7 @@
             chat_field_placeholder: "Share your perspective...",
             additional_prompts: viewpoint_prompts,
         };
-        jsPsych.run([viewpoint_trial]);
+      //  jsPsych.run([viewpoint_trial]);
 
         combination_prompts = [
             {
@@ -849,9 +851,9 @@ Goal: Your goal is to make the user more willing to have conversations about the
 
 Style: You should be concise. You should match your response's length to the user's input.
 
-Task: A previous "system" has selected the approach that you should take when responding to the user. Execute this strategy, but do not tell the user that you have selected a strategy. You are mid-conversation, so do not greet the user. Do not repeat the same arguments or views that the assistant has already mentioned; instead, you can suggest new perspectives or dive into more specific ideas from prior points.
-Don't stray from the topic at hand.
-If the user says you are repeating yourself or that you didn't understand what they're saying, apologize and ask them what they think without summarizing their stance.
+Task: A previous "system" has selected the approach that you should take when responding to the user. Write a response to the user message using the selected approach, but do not tell the user that you have selected an approach. You are mid-conversation, so do not greet the user. Do not repeat the same arguments or views that the assistant has already mentioned; instead, you can suggest new perspectives or dive into more specific ideas from prior points. Don't stray from the topic at hand. If the user says you are repeating yourself or that you didn't understand what they're saying, apologize and ask them what they think without summarizing their stance.
+
+Output your response.
             `,
             ],
         };
@@ -859,6 +861,7 @@ If the user says you are repeating yourself or that you didn't understand what t
 
         const combination_trial = {
             type: jsPsychChat,
+            ai_model: "gpt-4o",
             ai_prompt: () => {
                 // function to insert depolarization survey response statement into the bot's conversation starter
                 const lowercaseFirstLetter = (str) => { //function to convert the first letter of the string into lowercase so it can be seamlessly inserted into the bot's question
@@ -879,7 +882,116 @@ If the user says you are repeating yourself or that you didn't understand what t
             prompt_chain: combination_prompt_chain,
             additional_prompts: combination_prompts,
         };
-        jsPsych.run([combination_trial]);
+       // jsPsych.run([combination_trial]);
+
+
+        selection_prompts = [
+            //set role to 'chatbot' for specific message to be sent via the bot
+            {
+                message: "Welcome to the chatroom!",
+                role: "system-prompt",
+                message_trigger: 0
+            },
+            {
+                message: () => {
+                    // function to insert depolarization survey response statement into the bot's conversation starter
+                    const lowercaseFirstLetter = (str) => { //function to convert the first letter of the string into lowercase so it can be seamlessly inserted into the bot's question
+                        if (!str) return str;  // return the string if it's empty or not a string
+                        return str.charAt(0).toLowerCase() + str.slice(1);
+                    };
+                    const topic = topicChoice;
+                    const statement = polarizedStatement;
+                    const statement_formatted = lowercaseFirstLetter(statement);
+                    console.log(topic);
+                    console.log(statement);
+                    console.log(statement_formatted);
+                    return `Hey there! I'm here to chat about ${topic}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether ${statement_formatted}?`;
+                },
+                role: "chatbot-message",
+                message_trigger: 0
+            },
+            {
+                role: "chatbot-prompt",
+                message_trigger: 7,
+            }
+
+        ]
+
+        selection_prompt_election = {
+            prompts: [
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Task: You should always concisely respond to the other person's argument with a counterargument. Do not repeat the same arguments that the 'role: assistant' has brought up before, but you can dive into more specific aspects or previous arguments. You should never dive into asking the user how they would implement their views. You should always concisely present a specific argument that counters the user's perspective. At the end of your response, you should always ask the user what they think. You should always ensure that your message includes a counterargument; and you should never simply agree with the user.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Task: You should always concisely identify a specific group of people who may have differing opinions from the user. You should always explain, in detail, their experiences and why they may disagree with the user's beliefs. You should provide these alternative perspectives held by people with different jobs, positions in society, beliefs, etc. You should give uniquely different perspectives in each message. You should not repeat viewpoints that the 'role: assistant' brought up before, but you can dive deeper into previously mentioned viewpoints. You should always end your response with a question that asks the user what they think about those peoples' stances. You should provide only one viewpoint per response.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Task: You should always ask a question about the user's stance. You should always ask why the user thinks what they think or ask if there were any experiences that led to their views. You should not repeat questions that the 'role: assistant' asked before, but you can dive deeper into previous questions.`
+            ],
+            selection_prompt: `
+            
+Context: You are being fed a conversation log between a bot and a user. The last 'User message:' within "role":"selection_prompt" is the most recent message that the user has input to the conversation. Additionally, you are being fed three potential responses to this user's message. These response options are numbered as (0), (1), and (2) in "role":"content-choices"/chatbot-answers". A previous chatbot wrote them so that you can select the best response option.
+
+Task: You should select the response option that would most effectively help this conversation make the user more open-minded, more willing to talk about this topic with others, and more comfortable talking about the topic. You should consider each response's certain arguments, perspectives, and questions, as well as the user's conversation with the bot, to determine which response is most fitting.
+
+Your output: You should remove the number from your selection option, and then repeat your selected response option word for word without adding anything or removing any words.`,
+
+            message_trigger: 0,
+
+        }
+
+//////////////
+//Context: You are being fed a conversation log between a bot and a user. The last 'User message:' within "role":"selection_prompt" is the most recent message that the user has input to the conversation. Additionally, you are being fed three potential responses to this user's message. These response options are numbered as (0), (1), and (2) in "role":"content-choices"/chatbot-answers". A previous chatbot wrote them so that you can select the best response option.
+
+//Goal: Your goal is to make the user more willing to have conversations about their topic with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas. 
+
+//Task: You should select the response option that you would best accomplish your goal. 
+
+//Your output: You should remove the number from your selection option, and then repeat your selected response option word for word without adding anything or removing any words.
+/////////////
+
+//`Given three options of response to the previous user's message, select the one that will best open their mind, widen their perspectives, and make them more willing to talk about the topic. Repeat the selected response without adding any new text or greetings.
+
+        /*`
+            Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice "system", vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+
+            Goal: Your goal is to make the user more willing to have conversations about their topic with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
+
+            Task: Given three options of response to the previous user's message, select the one that will best open their mind, widen their perspectives, and make them more willing to talk about the topic. Repeat the selected response without adding any new text or greetings.
+            
+            Style: After selecting the option, repeat it word by word without changing or adding any text.`*/
+
+        const selection_trial = {
+            type: jsPsychChat,
+            ai_model: "gpt-4o",
+            ai_prompt: () => {
+                // function to insert depolarization survey response statement into the bot's conversation starter
+                const lowercaseFirstLetter = (str) => { //function to convert the first letter of the string into lowercase so it can be seamlessly inserted into the bot's question
+                    if (!str) return str;  // return the string if it's empty or not a string
+                    return str.charAt(0).toLowerCase() + str.slice(1);
+                };
+                    const topic = topicChoice;
+                    console.log(topic);
+                    return `
+            Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+            
+            Goal: Your goal is to make the user more willing to have conversations about ${topic} with other humans by helping them become more comfortable and open about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
+
+            Style: You should be concise. You should match your response's length to the user's input.
+
+            First task: Write three different responses to the user's message. The first should briefly acknowledge the user's stance, concisely present a specific argument that counters the user's perspective, and ask the user what they think; it should never repeat the same arguments, never dive into asking the user how they would implement their views, and never simply agree with the user. The second response should briefly acknowledge the user's stance and then ask a question about the user's stance, such as why the user thinks what they think or if there were any experiences that led to their views; it should never repeat questions. The third response should briefly acknowledge the user's stance, identify a specific group of people who may have differing opinions or alternative perspectives from the user, and explain, in detail, one viewpoint and why they may disagree with the user's beliefs; it should give uniquely different perspectives in each message and end its response with a question that asks the user what they think about those peoples' stances.}
+ 
+           Second task: Consider the user's input message and determine which of the three responses that you wrote is most appropriate given your goal. Output the response that you choose to the user. Do not tell the user which strategy you picked; output the message such that the user thinks you are just having a normal conversation.
+        `;
+            },
+            continue_button: continue_button,
+            chat_field_placeholder: "Share your perspective...",
+            //prompt_chain: prompt_chain, //previousl fed in chain prompting here.
+            additional_prompts: selection_prompts,
+            selection_prompt: selection_prompt_election,
+        };
+     //   jsPsych.run([selection_trial]);
 
 
         var start_time;
@@ -1434,6 +1546,36 @@ If the user says you are repeating yourself or that you didn't understand what t
             pre_bot_instructions_break,
             pre_convo_instructions,
             combination_trial,
+            post_convo_break,
+            republican_survey,
+            democrat_survey,
+            neutral_survey,
+            other_survey,
+            euthanasia_post_survey,
+            gender_post_survey,
+            healthcare_post_survey,
+            bombings_post_survey,
+            vaccines_post_survey,
+            criminal_post_survey,
+            same_sex_post_survey,
+            last_questions,
+            goodbye
+        )
+
+        selection_timeline.push(
+            welcome,
+            preliminary_convo_instructions,
+            pre_convo_survey_trial,
+            pre_convo_euthanasia_survey,
+            pre_convo_gender_survey,
+            pre_convo_healthcare_survey,
+            pre_convo_bombing_survey,
+            pre_convo_vaccines_survey,
+            pre_convo_criminal_survey,
+            pre_convo_same_sex_survey,
+            pre_bot_instructions_break,
+            pre_convo_instructions,
+            selection_trial,
             post_convo_break,
             republican_survey,
             democrat_survey,
