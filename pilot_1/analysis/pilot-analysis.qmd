@@ -2573,17 +2573,24 @@ write.csv(bot_feedback, "bot_feedback.csv", row.names = FALSE)
 #| label: Created automated process for flagging transcripts that might have been pasted in
 #| include: false
 
-keypress_flagging <- conversations_raw_df 
-
-keypress_flagging <- keypress_flagging %>%
+keypress_flagging <- conversations_raw_df %>%
   separate_rows(logs, sep = 'keyPressLog') %>%
+  mutate()
   filter(!grepl('^\\[\\{"role":"system","content":', logs)) %>%
-   mutate(logs = gsub('"role":"assistant","content".*', '', logs))
-  
+   mutate(logs = gsub('"role":"assistant","content".*', '', logs)) %>%
+  filter(grepl('"Command","v"', logs) | 
+
+#search for ctrl v or cmnd v 
+#also look at number of individual key presses and number of characters in responses. anytime response is longer than keypresses 
+
+
+
+#make it cleae that we want a stram of thoughts more than a clear explanation 
 ```
 
 # Tables for html
 
+## Example attitude change table
 ```{r}
 #| label: Make an example table of changes
 #| echo: false
@@ -2611,6 +2618,7 @@ print(example_table_of_changes)
 
 ```
 
+## Demographics table
 ```{r}
 #| label: Create table of basic demographics. The current code is just a rough idea with commented out examples from an old project
 #| echo: false
