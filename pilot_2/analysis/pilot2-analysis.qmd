@@ -1,12 +1,8 @@
 ---
-title: "pilot2-analysis"
+title: "Pilot 2 Data Wrangling"
 format: html
 editor: visual
 ---
-
-# Getting set up
-
-## Packages
 
 ```{r}
 #| label: Data Fetching. Load R packages
@@ -28,9 +24,10 @@ library(stringr)
 
 ```
 
-# Prolific demographics data wrangling
-
 ```{r}
+#| label: Prolific demographics data
+#| include: false 
+
 ## add which round of the pilot it was by reading in demographics files so we know completion dates
 
 #read in prolific demographics files 
@@ -48,9 +45,8 @@ rename("prolific_subject_id" = "Participant id") %>%
 filter(Status != "RETURNED") %>%
 #rename "Started at" to make grepl function easier to use later on
 rename("start" = "Started at") %>%
-# make time more readable 
+# make time more readable but keep the seconds version for analysis stuff later
 mutate(`Time taken (minutes)` = as.numeric(`Time taken`) / 60) %>%
-select(- "Time taken") %>%
 # manually remove one subject who didn't receive a condition because i messed up our experiment code and one subject who didn't give us their data
   filter(prolific_subject_id != "65fc207aef1f5877493fe5e8") %>% 
   filter(prolific_subject_id != "6602ce6267191d285a324221") %>% 
@@ -60,8 +56,6 @@ select(- "Time taken") %>%
     TRUE ~ NA_character_
   )) 
 ```
-
-# OSF
 
 ```{r}
 #| label: Retrieve data from our OSF project. Loading into a data folder, which  we manually create
@@ -76,7 +70,7 @@ osf_retrieve_node("x32pv") %>%
 ```
 
 ```{r}
-#| label: Bind csv's together so we have one big data frame to work with.
+#| label: Bind csv's
 #| include: false 
 
 osf_csv_filenames <- list.files(path = "data/")
@@ -86,7 +80,7 @@ rawwwwwww_df <- bind_rows(raw_dfs_tibbles)
 ```
 
 ```{r}
-#| label: Merge prolific demographics and create a condition type column in the raw_df
+#| label: Merge prolific demos + create a condition type column
 #| include: false 
 
 raw_df <- rawwwwwww_df %>%
@@ -95,7 +89,7 @@ raw_df <- rawwwwwww_df %>%
   # manually remove one subject who didn't receive a condition because i messed up our experiment code and one subject who didn't give us their data
   filter(prolific_subject_id != "65fc207aef1f5877493fe5e8") %>% 
   filter(prolific_subject_id != "6602ce6267191d285a324221") %>%
-  # add condition column. use fill so that every row associated with a subject has their condition entered
+  # add condition column
   mutate(condition = case_when(
      grepl("Additionally, you are being fed three potential responses to this user's message.", logs) ~ "selection bot",
     TRUE ~ NA_character_
@@ -105,15 +99,27 @@ raw_df <- rawwwwwww_df %>%
     phase == "control-intervention" ~ "control free reflection",
     TRUE ~ condition
   )) %>%
+  # remove unnecessary syntax from rowAsString and topicChoiceAsString for readability later
+  mutate(rowAsString = gsub('\\{"row":"', '', rowAsString)) %>%
+  mutate(rowAsString = gsub('"}', '', rowAsString)) %>%
+  mutate(topicChoiceAsString = gsub('\\{"row":"', '', topicChoiceAsString)) %>%
+  mutate(topicChoiceAsString = gsub('"}', '', topicChoiceAsString)) %>%
+  # fill condition column and row and topic strings
   group_by(prolific_subject_id) %>%
-  fill(condition, .direction = "downup")
+  fill(condition, .direction = "downup") %>%
+  fill(rowAsString, .direction = "downup") %>%
+  fill(topicChoiceAsString, .direction = "downup") %>%
+  ungroup() 
+
+# number of subjects in data 
+total_num_subjects_in_data <- nrow(raw_df %>%
+  group_by(prolific_subject_id) %>%
+  summarize(total_num_subjects_in_data = n()))
 
 ```
 
-# Create survey data frame
-
 ```{r}
-#| label: Create a data frame that is just for surveys and clean it up a bit
+#| label: Surveys data frame
 #| include: false
 
 surveys_cleaning_df <- raw_df %>%
@@ -300,12 +306,162 @@ surveys_df <- surveys_cleaning_df %>%
                          answer)) 
 ```
 
-# Analyze likert measures
-
-## Reverse code
 
 ```{r}
-#| label: Reverse code relevant statements to prepare or aggregating scores for quantitative analysis
+#| label: Created automated process for flagging transcripts that might have been pasted in
+#| include: false
+
+# flag copy pastes
+copypaste_flagging <- raw_df %>%
+  #filter for conversations again
+  filter(trial_type == "chat") %>%
+  select(prolific_subject_id, logs, condition) %>%
+  separate_rows(logs, sep = '"role":"user","content":"') %>%
+  separate_rows(logs, sep = 'keyPressLog') %>%
+  #remove the excess content in each entry that comes after the keypresslog
+    # for combo bot
+   mutate(logs = gsub('"role":"assistant","content".*', '', logs)) %>%
+    # for selection bot 
+  mutate(logs = gsub('"role":"selection_prompt","content".*', '', logs)) %>%
+  #remove rows that start with (0) because that means that the "role" "user" "content" was within the selection bot's prompt
+  filter(!grepl('(0)', logs)) %>%
+  #remove rows that aren't keypress logs
+  filter(!grepl('^\\[\\{"role":"system","content":', logs)) %>%
+  #remove some excess punctuation
+  mutate(logs = gsub('":\\[', '', logs)) %>%
+  mutate(logs = gsub('\\]\\},\\{', '', logs)) %>%
+  #create new column to identify copy paste
+  group_by(prolific_subject_id) %>%
+  mutate(flag = case_when(
+    grepl('"Command","v"', logs) | grepl('"Control","v"', logs)  ~ "copy-pasted",
+    TRUE ~ NA_character_
+  )) %>%
+  ungroup()
+
+# extract value for text 
+failed_copypaste_check <- copypaste_flagging %>%
+  filter(flag == 'copy-pasted') %>%
+  summarize(failed_copypaste_check = n_distinct(prolific_subject_id)) %>%
+  pull(failed_copypaste_check)
+
+# get their ids so we can remove them from data analysis
+failed_copypaste_check_subject_ids <- copypaste_flagging %>%
+  filter(flag == 'copy-pasted') %>%
+  distinct(prolific_subject_id) %>%
+  pull(prolific_subject_id)
+
+# look at number of individual key presses and number of characters in responses. anytime response is longer than keypresses should be flagged 
+character_count_flagging <- raw_df %>%
+  #filter for conversations again
+  filter(trial_type == "chat") %>%
+  filter(prolific_subject_id != "60d6befca58e40d0c63bba9f") %>%
+  filter(prolific_subject_id != "669f491562bcbc5facd5014b") %>%
+  select(prolific_subject_id, logs, condition) %>%
+  #separate based on keypress log
+  separate_rows(logs, sep = 'keyPressLog') %>%
+  mutate(logs = gsub('"role":"assistant","content".*\\}\\],"time"', '', logs)) %>%
+  mutate(logs = gsub('\\]\\},\\{"role":"selection_prompt","content".*\\}\\],"time"', '', logs)) %>%
+  separate_rows(logs, sep = '"role":"user","content":"') %>%
+  #remove rows that don't contain user messages 
+  filter(!grepl('^\\[\\{"role":"system","content":', logs)) %>%
+  # remove excess syntax at end of keypress 
+  mutate(logs = gsub('"\\]\\},\\{.*', '', logs)) %>%
+  mutate(logs = gsub('":\\[', '', logs)) %>%
+  mutate(logs = gsub('","time":.*', '', logs)) %>%
+  # turn keypress log into its own column so we can compare character counts easier
+  mutate(row_group = rep(1:(n()/2), each = 2))  %>%
+  group_by(row_group) %>%
+  mutate(message_log = lag(logs)) %>%
+  ungroup() %>%
+  filter(!is.na(message_log)) %>%
+  rename(keypress_log = logs) %>%
+  select(-row_group)
+
+#count the number of characters, which are separated by quotation marks (counting keys like Backspace, Shift, etc. as one character. can remove them from df first if we want more precision)
+character_count_flagging$keypress_character_count <- str_count(character_count_flagging$keypress_log, '"')/2 - 0.5
+
+#count message number of characters
+character_count_flagging$message_character_count <- nchar(character_count_flagging$message_log)
+
+# flag fishy cases
+character_count_flagging <- character_count_flagging %>%
+  mutate(flag = case_when(
+    keypress_character_count < message_character_count ~ "fishy",
+    TRUE ~ NA_character_
+  ))
+
+# get count of how many ppl are fishy
+failed_character_count_check <- character_count_flagging %>%
+  filter(flag == 'fishy') %>%
+ summarize(failed_character_count_check = n_distinct(prolific_subject_id)) %>%
+pull(failed_character_count_check)
+
+# get their ids so we can remove them from data analysis
+failed_character_count_subject_ids <- character_count_flagging %>%
+  filter(flag == 'fishy') %>%
+  distinct(prolific_subject_id) %>%
+  pull(prolific_subject_id)
+```
+
+```{r}
+#| label: Create a df that flags people who failed the attention check
+#| include: false
+
+attention_check <- surveys_df %>%
+  filter(question == "attention-check-slider-post-placeholder" | question == "attention-check-slider-pre-placeholder") %>%
+  group_by(prolific_subject_id) %>%
+  mutate(flag = case_when(
+    sum(answer == "0.00") == 0 ~ "double fail", #double fail means we should reject their data
+    sum(answer == "0.00") == 1 ~ "single fail", #single fail is not means for rejecting data
+    sum(answer == "0.00") == 2 ~ "pass", #good subject :3
+    TRUE ~ NA_character_
+  )) %>%
+  ungroup() %>%
+  select(flag, question, answer, prolific_subject_id, "Time taken (minutes)", condition)
+
+# extract value for text 
+total_failed_attention_checks <- attention_check %>%
+  filter(flag == 'double fail') %>%
+  # add distinct because there are two attention check questions so a failed subject gets flagged twice
+  summarize(total_failed_attention_checks = n_distinct(prolific_subject_id)) %>%
+  pull(total_failed_attention_checks)
+
+# get count of how many ppl double failed
+failed_attention_checks_subject_ids <- attention_check %>%
+  filter(flag == 'double fail') %>%
+  distinct(prolific_subject_id) %>%
+  pull(prolific_subject_id)
+
+```
+
+```{r}
+#| label: Remove bad subs
+#| include: false
+
+# remove bad subs
+raw_df <- raw_df %>%
+  filter(!(prolific_subject_id %in% failed_copypaste_check_subject_ids)) %>%
+  filter(!(prolific_subject_id %in% failed_character_count_subject_ids))
+    
+surveys_df <- surveys_df %>%
+  filter(!prolific_subject_id %in% failed_copypaste_check_subject_ids)  %>%
+  filter(!prolific_subject_id %in% failed_character_count_subject_ids)  %>%
+  filter(!prolific_subject_id %in% failed_attention_checks_subject_ids) 
+  
+total_num_clean_subjects_in_data <- nrow(raw_df %>%
+  group_by(prolific_subject_id) %>%
+  summarize(total_num_clean_subjects_in_data = n()))
+
+```
+## Introduction
+## Methods
+
+### Participants
+
+We currently have data from `r total_num_subjects_in_data` subjects in our second pilot, which we gathered on Prolific. We restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of five dollars. After applying exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain. We excluded `r total_failed_attention_checks` subjects for failing the two attention checks in the surveys and `r failed_copypaste_check + failed_character_count_check` subjects for likely plagiarizing their conversation messages. 
+
+```{r}
+#| label: Reverse code for quantitative analysis
 #| include: false
 
 reverse_coded_scores_df <- surveys_df %>%
@@ -345,8 +501,6 @@ filter(!grepl("slider", question)) %>%
                          .default = as.numeric(answer)
   ))
 ```
-
-## Mean scores
 
 ```{r}
 #| label: Get pre- and post-intervention mean scores for polarization questions (specific and general lumped together)
@@ -403,9 +557,9 @@ pre_polarization_df <- reverse_coded_scores_df %>%
           grepl("polarization-general", question)
            ) %>%
   filter(grepl("pre-convo", phase)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -463,9 +617,9 @@ post_polarization_df <- reverse_coded_scores_df %>%
           grepl("polarization-general", question)
            ) %>%
   filter(grepl('post-convo', phase)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     post_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -481,22 +635,23 @@ pre_polarization_general_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("polarization-general", question))%>%
   filter(grepl('pre-convo', phase)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
     max_score = max(as.numeric(answer), na.rm = TRUE)
   )
 
+
 post_polarization_general_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("polarization-general", question)) %>%
   filter(grepl("post-convo", phase)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     post_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -559,9 +714,9 @@ pre_specific_polarization_df <- reverse_coded_scores_df %>%
          grepl("Discrimination against same-sex couples in housing and public accommodations should be banned", question)
            ) %>%
   filter(grepl('pre-convo', phase)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -619,9 +774,9 @@ post_specific_polarization_df <- reverse_coded_scores_df %>%
          grepl("Discrimination against same-sex couples in housing and public accommodations should be banned", question)
            ) %>%
   filter(grepl('post-convo', phase)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     post_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -638,22 +793,21 @@ pre_offending_reason_df <- reverse_coded_scores_df %>%
   filter(grepl("offending-reason", question)) %>%
   filter(grepl('pre-convo', phase)) %>%
   group_by(prolific_subject_id) %>%
-  filter(condition != 'control free reflection') %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
     max_score = max(as.numeric(answer), na.rm = TRUE)
   )
 
-
 post_offending_reason_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("reason-of-avoidance-post", question) | grepl("offending-reason", question)) %>%
   filter(grepl('post-convo', phase)) %>%
   group_by(prolific_subject_id) %>%
-  filter(condition != 'control free reflection') %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     post_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -671,8 +825,8 @@ pre_openmindedness_df <- reverse_coded_scores_df %>%
   filter(grepl("openmindedness", question)) %>%
   filter(grepl('pre-convo', phase)) %>%
   group_by(prolific_subject_id) %>%
-  filter(condition != 'control free reflection') %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -685,8 +839,8 @@ post_openmindedness_df <- reverse_coded_scores_df %>%
   filter(grepl("openmindedness", question)) %>%
   filter(grepl('post-convo', phase)) %>%
   group_by(prolific_subject_id) %>%
-  filter(condition != 'control free reflection') %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     post_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -702,9 +856,9 @@ post_openmindedness_df <- reverse_coded_scores_df %>%
 pre_sliders_df <- sliders_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl('pre-convo', phase)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -714,9 +868,9 @@ pre_sliders_df <- sliders_df %>%
 post_sliders_df <- sliders_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl('post-convo', phase)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     post_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -732,9 +886,9 @@ post_sliders_df <- sliders_df %>%
 pre_politics_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("pre-rating-republicans", question) | grepl("pre-interacting-with-republicans", question) | grepl("pre-rating-democrats", question) | grepl("pre-interacting-with-democrats", question)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -744,9 +898,9 @@ pre_politics_df <- reverse_coded_scores_df %>%
 post_politics_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("rating-republicans-post", question) | grepl("interacting-with-republicans-post", question) | grepl("rating-democrats-post", question) | grepl("interacting-with-democrats-post", question)) %>%
-  filter(condition != 'control free reflection') %>%
   group_by(prolific_subject_id) %>%
   summarize(
+    condition = first(condition),
     total_score = sum(as.numeric(answer), na.rm = TRUE),
     post_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
@@ -755,154 +909,59 @@ post_politics_df <- reverse_coded_scores_df %>%
 
 ```
 
-##T tests
-
 ```{r}
 #| label: T-tests with all topics lumped together 
 #| echo: false
 
-t_test_politics <- t.test(pre_politics_df$pre_mean_score, post_politics_df$post_mean_score, paired = TRUE)
+t_test_politics <- t.test(pre_politics_df$pre_mean_score[pre_politics_df$condition != 'control free reflection'], post_politics_df$post_mean_score[post_politics_df$condition != 'control free reflection'], paired = TRUE)
 
-t_test_polarization <- t.test(pre_polarization_df$pre_mean_score, post_polarization_df$post_mean_score, paired = TRUE)
+t_test_polarization <- t.test(pre_polarization_df$pre_mean_score[pre_polarization_df$condition != 'control free reflection'], post_polarization_df$post_mean_score[post_polarization_df$condition != 'control free reflection'], paired = TRUE)
 
-t_test_sliders <- t.test(pre_sliders_df$pre_mean_score, post_sliders_df$post_mean_score, paired = TRUE)
+t_test_sliders <- t.test(pre_sliders_df$pre_mean_score[pre_sliders_df$condition != 'control free reflection'], post_sliders_df$post_mean_score[post_sliders_df$condition != 'control free reflection'], paired = TRUE)
 
-t_test_offending_reason <- t.test(pre_offending_reason_df$pre_mean_score, post_offending_reason_df$post_mean_score, paired = TRUE)
+t_test_offending_reason <- t.test(pre_offending_reason_df$pre_mean_score[pre_offending_reason_df$condition != 'control free reflection'], post_offending_reason_df$post_mean_score[post_offending_reason_df$condition != 'control free reflection'], paired = TRUE)
 
-t_test_openmindedness <- t.test(pre_openmindedness_df$pre_mean_score, post_openmindedness_df$post_mean_score, paired = TRUE)
-
-
-```
-
-## Graphs
-
-```{r}
-#| label: Political party graph
-#| echo: false
-
-print(t_test_politics)
-
-merged_politics_df <- merge(pre_politics_df, post_politics_df, by = "prolific_subject_id")
-
-politics_scatterplot <- ggplot(merged_politics_df, aes(x = pre_mean_score, y = post_mean_score)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "darkseagreen", linetype = "dashed") +  # Line of equality +
-  geom_ribbon(aes(ymin = 0, ymax = pmin(pre_mean_score, post_mean_score)), fill = "gray", alpha = 0.3) +  # Shaded area
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in opinions of the opposite party") +
-  theme_bw()
-
-print(politics_scatterplot)
-
+t_test_openmindedness <- t.test(pre_openmindedness_df$pre_mean_score[pre_openmindedness_df$condition != 'control free reflection'], post_openmindedness_df$post_mean_score[post_openmindedness_df$condition != 'control free reflection'], paired = TRUE)
 ```
 
 ```{r}
-#| label: General polarization graph
-#| echo: false
+#| label: Extract t-test values
+#| echo: false 
 
-print(t_test_polarization)
+# politics 
+politics_t_value <- round(t_test_politics$statistic, 3)
+politics_ci <- round(t_test_politics$conf.int, 3)
+politics_p_val <- round(t_test_politics$p.value, 3)
+politics_significance_status <- ifelse(politics_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
 
-merged_polarization_df <- merge(pre_polarization_df, post_polarization_df, by = "prolific_subject_id")
+# polarization
+polarization_t_value <- round(t_test_polarization$statistic, 3)
+polarization_ci <- round(t_test_polarization$conf.int, 3)
+polarization_p_val <- round(t_test_polarization$p.value, 3)
+polarization_significance_status <- ifelse(polarization_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
 
-general_polarization_scatterplot <- ggplot(merged_polarization_df, aes(x = pre_mean_score, y = post_mean_score)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "darkseagreen", linetype = "dashed") +  # Line of equality +
-  geom_ribbon(aes(ymin = 0, ymax = pmin(pre_mean_score, post_mean_score)), fill = "gray", alpha = 0.3) +  # Shaded area
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in general polarization of topic-specific beliefs") +
-  theme_bw()
+# sliders
+sliders_t_value <- round(t_test_sliders$statistic, 3)
+sliders_ci <- round(t_test_sliders$conf.int, 3)
+sliders_p_val <- round(t_test_sliders$p.value, 3)
+sliders_significance_status <- ifelse(sliders_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
 
-print(general_polarization_scatterplot)
+# openmindedness
+openmindedness_t_value <- round(t_test_openmindedness$statistic, 3)
+openmindedness_ci <- round(t_test_openmindedness$conf.int, 3)
+openmindedness_p_val <- round(t_test_openmindedness$p.value, 3)
+openmindedness_significance_status <- ifelse(openmindedness_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
+
+# offending_reason
+offending_reason_t_value <- round(t_test_offending_reason$statistic, 3)
+offending_reason_ci <- round(t_test_offending_reason$conf.int, 3)
+offending_reason_p_val <- round(t_test_offending_reason$p.value, 3)
+offending_reason_significance_status <- ifelse(offending_reason_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
 
 ```
 
 ```{r}
-#| label: Specific polarization graph
-#| echo: false
-
-print(t_test_polarization)
-
-merged_polarization_df <- merge(pre_polarization_df, post_polarization_df, by = "prolific_subject_id")
-
-polarization_scatterplot <- ggplot(merged_polarization_df, aes(x = pre_mean_score, y = post_mean_score)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "darkseagreen", linetype = "dashed") +  # Line of equality +
-  geom_ribbon(aes(ymin = 0, ymax = pmin(pre_mean_score, post_mean_score)), fill = "gray", alpha = 0.3) +  # Shaded area
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in polarization of topic-specific beliefs") +
-  theme_bw()
-
-print(polarization_scatterplot)
-
-```
-
-```{r}
-#| label: Offending reason graph
-#| echo: false
-
-print(t_test_offending_reason)
-
-merged_offending_reason_df <- merge(pre_offending_reason_df, post_offending_reason_df, by = "prolific_subject_id")
-
-offending_reason_scatterplot <- ggplot(merged_offending_reason_df, aes(x = pre_mean_score, y = post_mean_score)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "darkseagreen", linetype = "dashed") +  # Line of equality +
-  geom_ribbon(aes(ymin = 0, ymax = pmin(pre_mean_score, post_mean_score)), fill = "gray", alpha = 0.3) +  # Shaded area
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in how much different concerns affect willingness to converse") +
-  theme_bw()
-
-print(offending_reason_scatterplot)
-
-```
-
-```{r}
-#| label: Sliders graph
-#| echo: false
-
-print(t_test_sliders)
-
-merged_sliders_df <- merge(pre_sliders_df, post_sliders_df, by = "prolific_subject_id")
-
-sliders_scatterplot <- ggplot(merged_sliders_df, aes(x = pre_mean_score, y = post_mean_score)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "darkseagreen", linetype = "dashed") +  # Line of equality +
-  geom_ribbon(aes(ymin = 0, ymax = pmin(pre_mean_score, post_mean_score)), fill = "gray", alpha = 0.3) +  # Shaded area
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in willingness to converse about selected topic with others") +
-  theme_bw()
-
-print(sliders_scatterplot)
-
-```
-
-```{r}
-#| label: Openmindedness graph
-#| echo: false
-
-print(t_test_openmindedness)
-
-merged_openmindedness_df <- merge(pre_openmindedness_df, post_openmindedness_df, by = "prolific_subject_id")
-
-openmindedness_scatterplot <- ggplot(merged_openmindedness_df, aes(x = pre_mean_score, y = post_mean_score)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "darkseagreen", linetype = "dashed") +  # Line of equality
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in open-mindedness ratings before and after conversations") +
-  theme_bw()
-
-print(sliders_scatterplot)
-
-merged_pilot1_open_df <- read_csv("opendfone copy.csv")
-
-graph_df <- rbind(merged_openmindedness_df, merged_pilot1_open_df)
-
-ggplot(graph_df, aes(x = pre_mean_score, y = post_mean_score)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "darkseagreen", linetype = "dashed") +  # Line of equality
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in open-mindedness score") +
-  theme_bw()
-
-```
-
-# Conversation transcripts
-
-```{r}
-#| label: Create df with just convo transcripts 
+#| label: Conversation raw transcript df
 #| echo: false
 
 ## make raw conversations df with subject_id and condition. remove keypresslog 
@@ -911,23 +970,22 @@ conversations_rawwww_df <- raw_df %>%
   select(prolific_subject_id, logs, condition) 
 
 # merge with conversations df 
-conversations_raw_df <-  conversations_rawwww_df %>%
+conversations_raw_df <- conversations_rawwww_df %>%
   mutate(across(everything(), ~ gsub("keyPressLog.*?\\]}", '', .))) %>%
   left_join(full_prolific_demographics_df, by = "prolific_subject_id") %>%
   select(prolific_subject_id, logs, condition, pilot_iteration)
+
 ```
 
-## Combo bot (chain prompting) parse
-
 ```{r}
-#| label: Parse the combo bot transcripts for readability 
+#| label: Parse combo bot transcripts for readability 
 #| echo: false
 
 ##  clean chain bot  
 conversations_df_combo <- conversations_raw_df %>%
   # filter for combo only 
   filter(condition == "combination bot") %>%
-  #remove system content (chatbot single prompts and prompt within the chain prompt)
+  #remove system content (chatbot prompts)
     mutate(across(everything(), ~ gsub('"role":"system","content".*?\\},', '', .))) %>%
   #remove welcome to chatroom message
     mutate(across(everything(), ~ gsub('"role":"system-prompt","content".*?\\},', '', .))) %>%
@@ -940,25 +998,6 @@ conversations_df_combo <- conversations_raw_df %>%
   #rename to clarify the content that the first bot passes to the second bot in the chain
     mutate(across(everything(), ~ gsub('"role":"chain-prompt"', "|CHAIN PROMPT", .))) %>%
   mutate(across(everything(), ~ gsub('\\}\\],"time"', ',"time"', .))) 
-
-conversations_df_only_selection <- conversations_raw_df %>%
-   # remove keypresslog
-    mutate(across(everything(), ~ gsub("keyPressLog.*?\\]}", '', .))) %>%
-  #remove system content (chatbot single prompts and prompt within the chain prompt)
-    mutate(across(everything(), ~ gsub('"role":"system","content".*?\\},', '', .))) %>%
-  #remove welcome to chatroom message
-    mutate(across(everything(), ~ gsub('"role":"system-prompt","content".*?\\},', '', .))) %>%
-  #rename to clarify chatbot's first message. include | so that we can use it as a delimiter later
-    mutate(across(everything(), ~ gsub('"role":"chatbot","content"', '|FIRST MESSAGE', .))) %>%
-  #rename to clarify user messages
-    mutate(across(everything(), ~ gsub('"role":"user","content"', '|USER', .))) %>%
-  #rename to clarify bot messages
-    mutate(across(everything(), ~ gsub('"role":"assistant","content"', '|BOT', .))) %>%
-  #rename to clarify the content that the first bot passes to the second bot in the chain
-    mutate(across(everything(), ~ gsub('"role":"chain-prompt"', "|CHAIN PROMPT", .))) %>%
-  mutate(across(everything(), ~ gsub('\\}\\],"time"', ',"time"', .))) 
-
-conversations_df <- bind_rows(conversations_df_only_selection, conversations_df_no_selection)
 
 # the mutates make the user and bot strings within the chain prompt look like they were actual exchanges in the conversations. when i tried to fix this, gsub wasn't parsing special characters right even with escapes, so i had chat define a function to replace the pattern. i don't really understand how it works
 replace_chain_pattern <- function(text) {
@@ -968,10 +1007,10 @@ replace_chain_pattern <- function(text) {
 }
 
 # apply the function to all columns in the data frame
-conversations_df <- conversations_df %>%
+conversations_df_combo <- conversations_df_combo %>%
   mutate(across(everything(), ~ replace_chain_pattern(.)))
 
-#had chat make a function for making the csvs more readable. i don't think this actually does anything?
+#asked chat to make a paragraph break function for making the csvs more readable. i don't think the code actually does anything though??
 add_paragraph_breaks <- function(text) {
   # Replace `},{` with `},\n{`
   text <- gsub("\\},\\{", "},\n{", text)
@@ -979,7 +1018,7 @@ add_paragraph_breaks <- function(text) {
 }
 
 # apply this function to the conversation logs column
-conversations_df <- conversations_df %>%
+conversations_df_combo <- conversations_df_combo %>%
   mutate(logs = add_paragraph_breaks(logs))
 
 add_delimiter <- function(text) {
@@ -989,13 +1028,13 @@ add_delimiter <- function(text) {
 }
 
 # Apply this function to the logs column, split into multiple rows, and export to CSV
-conversations_df <- conversations_df %>%  
+conversations_df_combo <- conversations_df_combo %>%  
   mutate(logs = add_delimiter(logs)) %>%
   separate_rows(logs, sep = "\\|") %>%
   filter(logs != "") # Remove any empty rows that might have been created
 
 define_chain_prompts <- data.frame(
-  question = c("THE SYSTEM CHAIN LINK PROMPTS",
+  logs = c("THE SYSTEM CHAIN LINK PROMPTS",
     'LINK 1 PROMPT: Context: You are being fed a conversation log. The last paragraph following {"role", "user", "content"} is the most recent message that the user has input. This is the message that you should be responding to.
 
               Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
@@ -1021,14 +1060,64 @@ What you should output: You are passing your output to another "system" that is 
 )
 
 #merge them 
-bot_feedback <- bind_rows(define_bot_feedback_questions, bot_feedback)
+conversations_df_combo <- bind_rows(define_chain_prompts, conversations_df_combo)
 
 ```
 
 ```{r}
-#| label: Parse selection bot (response election format)
+#| label: Parse selection bot transcripts
 #| echo: false
 
+conversations_df_selection <- conversations_raw_df %>%
+  # filter for combo only 
+  filter(condition == "selection bot") %>%
+    # remove keypresslog
+    mutate(across(everything(), ~ gsub("keyPressLog.*?\\]}", '', .))) %>%
+  #remove system content (chatbot single prompts and prompt within the chain prompt)
+    mutate(across(everything(), ~ gsub('"role":"system","content".*?\\},', '', .))) %>%
+  #remove welcome to chatroom message
+    mutate(across(everything(), ~ gsub('"role":"system-prompt","content".*?\\},', '', .))) %>%
+  #rename to clarify chatbot's first message. include | so that we can use it as a delimiter later
+    mutate(across(everything(), ~ gsub('"role":"chatbot","content"', '|FIRST MESSAGE', .))) %>%
+  #rename to clarify user messages
+    mutate(across(everything(), ~ gsub('"role":"user","content"', '|USER', .))) %>%
+  #rename to clarify bot output messages
+    mutate(across(everything(), ~ gsub('"role":"assistant","content"', '|BOT', .))) %>%
+  #rename to clarify the responses that the bot generated for election
+    mutate(across(everything(), ~ gsub('"role":"selection_prompt","content"', '|THREE RESPONSE OPTIONS', .))) %>%
+  #rename the |USER inside the selection prompt because it should be a delimiter later 
+    mutate(across(everything(), ~ gsub('\\|USER:"\\(0\\)', '(0)', .)))
+
+#delimit text 
+conversations_df_selection <- conversations_df_selection %>%  
+  separate_rows(logs, sep = "\\|") %>%
+  filter(logs != "") # Remove any empty rows that might have been created
+
+#make some rows that document what the selection bot was prompted with 
+define_selection_prompts <- data.frame(
+  logs = c("PROMPTS TO EACH OF THE RESPONSE-GENERATING BOTS:","COUNTER BOT: Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent 'role':'user':'content'. You should be conversational but use technically precise language. Be concise.
+                Task: You should always concisely respond to the other person's argument with a counterargument. Do not repeat the same arguments that the 'role: assistant' has brought up before, but you can dive into more specific aspects or previous arguments. You should never dive into asking the user how they would implement their views. You should always concisely present a specific argument that counters the user's perspective. At the end of your response, you should always ask the user what they think. You should always ensure that your message includes a counterargument; and you should never simply agree with the user.", "VIEWPOINT BOT: Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent 'role':'user':'content'. You should be conversational but use technically precise language. Be concise.
+                Task: You should always concisely identify a specific group of people who may have differing opinions from the user. You should always explain, in detail, their experiences and why they may disagree with the user's beliefs. You should provide these alternative perspectives held by people with different jobs, positions in society, beliefs, etc. You should give uniquely different perspectives in each message. You should not repeat viewpoints that the 'role: assistant' brought up before, but you can dive deeper into previously mentioned viewpoints. You should always end your response with a question that asks the user what they think about those peoples' stances. You should provide only one viewpoint per response.", "QUESTION BOT: Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent 'role':'user':'content'. You should be conversational but use technically precise language. Be concise.
+               Task: You should always ask a question about the user's stance. You should always ask why the user thinks what they think or ask if there were any experiences that led to their views. You should not repeat questions that the 'role: assistant' asked before, but you can dive deeper into previous questions.", "SELECTION BOT: Context: You are being fed a conversation log between a bot and a user. The last 'User message:' within 'role':'selection_prompt' is the most recent message that the user has input to the conversation. Additionally, you are being fed three potential responses to this user's message. These response options are numbered as (0), (1), and (2) in 'role':'content-choices'/chatbot-answers'. A previous chatbot wrote them so that you can select the best response option.
+
+Task: You should select the response option that would most effectively help this conversation make the user more open-minded, more willing to talk about this topic with others, and more comfortable talking about the topic. You should consider each response's certain arguments, perspectives, and questions, as well as the user's conversation with the bot, to determine which response is most fitting.
+
+Your output: You should remove the number from your selection option, and then repeat your selected response option word for word without adding anything or removing any words."
+  ),
+  stringsAsFactors = FALSE
+)
+
+#add these rows to the top of the df
+conversations_df_selection <- bind_rows(define_selection_prompts, conversations_df_selection)
+
+#assess the output
+write.csv(conversations_df_selection, "conversation_transcripts_selection.csv", row.names = FALSE)
+
+#merge
+conversations_df <- bind_rows(conversations_df_selection, conversations_df_combo)
 
 ```
 
@@ -1036,43 +1125,38 @@ bot_feedback <- bind_rows(define_bot_feedback_questions, bot_feedback)
 #| label: Merge all convo transcripts and export as csv's
 #| echo: false
 
-
-# Export the modified data frame to CSV
 write.csv(conversations_df, "conversation_transcripts.csv", row.names = FALSE)
 
 #write extra raw convo df to compare with if there are bugs in refined dfs
-write.csv(conversations_rawwww_df, "rawwwww_conversation_transcripts.csv", row.names = FALSE)
+#write.csv(conversations_rawwww_df, "rawwwww_conversation_transcripts.csv", row.names = FALSE)
 
 ```
 
-# Reflections df
-
 ```{r}
 #| label: Reflections df and csv
-#| include: false
+#| echo: false
 
 reflections_df <- raw_df %>%
-  filter(phase == "control-intervention")%>%
-  select(prolific_subject_id, response, time_elapsed, phase, condition) %>%
-  mutate(`Time spent on reflection (minutes)` = as.numeric(`time_elapsed`) / 60000) %>%
-select(- "time_elapsed")
+  filter(phase == "control-intervention") %>%
+  mutate(across(everything(), ~ gsub('\\{"Q0":"', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"\\}', '', .))) %>%
+  select(prolific_subject_id, response, rt, rowAsString) %>%
+  rename('Statement the subject reflected on' = rowAsString) %>%
+  mutate(`Time spent on reflection (minutes)` = as.numeric(`rt`) / 60000) %>%
+  rename('Time spent on reflection (ms)' = rt)
 
 #write df
 write.csv(reflections_df, "reflection_transcripts.csv", row.names = FALSE)
 ```
 
-# Feedback "last questions" data
-
 ```{r}
-#| label: Wrangling feedback data for readability. Make csv
+#| label: Bot feedback data
 #| include: false
-
-# make demographics df. need demo data so we can define the round that the people were in (so we know whether they chatted with an older bot)
 
 # make df
 bot_feedback <- surveys_df %>%
   left_join(full_prolific_demographics_df, by = "prolific_subject_id") %>%
-  filter(!any(condition == "control free reflection")) %>%
+  filter(condition != "control free reflection") %>%
   mutate(question = ifelse(str_detect(question, "free-response"), "free-response", question)) %>%
     mutate(question = ifelse(str_detect(question, "convo-effect-on-willingness"), "convo-effect-on-willingness", question)) %>%
     mutate(question = ifelse(str_detect(question, "new-perspective"), "new-perspective", question)) %>%
@@ -1080,140 +1164,145 @@ bot_feedback <- surveys_df %>%
     mutate(question = ifelse(str_detect(question, "feelings-about-bot"), "feelings-about-bot", question)) %>%
   filter(question == "free-response" | question == "convo-effect-on-willingness" | question == "new-perspective" | question == "still-contributes" | question == "feelings-about-bot" | question == "topicChoice") %>%
   arrange(desc(prolific_subject_id)) %>%
-  select(prolific_subject_id, question, answer, condition, pilot_iteration)
+  select(prolific_subject_id, question, answer, condition, pilot_iteration.x) %>%
+  mutate(word_count = ifelse(question == "topicChoice", NA, str_count(answer, '\\S+'))) %>%
+  mutate(question = as.character(question))
 
 # add some entries that explain what the questions were 
 define_bot_feedback_questions <- data.frame(
   question = c("THE FULL QUESTIONS",
-    "free-response: After your conversation with the chat bot, do you feel more willing to have a conversation with others about ${topicChoiceAsString}? Please freely reflect in the space below.",
-  "convo-effect-on-willingness: What parts of this conversation, if any, affected your willingness to talk with someone who has different views about ${topicChoiceAsString}? What made you feel like the conversation was or was not productive?", 
-  "new-perspective: Throughout this conversation, were there any moments that opened you up to a new perspective about ${topicChoiceAsString}? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?", 
-  "still-contributes: What still contributes to your willingness or unwillingness to converse with others about ${topicChoiceAsString}? Please freely reflect in the space below.", 
+    "free-response: After your conversation with the chat bot, do you feel more willing to have a conversation with others about [topic]? Please freely reflect in the space below.",
+  "convo-effect-on-willingness: What parts of this conversation, if any, affected your willingness to talk with someone who has different views about [topic]? What made you feel like the conversation was or was not productive?", 
+  "new-perspective: Throughout this conversation, were there any moments that opened you up to a new perspective about [topic]? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?", 
+  "still-contributes: What still contributes to your willingness or unwillingness to converse with others about [topic]? Please freely reflect in the space below.", 
   "feelings-about-bot: We are still working on improving our chatbot. How did you like talking with the bot? What do you wish were different? Please provide any feedback regarding your conversation that we have not already covered.",
   "DATA"
   ),
   stringsAsFactors = FALSE
-)
+) %>%
+  mutate(question = as.character(question))
 
 #merge them 
-bot_feedback <- bind_rows(define_bot_feedback_questions, bot_feedback)
+bot_feedback_for_csv <- bind_rows(define_bot_feedback_questions, bot_feedback)
 
-write.csv(bot_feedback, "bot_feedback.csv", row.names = FALSE)
-
-```
-
-# Attention check
-
-```{r}
-#| label: Create a df that flags people who failed the attention check
-attention_check <- surveys_df %>%
-  filter(question == "attention-check-slider-post-placeholder" | question == "attention-check-slider-pre-placeholder") %>%
-  group_by(prolific_subject_id) %>%
-  mutate(flag = case_when(
-    sum(answer == "0.00") == 0 ~ "double fail", #double fail means we should reject their data
-    sum(answer == "0.00") == 1 ~ "single fail", #single fail is not means for rejecting data
-    sum(answer == "0.00") == 2 ~ "pass", #good subject :3
-    TRUE ~ NA_character_
-  )) %>%
-  ungroup() %>%
-  select(flag, question, answer, prolific_subject_id, "Time taken (minutes)", condition) %>%
-    filter(flag != "pass") 
-
-```
-
-# Keypress log check
-
-```{r}
-#| label: Created automated process for flagging transcripts that might have been pasted in
-#| include: false
-
-# flag copy pastes
-copypaste_flagging <- raw_df %>%
-  #filter for conversations again
-  filter(trial_type == "chat") %>%
-  select(prolific_subject_id, logs, condition) %>%
-  separate_rows(logs, sep = '"role":"user","content":"') %>%
-  separate_rows(logs, sep = 'keyPressLog') %>%
-  #remove the excess content in each entry that comes after the keypresslog
-    # for combo bot
-   mutate(logs = gsub('"role":"assistant","content".*', '', logs)) %>%
-    # for selection bot 
-  mutate(logs = gsub('"role":"selection_prompt","content".*', '', logs)) %>%
-  #remove rows that start with (0) because that means that the "role" "user" "content" was within the selection bot's prompt
-  filter(!grepl('(0)', logs)) %>%
-  #remove rows that aren't keypress logs
-  filter(!grepl('^\\[\\{"role":"system","content":', logs)) %>%
-  #remove some excess punctuation
-  mutate(logs = gsub('":\\[', '', logs)) %>%
-  mutate(logs = gsub('\\]\\},\\{', '', logs)) %>%
-  #create new column to identify copy paste
-  group_by(prolific_subject_id) %>%
-  mutate(flag = case_when(
-    grepl('"Command","v"', logs) | grepl('"Control","v"', logs)  ~ "copy-pasted",
-    TRUE ~ NA_character_
-  ))
   
-character_count_flagging <- raw_df %>%
-  #filter for conversations again
-  filter(trial_type == "chat") %>%
-  select(prolific_subject_id, logs, condition) %>%
-  #separate based on keypress log
-  separate_rows(logs, sep = 'keyPressLog') %>%
-  #remove rows that aren't keypress logs
-  filter(!grepl('^\\[\\{"role":"system","content":', logs)) %>%
-  #make a new column for the person's actual output
-   mutate(logs = gsub('"role":"assistant","content".*', '', logs)) %>%
-  #remove some excess punctuation
-  mutate(logs = gsub('":\\[', '', logs)) %>%
-  mutate(logs = gsub('\\]\\},\\{', '', logs)) %>%
-  #create new column to identify copy paste
-  group_by(prolific_subject_id) %>%
-  mutate(flag = case_when(
-    grepl('"Command","v"', logs) | grepl('"Control","v"', logs)  ~ "copy-pasted",
-    TRUE ~ NA_character_
-  )) %>%
-  
-#also look at number of individual key presses and number of characters in responses. anytime response is longer than keypresses should be flagged 
-
-
+write.csv(bot_feedback_for_csv, "bot_feedback.csv", row.names = FALSE)
 ```
 
-# Tables for html
-
-## Example attitude change table
-
 ```{r}
-#| label: Make an example table of changes
+#| label: Make new dfs for finding time taken in interventions
 #| echo: false
 
-processing_example_table_of_changes <- surveys_df
+#make data frame that 
+chatbot_time_df <- raw_df %>%
+  group_by(prolific_subject_id) %>%  
+  filter(condition != 'control free reflection') %>%
+#add up each subject's rts to find total time (not including chatbot convo bc we only logged chat time in the transcripts) spent doing experiment
+  mutate(summed_rt = sum(as.numeric(rt), na.rm = TRUE)) %>%
+#easier while figuring out the different time metrics to convert into minutes
+  mutate(summed_rt_minutes = summed_rt / 60000) %>%
+#elapsed time is measured since the subject started the experiment. so, elapsed time at the last phase of the experiment (goodbye) is the total time spent on the experiment 
+  filter(phase == 'goodbye') %>%
+  mutate(time_elapsed_minutes = as.numeric(time_elapsed) / 60000) %>%
+  # select what we want because there are a lot of columns 
+  select(prolific_subject_id, summed_rt, time_elapsed, summed_rt_minutes, time_elapsed_minutes) %>%
+#subtract summed time from elapsed time to see how long people spent on chat 
+  mutate(chatbot_time = time_elapsed - summed_rt) %>%
+  mutate(chatbot_time_minutes = chatbot_time / 60000) %>%
+  ungroup()
 
-processing_example_table_of_changes <- processing_example_table_of_changes %>%
-  filter(prolific_subject_id == "662c7cce4d3e84ac2f284706") %>%
-  filter(grepl("rating-democrats", question)) %>%
-  rename("Subject's opinions on the opposite party"  = "question") %>%
-  mutate(across(everything(), ~ gsub('@R@', '', .))) %>%
-  mutate(across(everything(), ~ gsub('rating-democrats-post-', '', .))) %>%
-  mutate(across(everything(), ~ gsub('pre-rating-democrats-', '', .))) 
+reflections_time_df <- reflections_df %>%
+  select(prolific_subject_id, 'Time spent on reflection (ms)', 'Time spent on reflection (minutes)')
+```
 
-part1_processing_example_table_of_changes <-processing_example_table_of_changes[1:6, ]
-part2_processing_example_table_of_changes <-processing_example_table_of_changes[7:12, ]
+```{r}
+#| label: Time taken on surveys
+#| echo: false 
 
-example_table_of_changes <- part1_processing_example_table_of_changes %>%
-  left_join(part2_processing_example_table_of_changes, by = "Subject's opinions on the opposite party", suffix = c("", "_new")) %>%
-    rename("Pre-Convo Ratings" = answer, "Post-Convo Ratings" =  answer_new) %>%
-  select("Subject's opinions on the opposite party", "Pre-Convo Ratings", "Post-Convo Ratings")
+#Find time taken on first survey and time taken on second survey. Also subtract for the different. Also, look at whether there's a difference for control people versus chatbot people
 
+#finding time taken on pre survey
+pre_intervention_survey_time_df <- raw_df %>%
+  filter(grepl('survey', phase), grepl('pre', phase)) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(pre_time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
+  select(prolific_subject_id, condition, pre_time_minutes)
 
-print(example_table_of_changes)
+#removing duplicate rows
+pre_intervention_survey_time_df <- unique(pre_intervention_survey_time_df)
+
+#finding time taken on post survey
+post_intervention_survey_time_df <- raw_df %>%
+  filter(grepl('survey', phase), grepl('post', phase)) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(post_time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
+  select(prolific_subject_id, post_time_minutes)
+
+#removing duplicates
+post_intervention_survey_time_df <- unique(post_intervention_survey_time_df)
+
+#merge dfs to view differences 
+survey_time_df <- pre_intervention_survey_time_df %>%
+  full_join(post_intervention_survey_time_df, by = "prolific_subject_id") %>%
+  mutate(difference_pre_post_time_minutes = pre_time_minutes - post_time_minutes) %>%
+  ungroup()
 
 ```
 
-## Demographics table
+```{r}
+#| label: Word counts
+#| echo: false
+
+bot_feedback_word_counts <- bot_feedback %>%
+  filter(!is.na(word_count))
+
+conversations_messages_word_counts <- conversations_df %>%
+  filter(grepl('USER', logs)) %>%
+  mutate(across(everything(), ~ gsub('","time":.*', '', .))) %>%
+  mutate(across(everything(), ~ gsub('USER:"', '', .))) %>%
+  mutate(conversation_word_count = str_count(logs, '\\S+')) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(avg_convo_message_word_count = mean(as.numeric(conversation_word_count), na.rm = TRUE)) %>%
+  select(prolific_subject_id, avg_convo_message_word_count, logs, conversation_word_count)
+
+reflections_word_counts <- reflections_df %>% 
+  mutate(reflection_word_count = str_count(response, '\\S+')) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(avg_reflection_word_count = mean(as.numeric(reflection_word_count), na.rm = TRUE)) %>%
+  select(prolific_subject_id, avg_reflection_word_count, response, reflection_word_count)
+
+```
 
 ```{r}
-#| label: Create table of basic demographics. The current code is just a rough idea with commented out examples from an old project
+#| label: Values from word count & time spent 
+#| include: false 
+
+average_chatbot_time <- round(mean(chatbot_time_df$chatbot_time_minutes, na.rm = TRUE), 1)
+
+range_chatbot_time <- round(range(chatbot_time_df$chatbot_time_minutes, na.rm = TRUE), 1)
+
+average_reflection_time <- round(mean(reflections_time_df$`Time spent on reflection (minutes)`, na.rm = TRUE), 1)
+
+range_reflection_time <- round(range(reflections_time_df$`Time spent on reflection (minutes)`, na.rm = TRUE), 1)
+
+avg_bot_feedback_word_count <- round(mean(bot_feedback_word_counts$word_count, na.rm = TRUE), 1)
+
+range_bot_feedback_word_count <- round(range(bot_feedback_word_counts$word_count, na.rm = TRUE), 1)
+
+avg_conversation_word_count <- round(mean(conversations_messages_word_counts$conversation_word_count), 1)
+
+range_conversation_word_count <- round(range(conversations_messages_word_counts$conversation_word_count), 1)
+
+avg_reflection_word_count <- round(mean(reflections_word_counts$reflection_word_count), 1)
+
+range_reflection_word_count <- round(range(reflections_word_counts$reflection_word_count), 1)
+
+```
+
+```{r}
+#| label: tbl-basic-demographics-table
 #| echo: false
+#| tbl-cap: Table of basic demographics.
 
 #we already read in demographics earlier 
 
@@ -1224,27 +1313,27 @@ select(question, answer, prolific_subject_id, condition) %>%
 pivot_wider(names_from = question, values_from = answer)
 
 #merge our two demographics tables
-sixteen_sub_all_demographics_df <- full_prolific_demographics_df %>%
-  filter(pilot_round != 1) %>%
-  left_join(survey_demographics_df, by = "prolific_subject_id", suffix = c("_prolific", ""))
+demo_table_df <- survey_demographics_df %>%
+  left_join(full_prolific_demographics_df, by = "prolific_subject_id", suffix = c("_prolific", ""))
 
-#make a region column because graphic each state is excessive
-sixteen_demographics_df$Region <- ifelse(sixteen_demographics_df$`Current u.s state of residence` %in% c("California (CA)", "Colorado (CO)", "Utah (UT)", "Utah(UT)", "Idaho (ID)", "Alaska (AK)", "Hawaii (HI)", "Washington (WA)", "Oregon (OR)", "Nevada (NV)", "New Mexico (NM)", "Montana (MT)", "Arizona (AZ)", "Wyoming (WY)"), "West",
-                     ifelse(sixteen_demographics_df$`Current u.s state of residence` %in% c("Texas (TX)", "Florida (FL)", "Georgia (GA)", "North Carolina (NC)", "Tennessee (TN)", "South Carolina (SC)", "Alabama (AL)", "Mississippi (MS)", "Louisiana (LA)", "Delaware (DE)", "Maryland (MD)", "Virginia (VA)", "Washington, D.C. (DC)", "West Virginia (WV)", "Kentucky (KY)", "Arkansas (AR)", "Oklahoma (OK)"), "South",
-                            ifelse(sixteen_demographics_df$`Current u.s state of residence` %in% c("New York (NY)", "New Jersey (NJ)", "Massachusetts (MA)", "Pennsylvania (PA)", "Connecticut (CT)", "Rhode Island (RI)", "Vermont (VT)", "New Hampshire (NH)", "Maine (ME)"), "Northeast",
-                                   ifelse(sixteen_demographics_df$`Current u.s state of residence` %in% c("Michigan (MI)", "Illinois (IL)", "Ohio (OH)", "Indiana (IN)", "Wisconsin (WI)", "Minnesota (MN)", "Iowa (IA)", "Missouri (MO)", "Kansas (KS)", "Nebraska (NE)", "South Dakota (SD)", "North Dakota (ND)"), "Midwest", NA))))
+#make a region column because showing each state is excessive
+demo_table_df$Region <- ifelse(demo_table_df$`Current u.s state of residence` %in% c("California (CA)", "Colorado (CO)", "Utah (UT)", "Utah(UT)", "Idaho (ID)", "Alaska (AK)", "Hawaii (HI)", "Washington (WA)", "Oregon (OR)", "Nevada (NV)", "New Mexico (NM)", "Montana (MT)", "Arizona (AZ)", "Wyoming (WY)"), "West",
+                     ifelse(demo_table_df$`Current u.s state of residence` %in% c("Texas (TX)", "Florida (FL)", "Georgia (GA)", "North Carolina (NC)", "Tennessee (TN)", "South Carolina (SC)", "Alabama (AL)", "Mississippi (MS)", "Louisiana (LA)", "Delaware (DE)", "Maryland (MD)", "Virginia (VA)", "Washington, D.C. (DC)", "West Virginia (WV)", "Kentucky (KY)", "Arkansas (AR)", "Oklahoma (OK)"), "South",
+                            ifelse(demo_table_df$`Current u.s state of residence` %in% c("New York (NY)", "New Jersey (NJ)", "Massachusetts (MA)", "Pennsylvania (PA)", "Connecticut (CT)", "Rhode Island (RI)", "Vermont (VT)", "New Hampshire (NH)", "Maine (ME)"), "Northeast",
+                                   ifelse(demo_table_df$`Current u.s state of residence` %in% c("Michigan (MI)", "Illinois (IL)", "Ohio (OH)", "Indiana (IN)", "Wisconsin (WI)", "Minnesota (MN)", "Iowa (IA)", "Missouri (MO)", "Kansas (KS)", "Nebraska (NE)", "South Dakota (SD)", "North Dakota (ND)"), "Midwest", NA))))
 
 
 # define the levels in categorical variables so that they are organized in the table 
-sixteen_demographics_df$'political-affiliation' <- fct_relevel(
-  sixteen_demographics_df$'political-affiliation',
+demo_table_df$'political-affiliation' <- fct_relevel(
+  demo_table_df$'political-affiliation',
   "Republican",
   "Democrat",
-  "Independent"
+  "Independent",
 )
 
-sixteen_demographics_df$'education-level' <- fct_relevel(
-  sixteen_demographics_df$'education-level',
+
+demo_table_df$'education-level' <- fct_relevel(
+  demo_table_df$'education-level',
   "High school diploma or GED",
    "Some college; no degree",
   "Associate degree",
@@ -1253,8 +1342,8 @@ sixteen_demographics_df$'education-level' <- fct_relevel(
 )
 
 
-sixteen_demographics_df$'political-ideology' <- fct_relevel(
-  sixteen_demographics_df$'political-ideology',
+demo_table_df$'political-ideology' <- fct_relevel(
+  demo_table_df$'political-ideology',
 "Very conservative",
 "Conservative",
 "Somewhat conservative",
@@ -1264,8 +1353,10 @@ sixteen_demographics_df$'political-ideology' <- fct_relevel(
 "Very liberal"
 )
 
+demo_table_df <- demo_table_df %>%
+  mutate(across(where(is.factor), ~ droplevels(.)))
 
-demographics_table <- tbl_summary(sixteen_demographics_df,
+demographics_table <- tbl_summary(demo_table_df,
  by = NULL,
   label = list(
     `Time taken (minutes)` = "Time taken (minutes)",
@@ -1315,9 +1406,280 @@ demographics_table <- tbl_summary(sixteen_demographics_df,
 'religious-affiliation', 
 'political-ideology'
 ))
- # %>%  modify_header(label = "**Predictor Variable**")
+ # %>%  modify_header(label = "**whatever label i want**")
 
 # Print the table
 as_gt(demographics_table)
 
 ```
+
+### Materials
+
+### Procedure
+
+## Results
+
+On average, subjects spent `r average_chatbot_time` minutes with the chatbot (range `r range_chatbot_time`) and each message was `r avg_conversation_word_count` words long (range `r range_conversation_word_count`). Subjects averaged `r average_reflection_time` minutes on the control free reflection (range `r range_reflection_time`) with a reflection length of `r avg_reflection_word_count` words (range `r range_reflection_word_count`). Experimental group subjects averaged `r avg_bot_feedback_word_count` words in response to each post-intervention survey  question that asked for feedback on the bot (range `r range_bot_feedback_word_count`).
+
+```{r}
+#| label: fig-time-plot
+#| echo: false
+#| fig-cap: Scatterplot showing time spent on pre- and post-intervention surveys with color indicating whether subject was in control group or experimental group.
+
+time_plot_df <- survey_time_df %>%
+  full_join(reflections_time_df, by = "prolific_subject_id") %>%
+  full_join(chatbot_time_df, by = "prolific_subject_id") %>%
+  mutate(intervention_time_minutes = coalesce(as.numeric(`Time spent on reflection (minutes)`, na.rm = TRUE), as.numeric(chatbot_time_minutes, na.rm = TRUE))) %>%
+  rename(Condition = condition) %>%
+  select(Condition, pre_time_minutes, post_time_minutes, difference_pre_post_time_minutes, intervention_time_minutes) %>%
+  arrange(desc(Condition)) %>%
+  mutate_if(is.numeric, ~ round(., 2)) %>%
+  ungroup() %>%
+  mutate(condition_general = if_else(Condition == 'control free reflection', 'control', 'experimental'))
+
+
+time_plot <- ggplot(time_plot_df, aes(x = pre_time_minutes, y = post_time_minutes, color = condition_general)) + labs(title = "Post- vs. Pre-Intervention Surveys", x = 'Time spent on pre-intervention survey (minutes)', y = 'Time spent on post-intervention survey (minutes)', color = "Experiment condition") +
+  geom_point() + #scatterplot
+  theme_minimal()  + 
+  scale_color_manual(values = c("control" = "cornflowerblue", "experimental" = "darkseagreen"), 
+                     labels = c("control" = "Control Group", "experimental" = "Experimental Group"))
+
+print(time_plot)
+```
+
+```{r}
+#| label: tbl-time-df
+#| echo: false
+#| tbl-cap: Table showing time spent on pre-intervention survey, post-intervention survey, difference in pre- and post-intervention survey times, and time spent on intervention. 
+
+time_figure_df <- time_plot_df %>%
+  group_by(Condition) %>%
+  select(-condition_general) %>%
+   # take all mean times by condition
+  summarise(across(everything(), \(x) round(mean(x, na.rm = TRUE), 1))) %>%
+  rename(
+    'Pre-intervention survey time (minutes)' = pre_time_minutes,
+    'Post-intervention survey time (minutes)' = post_time_minutes,
+    'Difference in survey time (minutes)' = difference_pre_post_time_minutes,
+    'Intervention time (minutes)' = intervention_time_minutes
+  )
+
+kable(time_figure_df)
+```
+
+### Scatterplots of subjects' pre- and post-intervention ratings on surveys 
+
+The politics t-test revealed a t-value of `r politics_t_value` with a p-value of `r politics_p_val`, indicating `r politics_significance_status` between the change in experimental group subjects' views of the opposing political party and control group subjects' change in views (95% CI: `r politics_ci`).
+
+```{r}
+#| label: fig-political-party-graph
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of opinions on the opposite party. Subjects rated their opinions on a scale from 0 to 7, where a rating of 0 was strongly negative and a rating of 7 was strongly positive.
+
+merged_politics_df <- merge(pre_politics_df, post_politics_df, by = "prolific_subject_id")
+
+politics_scatterplot <- ggplot(merged_politics_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in opinions of the opposite party", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(politics_scatterplot)
+
+```
+
+The polarization t-test revealed a t-value of `r polarization_t_value` with a p-value of `r polarization_p_val`, indicating `r polarization_significance_status` between the change in experimental group subjects' topic-specific opinions and control group subjects' change in opinions (95% CI: `r polarization_ci`).
+
+```{r}
+#| label: fig-polarization-graph
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of opinions on topic-specific statements. Subjects rated their opinions on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
+
+merged_polarization_df <- merge(pre_polarization_df, post_polarization_df, by = "prolific_subject_id")
+
+polarization_scatterplot <- ggplot(merged_polarization_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in polarization of topic-specific beliefs.", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(polarization_scatterplot)
+
+```
+The offending reason t-test revealed a t-value of `r offending_reason_t_value` with a p-value of `r offending_reason_p_val`, indicating `r offending_reason_significance_status` between the change in experimental group subjects' severity of reasons that hold them back from conversing and control group subjects' change in severity (95% CI: `r offending_reason_ci`).
+```{r}
+#| label: fig-offending-reason-graph
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of reasons subjects might be unwilling to converse about their topic. Subjects rated how true the reasons were to them on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
+
+merged_offending_reason_df <- merge(pre_offending_reason_df, post_offending_reason_df, by = "prolific_subject_id")
+
+offending_reason_scatterplot <- ggplot(merged_offending_reason_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in how much different concerns affect willingness to converse.", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(offending_reason_scatterplot)
+
+```
+The sliders t-test revealed a t-value of `r sliders_t_value` with a p-value of `r sliders_p_val`, indicating `r sliders_significance_status` between the change in experimental group subjects' willingness to converse about their topic and control group subjects' change in willingness (95% CI: `r sliders_ci`).
+
+```{r}
+#| label: fig-sliders-graph
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of willingness to converse. Subjects rated their willingness on a slider from 0 to 100, where a rating of 0 meant subject was absolutely unwilling and a rating of 100 meant subject was absolutely willing.
+
+
+merged_sliders_df <- merge(pre_sliders_df, post_sliders_df, by = "prolific_subject_id")
+
+sliders_scatterplot <- ggplot(merged_sliders_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in willingness to converse about selected topic with others.", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(sliders_scatterplot)
+
+```
+The open-mindedness t-test revealed a t-value of `r openmindedness_t_value` with a p-value of `r openmindedness_p_val`, indicating `r openmindedness_significance_status` between the change in experimental group subjects' open-mindedness on their topic and control group subjects' change in open-mindedness (95% CI: `r openmindedness_ci`).
+
+```{r}
+#| label: fig-openmindedness-graph
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of subjects' open-mindedness when discussing their topic. Subjects rated their open-mindedness on a scale from 0 to 7, where a rating of 0 meant subject was not open-minded and a rating of 7 meant subject was open-minded.
+
+merged_openmindedness_df <- merge(pre_openmindedness_df, post_openmindedness_df, by = "prolific_subject_id")
+
+openmindedness_scatterplot <- ggplot(merged_openmindedness_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in open-mindedness ratings before and after conversations.", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(sliders_scatterplot)
+
+
+```
+
+### Example table of changes in average willingness to converse (slider questions)
+```{r}
+#| label: tbl-willingness-df
+#| echo: false
+#| tbl-cap: Table showing changes in willingness according to sliders. This is the same information as the willingness scatterplot.
+
+example_table_of_changes <- surveys_df
+
+example_table_of_changes <- example_table_of_changes %>%
+  filter(grepl("slider", question)) %>%
+  group_by(prolific_subject_id, phase) %>%
+  summarize(condition = first(condition), 
+            question = mean(as.numeric(answer), na.rm = TRUE), .groups = "drop") %>%
+  #asked chat to give me code to separate into two columns
+  mutate(
+    'Post-conversation' = lead(question),   # Shift the 'questions' column up by one row
+    row_number = row_number()       # Add a row number for filtering later
+  ) %>%
+  filter(row_number %% 2 == 1) %>%  # Keep only odd rows, where the new column now has even-row values
+  select(question, 'Post-conversation', condition)        %>%
+  rename("Pre-conversation"  = "question") %>%
+  mutate_if(is.numeric, ~ round(., 1)) %>%
+  arrange(desc(condition)) 
+
+kable(example_table_of_changes)
+
+  # mutate(across(everything(), ~ gsub('rating-republicans-post-', '', .))) %>%
+  #   mutate(across(everything(), ~ gsub('rating-democrats-post-', '', .))) %>%
+  # mutate(across(everything(), ~ gsub('pre-rating-republicans-', '', .))) %>%
+  #   mutate(across(everything(), ~ gsub('pre-rating-democrats-', '', .))) 
+
+# 
+# part1_processing_example_table_of_changes <-processing_example_table_of_changes[1:6, ]
+# part2_processing_example_table_of_changes <-processing_example_table_of_changes[7:12, ]
+# 
+# example_table_of_changes <- part1_processing_example_table_of_changes %>%
+#   left_join(part2_processing_example_table_of_changes, by = "Subject's opinions on the opposite party", suffix = c("", "_new")) %>%
+#     rename("Pre-Convo Ratings" = answer, "Post-Convo Ratings" =  answer_new) %>%
+#   select("Subject's opinions on the opposite party", "Pre-Convo Ratings", "Post-Convo Ratings")
+# 
+# 
+# print(example_table_of_changes)
+
+```
+
+### Three free reflections
+
+```{r}
+#| label: tbl-example-reflections
+#| echo: false
+#| tbl-cap: Example free reflections. Subjects received the statement that they rated most strongly in the pre-intervention survey. We prompted subjects to reflect for 10 minutes, and the timer paused if their keyboard inactivtiy exceeded 20 seconds. 
+
+# make a simplified df to display reflections
+
+example_reflections_df <- reflections_df %>%
+  ungroup() %>%
+  # only have three reflections right now, but will want to filter for just a few later on when we have more 
+  # filter(prolific_subject_id == ) %>%
+  select('Statement the subject reflected on', response, 'Time spent on reflection (minutes)')
+
+kable(example_reflections_df)
+
+```
+
+```{r}
+#| label: tbl-example-transcripts
+#| include: false
+#| tbl-cap: Example combo bot transcripts and selection bot transcripts with the bots' prompts
+
+# make a simplified df with just a couple examples of conversations
+
+example_conversation_transcripts <- conversations_df %>%
+  filter(prolific_subject_id %in% c('5a7a1973000dab00018c3410', '60d6befca58e40d0c63bba9f')) %>%
+  mutate(across(everything(), ~ gsub('time":.*', '', .))) %>%
+  select(logs, condition)
+
+#print(example_conversation_transcripts)
+
+kable(example_conversation_transcripts, "html") %>%
+  kable_styling() %>%
+  column_spec(2, width = "20em") # Wrap text in the 2nd column, adjust width as needed
+
+```
+
+### Free response feedback from chatbot group subjects
+```{r}
+#| label: tbl-bot-feedback-df
+#| echo: false
+#| tbl-cap: Table showing subjects' responses to free response feedback questions. 
+
+bot_feedback_figure <- bot_feedback %>%
+  # turn each question into its own column so one subject can be one row
+  pivot_wider(names_from = question, values_from = answer) %>%
+  # for each subject, smash all the rows together into one
+  group_by(prolific_subject_id) %>%
+  reframe(across(everything(), ~ paste(unique(na.omit(.)), collapse = "; "))) %>%
+  # unnecessary columns for visual display
+  select(-c(prolific_subject_id, pilot_iteration.x, word_count)) %>%
+  rename(
+    Condition = condition,
+    'Topic Choice' = topicChoice,
+    'Did willingness increase?' = 'free-response',
+    'Was conversation productive? Any parts affect willingness?' = 'convo-effect-on-willingness',
+    'Any moments in convo open subject to new perspective?' = 'new-perspective',
+    "What still contributes to willingness or unwillingness to converse?" = 'still-contributes',
+    'Feedback on the bot?' = 'feelings-about-bot'
+    )
+
+kable(bot_feedback_figure, "html") %>%
+  kable_styling() %>%
+  column_spec(2, width = "5em") %>%
+  column_spec(c(3,4,5,5), width = "40em")
+```
+
+## Discussion
+## References
