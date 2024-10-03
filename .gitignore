@@ -17,3 +17,5 @@ coverage/
 dist.zip
 .idea
 .env
+
+.csv
