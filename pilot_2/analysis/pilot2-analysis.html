@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.554">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Pilot 2 Data Wrangling</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="pilot2-analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="pilot2-analysis_files/libs/quarto-html/quarto.js"></script>
+<script src="pilot2-analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="pilot2-analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="pilot2-analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="pilot2-analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="pilot2-analysis_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="pilot2-analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="pilot2-analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="pilot2-analysis_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="pilot2-analysis_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="pilot2-analysis_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Pilot 2 Data Wrangling</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<section id="participants" class="level3">
+<h3 class="anchored" data-anchor-id="participants">Participants</h3>
+<p>We currently have data from 11 subjects in our second pilot, which we gathered on Prolific. We restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific’s harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of five dollars. After applying exclusion criteria, 9 subjects remain. We excluded 0 subjects for failing the two attention checks in the surveys and 2 subjects for likely plagiarizing their conversation messages.</p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: 1 unknown level in `f`: Master's degree</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: 2 unknown levels in `f`: Somewhat liberal and Very liberal</code></pre>
+</div>
+<div id="tbl-basic-demographics-table" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-basic-demographics-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Table of basic demographics.
+</figcaption>
+<div aria-describedby="tbl-basic-demographics-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div>
+<div id="cisumoztoj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#cisumoztoj table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#cisumoztoj thead, #cisumoztoj tbody, #cisumoztoj tfoot, #cisumoztoj tr, #cisumoztoj td, #cisumoztoj th {
+  border-style: none;
+}
+
+#cisumoztoj p {
+  margin: 0;
+  padding: 0;
+}
+
+#cisumoztoj .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#cisumoztoj .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#cisumoztoj .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#cisumoztoj .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#cisumoztoj .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#cisumoztoj .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#cisumoztoj .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#cisumoztoj .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#cisumoztoj .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#cisumoztoj .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#cisumoztoj .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#cisumoztoj .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#cisumoztoj .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#cisumoztoj .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#cisumoztoj .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cisumoztoj .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#cisumoztoj .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#cisumoztoj .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#cisumoztoj .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cisumoztoj .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#cisumoztoj .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cisumoztoj .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#cisumoztoj .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cisumoztoj .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cisumoztoj .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cisumoztoj .gt_left {
+  text-align: left;
+}
+
+#cisumoztoj .gt_center {
+  text-align: center;
+}
+
+#cisumoztoj .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#cisumoztoj .gt_font_normal {
+  font-weight: normal;
+}
+
+#cisumoztoj .gt_font_bold {
+  font-weight: bold;
+}
+
+#cisumoztoj .gt_font_italic {
+  font-style: italic;
+}
+
+#cisumoztoj .gt_super {
+  font-size: 65%;
+}
+
+#cisumoztoj .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#cisumoztoj .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#cisumoztoj .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#cisumoztoj .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#cisumoztoj .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#cisumoztoj .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#cisumoztoj .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header gt_col_headings">
+<th id="<strong>Characteristic</strong>" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="<strong>N = 9</strong><span class=&quot;gt_footnote_marks&quot; style=&quot;white-space:nowrap;font-style:italic;font-weight:normal;&quot;><sup>1</sup></span>" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>N = 9</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Time taken (minutes)</td>
+<td class="gt_row gt_center" headers="stat_0">29.65 (20.32, 38.25)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">Current U.S. region of residence</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Midwest</td>
+<td class="gt_row gt_center" headers="stat_0">2 (25%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;South</td>
+<td class="gt_row gt_center" headers="stat_0">3 (38%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;West</td>
+<td class="gt_row gt_center" headers="stat_0">3 (38%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
+<td class="gt_row gt_center" headers="stat_0">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Age (years)</td>
+<td class="gt_row gt_center" headers="stat_0">31.00 (25.00, 36.00)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">Sex</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Female</td>
+<td class="gt_row gt_center" headers="stat_0">3 (33%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Male</td>
+<td class="gt_row gt_center" headers="stat_0">6 (67%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Ethnicity simplified</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Asian</td>
+<td class="gt_row gt_center" headers="stat_0">2 (22%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Black</td>
+<td class="gt_row gt_center" headers="stat_0">3 (33%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;White</td>
+<td class="gt_row gt_center" headers="stat_0">4 (44%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Political affiliation</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Republican</td>
+<td class="gt_row gt_center" headers="stat_0">1 (11%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Democrat</td>
+<td class="gt_row gt_center" headers="stat_0">5 (56%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Independent</td>
+<td class="gt_row gt_center" headers="stat_0">3 (33%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Education level</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;High school diploma or GED</td>
+<td class="gt_row gt_center" headers="stat_0">1 (11%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Some college; no degree</td>
+<td class="gt_row gt_center" headers="stat_0">1 (11%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Associate degree</td>
+<td class="gt_row gt_center" headers="stat_0">3 (33%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Bachelor's degree</td>
+<td class="gt_row gt_center" headers="stat_0">4 (44%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">Religious affiliation</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Atheist/None</td>
+<td class="gt_row gt_center" headers="stat_0">4 (44%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Christian/Catholic</td>
+<td class="gt_row gt_center" headers="stat_0">5 (56%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Political ideology</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Very conservative</td>
+<td class="gt_row gt_center" headers="stat_0">1 (11%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Conservative</td>
+<td class="gt_row gt_center" headers="stat_0">1 (11%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Somewhat conservative</td>
+<td class="gt_row gt_center" headers="stat_0">1 (11%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Moderate</td>
+<td class="gt_row gt_center" headers="stat_0">1 (11%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Liberal</td>
+<td class="gt_row gt_center" headers="stat_0">5 (56%)</td>
+</tr>
+</tbody><tfoot class="gt_footnotes">
+<tr class="odd">
+<td colspan="2" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;"><sup>1</sup></span> Median (IQR); n (%)</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="materials" class="level3">
+<h3 class="anchored" data-anchor-id="materials">Materials</h3>
+</section>
+<section id="procedure" class="level3">
+<h3 class="anchored" data-anchor-id="procedure">Procedure</h3>
+</section>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<p>On average, subjects spent 9.5 minutes with the chatbot (range 4.1, 15.8) and each message was 21.9 words long (range 3, 66). Subjects averaged 11 minutes on the control free reflection (range 10.2, 12.2) with a reflection length of 104.7 words (range 42, 182). Experimental group subjects averaged 18.2 words in response to each post-intervention survey question that asked for feedback on the bot (range 4, 47).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-time-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-time-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pilot2-analysis_files/figure-html/fig-time-plot-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-time-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Scatterplot showing time spent on pre- and post-intervention surveys with color indicating whether subject was in control group or experimental group.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-time-df" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-time-df-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Table showing time spent on pre-intervention survey, post-intervention survey, difference in pre- and post-intervention survey times, and time spent on intervention.
+</figcaption>
+<div aria-describedby="tbl-time-df-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell table table-sm table-striped small">
+<colgroup>
+<col style="width: 14%">
+<col style="width: 23%">
+<col style="width: 23%">
+<col style="width: 21%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Condition</th>
+<th style="text-align: right;">Pre-intervention survey time (minutes)</th>
+<th style="text-align: right;">Post-intervention survey time (minutes)</th>
+<th style="text-align: right;">Difference in survey time (minutes)</th>
+<th style="text-align: right;">Intervention time (minutes)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">combination bot</td>
+<td style="text-align: right;">4.9</td>
+<td style="text-align: right;">9.3</td>
+<td style="text-align: right;">-4.3</td>
+<td style="text-align: right;">11.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">control free reflection</td>
+<td style="text-align: right;">15.0</td>
+<td style="text-align: right;">2.9</td>
+<td style="text-align: right;">12.1</td>
+<td style="text-align: right;">11.0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">selection bot</td>
+<td style="text-align: right;">7.2</td>
+<td style="text-align: right;">6.7</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">7.2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<section id="scatterplots-of-subjects-pre--and-post-intervention-ratings-on-surveys" class="level3">
+<h3 class="anchored" data-anchor-id="scatterplots-of-subjects-pre--and-post-intervention-ratings-on-surveys">Scatterplots of subjects’ pre- and post-intervention ratings on surveys</h3>
+<p>The politics t-test revealed a t-value of 0.663 with a p-value of 0.537, indicating no statistically significant difference between the change in experimental group subjects’ views of the opposing political party and control group subjects’ change in views (95% CI: -0.347, 0.587).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-political-party-graph" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-political-party-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pilot2-analysis_files/figure-html/fig-political-party-graph-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-political-party-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Scatterplot with line of equality of pre- and post-conversation mean ratings of opinions on the opposite party. Subjects rated their opinions on a scale from 0 to 7, where a rating of 0 was strongly negative and a rating of 7 was strongly positive.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The polarization t-test revealed a t-value of -1.131 with a p-value of 0.309, indicating no statistically significant difference between the change in experimental group subjects’ topic-specific opinions and control group subjects’ change in opinions (95% CI: -0.545, 0.212).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-polarization-graph" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-polarization-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pilot2-analysis_files/figure-html/fig-polarization-graph-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-polarization-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Scatterplot with line of equality of pre- and post-conversation mean ratings of opinions on topic-specific statements. Subjects rated their opinions on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The offending reason t-test revealed a t-value of 0.51 with a p-value of 0.632, indicating no statistically significant difference between the change in experimental group subjects’ severity of reasons that hold them back from conversing and control group subjects’ change in severity (95% CI: -0.471, 0.704).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-offending-reason-graph" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-offending-reason-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pilot2-analysis_files/figure-html/fig-offending-reason-graph-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-offending-reason-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Scatterplot with line of equality of pre- and post-conversation mean ratings of reasons subjects might be unwilling to converse about their topic. Subjects rated how true the reasons were to them on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The sliders t-test revealed a t-value of 1.008 with a p-value of 0.36, indicating no statistically significant difference between the change in experimental group subjects’ willingness to converse about their topic and control group subjects’ change in willingness (95% CI: -6.179, 14.146).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-sliders-graph" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sliders-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pilot2-analysis_files/figure-html/fig-sliders-graph-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sliders-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Scatterplot with line of equality of pre- and post-conversation mean ratings of willingness to converse. Subjects rated their willingness on a slider from 0 to 100, where a rating of 0 meant subject was absolutely unwilling and a rating of 100 meant subject was absolutely willing.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The open-mindedness t-test revealed a t-value of 1.73 with a p-value of 0.144, indicating no statistically significant difference between the change in experimental group subjects’ open-mindedness on their topic and control group subjects’ change in open-mindedness (95% CI: -0.324, 1.657).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-openmindedness-graph" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-openmindedness-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="pilot2-analysis_files/figure-html/fig-openmindedness-graph-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-openmindedness-graph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Scatterplot with line of equality of pre- and post-conversation mean ratings of subjects’ open-mindedness when discussing their topic. Subjects rated their open-mindedness on a scale from 0 to 7, where a rating of 0 meant subject was not open-minded and a rating of 7 meant subject was open-minded.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="example-table-of-changes-in-average-willingness-to-converse-slider-questions" class="level3">
+<h3 class="anchored" data-anchor-id="example-table-of-changes-in-average-willingness-to-converse-slider-questions">Example table of changes in average willingness to converse (slider questions)</h3>
+<div class="cell">
+<div id="tbl-willingness-df" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-willingness-df-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Table showing changes in willingness according to sliders. This is the same information as the willingness scatterplot.
+</figcaption>
+<div aria-describedby="tbl-willingness-df-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Pre-conversation</th>
+<th style="text-align: right;">Post-conversation</th>
+<th style="text-align: left;">condition</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">58.2</td>
+<td style="text-align: right;">56.8</td>
+<td style="text-align: left;">selection bot</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">27.2</td>
+<td style="text-align: right;">22.8</td>
+<td style="text-align: left;">selection bot</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">66.2</td>
+<td style="text-align: right;">68.8</td>
+<td style="text-align: left;">selection bot</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">23.6</td>
+<td style="text-align: right;">27.8</td>
+<td style="text-align: left;">control free reflection</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">11.8</td>
+<td style="text-align: right;">10.0</td>
+<td style="text-align: left;">control free reflection</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">51.2</td>
+<td style="text-align: right;">48.0</td>
+<td style="text-align: left;">control free reflection</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">16.2</td>
+<td style="text-align: right;">26.6</td>
+<td style="text-align: left;">combination bot</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">59.4</td>
+<td style="text-align: right;">79.8</td>
+<td style="text-align: left;">combination bot</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">54.4</td>
+<td style="text-align: right;">50.8</td>
+<td style="text-align: left;">combination bot</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="three-free-reflections" class="level3">
+<h3 class="anchored" data-anchor-id="three-free-reflections">Three free reflections</h3>
+<div class="cell">
+<div id="tbl-example-reflections" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-example-reflections-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Example free reflections. Subjects received the statement that they rated most strongly in the pre-intervention survey. We prompted subjects to reflect for 10 minutes, and the timer paused if their keyboard inactivtiy exceeded 20 seconds.
+</figcaption>
+<div aria-describedby="tbl-example-reflections-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell table table-sm table-striped small">
+<colgroup>
+<col style="width: 4%">
+<col style="width: 92%">
+<col style="width: 3%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Statement the subject reflected on</th>
+<th style="text-align: left;">response</th>
+<th style="text-align: right;">Time spent on reflection (minutes)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Vaccines should be mandated for healthcare workers</td>
+<td style="text-align: left;">Healthcare workers are always in contact with people of vulnerable health, so it should be in their best interest to not worsen their patients’ health. Furthermore, getting vaccinated would help prevent the spread of diseases from sick patients when the workers come back home from work to be with their families. Despite this, I think that the workers should not lose their jobs over refusing vaccination. Rather, they could be required to wear more personal protective equipment than vaccinated workers when dealing with patients to prevent the spread of diseases.</td>
+<td style="text-align: right;">10.44905</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Vaccines should be mandated for healthcare workers</td>
+<td style="text-align: left;">They should be mandated for healthcare workers who deal with extra sensitive cases. Those who choose not to vaccinate could likely get away with being tested more often than others. This only depends on the context of the situation though as I think in most cases we generally want to encourage freedom of choice and that in almost every scenario we should try to think of every alternative to forcing things on to people. There usually is a compromise that can be made somewhere down the line that should serve the purpose of both parties. There of course is the worry about spreading infection onto sensitive patients or even contracting the virus from patients and spreading it to other patients or even workers but above that of simple vaccinations these facilities and the workers within it should practice sterility and make sure not to allow for compromised surfaces and non hygenic practices. Putting all the responsibility on vaccines is cause for moral hazard in which the most basic preventative actions may not be taken which in turn could make things much worse.</td>
+<td style="text-align: right;">10.23908</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Same-sex marriage should remain legalized nationwide</td>
+<td style="text-align: left;">I do not believe that same sex marriage should be legal. I grew up in a home where Christianity is a big part of our livelihood and it has taught me over the years what to and what not to believe in.</td>
+<td style="text-align: right;">12.17490</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="free-response-feedback-from-chatbot-group-subjects" class="level3">
+<h3 class="anchored" data-anchor-id="free-response-feedback-from-chatbot-group-subjects">Free response feedback from chatbot group subjects</h3>
+<div class="cell">
+<div id="tbl-bot-feedback-df" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-bot-feedback-df-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5: Table showing subjects’ responses to free response feedback questions.
+</figcaption>
+<div aria-describedby="tbl-bot-feedback-df-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div>
+<table class="table do-not-create-environment cell table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Condition</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Topic Choice</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Did willingness increase?</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Was conversation productive? Any parts affect willingness?</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Any moments in convo open subject to new perspective?</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">What still contributes to willingness or unwillingness to converse?</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Feedback on the bot?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">selection bot</td>
+<td style="text-align: left; width: 5em;">the criminal justice system in the U.S.</td>
+<td style="text-align: left; width: 40em;">i feel the same as i did before, the chat did highlight how little i know about the topic though</td>
+<td style="text-align: left; width: 40em;">no affect on me really, i learned a litttle all through the chat, not much though</td>
+<td style="text-align: left; width: 40em; width: 40em;">no, they did not really provide mch information</td>
+<td style="text-align: left;">the only thing holding me back is my lack of knowledge, i would still be willing to have a conversation though</td>
+<td style="text-align: left;">everything worked great, responses were fast and relavent to the conversation</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">combination bot</td>
+<td style="text-align: left; width: 5em;">the atomic bombings of Hiroshima and Nagasaki</td>
+<td style="text-align: left; width: 40em;">Kind of I got some view points but still not very educated in it</td>
+<td style="text-align: left; width: 40em;">I felt the conversation went fairly the bot always acknowledged what I said and gave me more info</td>
+<td style="text-align: left; width: 40em; width: 40em;">maybe hearing from the people who lived through it. makes you look at it in a more humane way instead of acts of war</td>
+<td style="text-align: left;">I would like to become more educated on it</td>
+<td style="text-align: left;">Chatting with the bot was fine it gave me a lot of useful info</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">combination bot</td>
+<td style="text-align: left; width: 5em;">the atomic bombings of Hiroshima and Nagasaki</td>
+<td style="text-align: left; width: 40em;">I am willing to discuss any topic with anyone willing to have an open minded conversation, so yes.</td>
+<td style="text-align: left; width: 40em;">It was productive because I gained a new perspective and was able to see things differently.</td>
+<td style="text-align: left; width: 40em; width: 40em;">I reflected on the fact that even if nuclear disarmament were to occur, there are bad actors everywhere. How can we feel completely safe?</td>
+<td style="text-align: left;">I think that these are important conversations to have. It is history and truthful history is always worth discussing with an open mind.</td>
+<td style="text-align: left;">I enjoyed it very much! I do not think anything needs to change.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">combination bot</td>
+<td style="text-align: left; width: 5em;">the atomic bombings of Hiroshima and Nagasaki</td>
+<td style="text-align: left; width: 40em;">I was never heavily invested in my current perception of the WW2 nuclear bombings as being morally acceptable. Since I didn't feel the need to defend this, or need for this to be right, it was easier to be open minded to the chatbot's views.</td>
+<td style="text-align: left; width: 40em;">Having the conversation made me realize that this is not something that I am invested in or need to be right about so it would be easier to have a conversation about this issue with someone who disagrees.</td>
+<td style="text-align: left; width: 40em; width: 40em;">The chatbot mentioned that there may have been other work being done through diplomatic channels which might or might not have been likely to be successful.</td>
+<td style="text-align: left;">I would have to do a thorough review of this historical event to learn more about how to evaluate what alternatives may have been available to the atomic bomb. It would be a lot of work for an issue I am not invested in or attached to.</td>
+<td style="text-align: left;">I found the bot to be pleasant and respectful.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">selection bot</td>
+<td style="text-align: left; width: 5em;">the atomic bombings of Hiroshima and Nagasaki</td>
+<td style="text-align: left; width: 40em;">No I do not.</td>
+<td style="text-align: left; width: 40em;">None it did not change my views and was not productive.</td>
+<td style="text-align: left; width: 40em; width: 40em;">No I just keep what I knew, my views would not have changed, was not productive.</td>
+<td style="text-align: left;">Not wanting to discuss the topic.</td>
+<td style="text-align: left;">It is very informative but I could not trust the information provided, it feels more like an opinion.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">selection bot</td>
+<td style="text-align: left; width: 5em;">the atomic bombings of Hiroshima and Nagasaki</td>
+<td style="text-align: left; width: 40em;">yes because i want to express myself and also let people how wrong it is to do nuclear war</td>
+<td style="text-align: left; width: 40em;">the effect of the bomb in present day life</td>
+<td style="text-align: left; width: 40em; width: 40em;">i was surprised that the main objective to use the bomb was to quickly end the way which i find it funny because they never though thought of the long time effect of the bomb</td>
+<td style="text-align: left;">how it is wrong to use nuclear weapon for wars</td>
+<td style="text-align: left;">the bot was perfect</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="discussion" class="level2">
+<h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

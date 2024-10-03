@@ -378,7 +378,7 @@ var pre_convo_survey_json = {
     },
     {
       type: "matrix",
-      name: "topicChoice",
+      name: "topic",
       title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. Rate how comfortable you would be talking about each of the following topics.",
       isRequired: true,
       columns: [
@@ -413,31 +413,31 @@ var pre_convo_survey_json = {
       ],
       rows: [
         {
-          value: "human euthanasia in the U.S.",
+          value: "topicChoice-human euthanasia in the U.S.",
           text: "Human euthanasia in the U.S.",
         },
         {
-          value: "gender equality in the U.S.",
+          value: "topicChoice-gender equality in the U.S.",
           text: "Gender equality in the U.S.",
         },
         {
-          value: "the role of the U.S. government in healthcare",
+          value: "topicChoice-the role of the U.S. government in healthcare",
           text: "The role of the U.S. government in healthcare",
         },
         {
-          value: "the atomic bombings of Hiroshima and Nagasaki",
+          value: "topicChoice-the atomic bombings of Hiroshima and Nagasaki",
           text: "The atomic bombings of Hiroshima and Nagasaki",
         },
         {
-          value: "mandating vaccines in the U.S.",
+          value: "topicChoice-mandating vaccines in the U.S.",
           text: "Mandating vaccines in the U.S.",
         },
         {
-          value: "the criminal justice system in the U.S.",
+          value: "topicChoice-the criminal justice system in the U.S.",
           text: "The criminal justice system in the U.S.",
         },
         {
-          value: "same-sex marriage in the U.S.",
+          value: "topicChoice-same-sex marriage in the U.S.",
           text: "Same-sex marriage in the U.S.",
         },
       ],

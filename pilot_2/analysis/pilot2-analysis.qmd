@@ -274,7 +274,12 @@ surveys_cleaning_df <- raw_df %>%
   mutate(across(everything(), ~ gsub('"bombing-reason-of-avoidance-post":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"vaccines-reason-of-avoidance-post":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"criminal-reason-of-avoidance-post":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"same-sex-reason-of-avoidance-post":', '', .)))
+  mutate(across(everything(), ~ gsub('"same-sex-reason-of-avoidance-post":', '', .))) %>%
+  # the name of the question in 2.1 run of the experiment
+  mutate(across(everything(), ~ gsub('topicChoice":', '', .))) %>%
+  # the name of the question in future runs of the experiment
+  mutate(across(everything(), ~ gsub('topic":', '', .)))
+
 
   #Add a comma before the euthanasia-slider1 question because there isn't one for some reason and it messes up the rest of the code
   surveys_cleaning_df$response <- gsub("\\}\"euthanasia", "\\},\"euthanasia", surveys_cleaning_df$response)
@@ -295,6 +300,14 @@ surveys_df <- surveys_cleaning_df %>%
   filter(!is.na(answer) & answer != 'null' & answer != 'null,null') %>%
   # Remove the gender polarization line that we currently don't know how to code 
   filter(!grepl("Gender should be disregarded when selecting candidates for career advancement opportunities", question)) %>%
+  # Bin the religious affiliations because they were free response 
+   mutate(answer = case_when(
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "christian") ~ "Christian/Catholic",
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "catholic") ~ "Christian/Catholic",
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "atheis|none|") ~ "Atheist/None",
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "Nothing in Particular") ~ "Atheist/None",
+    TRUE ~ answer
+  )) %>%
   # REMOVE THIS LINE WHEN ANALYZING THE FULL EXPERIMENT DATA; WE CHANGED THE EXPERIMENT HTML SO THIS LINE WON'T BE NECESSARY IN THE FUTURE. Recode a likert rating item that we forgot to change in the experiment html
   mutate(answer = ifelse(question == "willing-to-converse-likert-post",
                          recode(answer, 
@@ -303,9 +316,233 @@ surveys_df <- surveys_cleaning_df %>%
                                 "Item 3" = "0", 
                                 "Item 4" = "1", 
                                 "Item 5" = "2"),
-                         answer)) 
+                         answer)) %>%
+  # REMOVE THIS LINE WHEN ANALYZING FULL EXPERIMENT DATA. was necessary because of an oversight on my part in pilot 2 
+   mutate(question = case_when(
+    question == "mandating vaccines in the U.S." ~ "topic-mandating vaccines in the U.S.",
+    question == "human euthanasia in the U.S." ~ "topic-human euthanasia in the U.S.",
+    question == "the criminal justice system in the U.S." ~ "topic-the criminal justice system in the U.S.",
+    question == "same-sex marriage in the U.S." ~ "topic-same-sex marriage in the U.S.",
+    question == "the role of the U.S. government in healthcare" ~ "topic-the role of the U.S. government in healthcare",
+    question == "gender equality in the U.S." ~ "topic-gender equality in the U.S.",
+    question == "the atomic bombings of Hiroshima and Nagasaki" ~ "topic-the atomic bombings of Hiroshima and Nagasaki",
+    TRUE ~ question 
+  )
+   )
 ```
 
+```{r}
+#| label: Experimening with a new way of coding Surveys data frame
+#| include: false
+
+ssurveys_cleaning_df <- raw_df %>%
+  # Filter for only surveys
+  filter(trial_type == "survey") %>%
+  # Remove control interventions (these are coded as surveys)
+  filter(phase != "control-intervention") %>%
+  # Remove the matrix question titles because they mess with separating questions from answers 
+  mutate(across(everything(), ~ gsub(',"rating-republicans":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub(',"rating-democrats":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-republicans":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-democrats":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans":null', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats":null', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization-general":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization-general":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization-general":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization-general":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization-general":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization-general":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization-general":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-offending-reason":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-offending-reason":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-offending-reason":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-offending-reason":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-offending-reason":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-offending-reason":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-offending-reason":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-euthanasia-openmindedness":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-gender-openmindedness":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-healthcare-openmindedness":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-bombing-openmindedness":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-vaccines-openmindedness":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-criminal-openmindedness":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-same-sex-openmindedness":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-openmindedness-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-openmindedness-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-openmindedness-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-openmindedness-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-openmindedness-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-openmindedness-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-openmindedness-post":null,', '', .))) %>% 
+  mutate(across(everything(), ~ gsub('"euthanasia-reason-of-avoidance":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-reason-of-avoidance":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-reason-of-avoidance":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-reason-of-avoidance":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-reason-of-avoidance":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-reason-of-avoidance":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-reason-of-avoidance":null,', '', .))) %>%
+ mutate(across(everything(), ~ gsub('"euthanasia-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization-general-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization-general-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization-general-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization-general-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization-general-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization-general-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization-general-post-":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-republicans-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-democrats-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-reason-of-avoidance-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-reason-of-avoidance-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-reason-of-avoidance-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-reason-of-avoidance-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-reason-of-avoidance-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-reason-of-avoidance-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-reason-of-avoidance-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub(',null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-republicans":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-democrats":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization-general":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization-general":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization-general":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization-general":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization-general":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization-general":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization-general":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-offending-reason":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-offending-reason":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-offending-reason":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-offending-reason":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-offending-reason":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-offending-reason":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-offending-reason":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-euthanasia-openmindedness":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-gender-openmindedness":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-healthcare-openmindedness":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-bombing-openmindedness":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-vaccines-openmindedness":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-criminal-openmindedness":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"pre-same-sex-openmindedness":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-openmindedness-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-openmindedness-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-openmindedness-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-openmindedness-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-openmindedness-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-openmindedness-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-openmindedness-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-reason-of-avoidance":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-reason-of-avoidance":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-reason-of-avoidance":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-reason-of-avoidance":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-reason-of-avoidance":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-reason-of-avoidance":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-reason-of-avoidance":', '', .))) %>% 
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization-general-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization-general-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization-general-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization-general-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization-general-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization-general-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization-general-post-":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-republicans-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-democrats-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-reason-of-avoidance-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-reason-of-avoidance-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-reason-of-avoidance-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-reason-of-avoidance-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-reason-of-avoidance-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-reason-of-avoidance-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-reason-of-avoidance-post":', '', .))) %>%
+  # the name of the question in 2.1 run of the experiment
+  mutate(across(everything(), ~ gsub('topicChoice":', '', .))) %>%
+  # the name of the question in future runs of the experiment
+  mutate(across(everything(), ~ gsub('topic":', '', .)))
+
+
+  #Add a comma before the euthanasia-slider1 question because there isn't one for some reason and it messes up the rest of the code
+  ssurveys_cleaning_df$response <- gsub("\\}\"euthanasia", "\\},\"euthanasia", ssurveys_cleaning_df$response)
+  
+ssurveys_df <- ssurveys_cleaning_df %>%
+  # Remove weird characters but don't remove quotations because we need them for separating questions
+  mutate(across(everything(), ~ gsub('}', '', .))) %>%
+  mutate(across(everything(), ~ gsub('\\{', '', .))) %>%
+  mutate(across(everything(), ~ gsub('\\[', '', .))) %>%
+  mutate(across(everything(), ~ gsub('\\]', '', .))) %>%
+  # Make each question its own row
+  separate_rows(response, sep = ',"') %>%
+  # Remove any leftover quotation marks
+  mutate(across(everything(), ~ gsub('"', '', .))) %>%
+  # Move answers to a new column
+  separate(response, into = c("question", "answer"), sep = ":", extra = "merge", fill = "right") %>%
+  # Remove all remaining questions that were answered with null (like the slider questions, because the slider 'placeholder' questions are where people actually answer the slider questions)
+  filter(!is.na(answer) & answer != 'null' & answer != 'null,null') %>%
+  # Remove the gender polarization line that we currently don't know how to code 
+  filter(!grepl("Gender should be disregarded when selecting candidates for career advancement opportunities", question)) %>%
+  # Bin the religious affiliations because they were free response 
+   mutate(answer = case_when(
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "christian") ~ "Christian/Catholic",
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "catholic") ~ "Christian/Catholic",
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "atheis|none|") ~ "Atheist/None",
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "Nothing in Particular") ~ "Atheist/None",
+    TRUE ~ answer
+  )) %>%
+  # REMOVE THIS LINE WHEN ANALYZING THE FULL EXPERIMENT DATA; WE CHANGED THE EXPERIMENT HTML SO THIS LINE WON'T BE NECESSARY IN THE FUTURE. Recode a likert rating item that we forgot to change in the experiment html
+  mutate(answer = ifelse(question == "willing-to-converse-likert-post",
+                         recode(answer, 
+                                "Item 1" = "-2", 
+                                "Item 2" = "-1", 
+                                "Item 3" = "0", 
+                                "Item 4" = "1", 
+                                "Item 5" = "2"),
+                         answer)) %>%
+  # REMOVE THIS LINE WHEN ANALYZING FULL EXPERIMENT DATA. was necessary because of an oversight on my part in pilot 2 
+   mutate(question = case_when(
+    question == "mandating vaccines in the U.S." ~ "topic-mandating vaccines in the U.S.",
+    question == "human euthanasia in the U.S." ~ "topic-human euthanasia in the U.S.",
+    question == "the criminal justice system in the U.S." ~ "topic-the criminal justice system in the U.S.",
+    question == "same-sex marriage in the U.S." ~ "topic-same-sex marriage in the U.S.",
+    question == "the role of the U.S. government in healthcare" ~ "topic-the role of the U.S. government in healthcare",
+    question == "gender equality in the U.S." ~ "topic-gender equality in the U.S.",
+    question == "the atomic bombings of Hiroshima and Nagasaki" ~ "topic-the atomic bombings of Hiroshima and Nagasaki",
+    TRUE ~ question 
+  )
+   )
+```
 
 ```{r}
 #| label: Created automated process for flagging transcripts that might have been pasted in
@@ -453,12 +690,14 @@ total_num_clean_subjects_in_data <- nrow(raw_df %>%
   summarize(total_num_clean_subjects_in_data = n()))
 
 ```
+
 ## Introduction
+
 ## Methods
 
 ### Participants
 
-We currently have data from `r total_num_subjects_in_data` subjects in our second pilot, which we gathered on Prolific. We restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of five dollars. After applying exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain. We excluded `r total_failed_attention_checks` subjects for failing the two attention checks in the surveys and `r failed_copypaste_check + failed_character_count_check` subjects for likely plagiarizing their conversation messages. 
+We currently have data from `r total_num_subjects_in_data` subjects in our second pilot, which we gathered on Prolific. We restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of five dollars. After applying exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain. We excluded `r total_failed_attention_checks` subjects for failing the two attention checks in the surveys and `r failed_copypaste_check + failed_character_count_check` subjects for likely plagiarizing their conversation messages.
 
 ```{r}
 #| label: Reverse code for quantitative analysis
@@ -1162,10 +1401,10 @@ bot_feedback <- surveys_df %>%
     mutate(question = ifelse(str_detect(question, "new-perspective"), "new-perspective", question)) %>%
     mutate(question = ifelse(str_detect(question, "still-contributes"), "still-contributes", question)) %>%
     mutate(question = ifelse(str_detect(question, "feelings-about-bot"), "feelings-about-bot", question)) %>%
-  filter(question == "free-response" | question == "convo-effect-on-willingness" | question == "new-perspective" | question == "still-contributes" | question == "feelings-about-bot" | question == "topicChoice") %>%
+  filter(question == "free-response" | question == "convo-effect-on-willingness" | question == "new-perspective" | question == "still-contributes" | question == "feelings-about-bot") %>%
   arrange(desc(prolific_subject_id)) %>%
-  select(prolific_subject_id, question, answer, condition, pilot_iteration.x) %>%
-  mutate(word_count = ifelse(question == "topicChoice", NA, str_count(answer, '\\S+'))) %>%
+  select(prolific_subject_id, question, answer, condition, pilot_iteration.x, topicChoiceAsString) %>%
+  mutate(word_count = str_count(answer, '\\S+')) %>%
   mutate(question = as.character(question))
 
 # add some entries that explain what the questions were 
@@ -1419,12 +1658,12 @@ as_gt(demographics_table)
 
 ## Results
 
-On average, subjects spent `r average_chatbot_time` minutes with the chatbot (range `r range_chatbot_time`) and each message was `r avg_conversation_word_count` words long (range `r range_conversation_word_count`). Subjects averaged `r average_reflection_time` minutes on the control free reflection (range `r range_reflection_time`) with a reflection length of `r avg_reflection_word_count` words (range `r range_reflection_word_count`). Experimental group subjects averaged `r avg_bot_feedback_word_count` words in response to each post-intervention survey  question that asked for feedback on the bot (range `r range_bot_feedback_word_count`).
+On average, subjects spent `r average_chatbot_time` minutes with the chatbot (range `r range_chatbot_time`) and each message was `r avg_conversation_word_count` words long (range `r range_conversation_word_count`). Subjects averaged `r average_reflection_time` minutes on the control free reflection (range `r range_reflection_time`) with a reflection length of `r avg_reflection_word_count` words (range `r range_reflection_word_count`). Experimental group subjects averaged `r avg_bot_feedback_word_count` words in response to each post-intervention survey question that asked for feedback on the bot (range `r range_bot_feedback_word_count`).
 
 ```{r}
 #| label: fig-time-plot
 #| echo: false
-#| fig-cap: Scatterplot showing time spent on pre- and post-intervention surveys with color indicating whether subject was in control group or experimental group.
+#| fig-cap: Scatterplot with line of equality showing time spent on pre- and post-intervention surveys with color indicating whether subject was in control group or experimental group.
 
 time_plot_df <- survey_time_df %>%
   full_join(reflections_time_df, by = "prolific_subject_id") %>%
@@ -1440,6 +1679,7 @@ time_plot_df <- survey_time_df %>%
 
 time_plot <- ggplot(time_plot_df, aes(x = pre_time_minutes, y = post_time_minutes, color = condition_general)) + labs(title = "Post- vs. Pre-Intervention Surveys", x = 'Time spent on pre-intervention survey (minutes)', y = 'Time spent on post-intervention survey (minutes)', color = "Experiment condition") +
   geom_point() + #scatterplot
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
   theme_minimal()  + 
   scale_color_manual(values = c("control" = "cornflowerblue", "experimental" = "darkseagreen"), 
                      labels = c("control" = "Control Group", "experimental" = "Experimental Group"))
@@ -1467,7 +1707,7 @@ time_figure_df <- time_plot_df %>%
 kable(time_figure_df)
 ```
 
-### Scatterplots of subjects' pre- and post-intervention ratings on surveys 
+### Scatterplots of subjects' pre- and post-intervention ratings on surveys
 
 The politics t-test revealed a t-value of `r politics_t_value` with a p-value of `r politics_p_val`, indicating `r politics_significance_status` between the change in experimental group subjects' views of the opposing political party and control group subjects' change in views (95% CI: `r politics_ci`).
 
@@ -1508,7 +1748,9 @@ polarization_scatterplot <- ggplot(merged_polarization_df, aes(x = pre_mean_scor
 print(polarization_scatterplot)
 
 ```
+
 The offending reason t-test revealed a t-value of `r offending_reason_t_value` with a p-value of `r offending_reason_p_val`, indicating `r offending_reason_significance_status` between the change in experimental group subjects' severity of reasons that hold them back from conversing and control group subjects' change in severity (95% CI: `r offending_reason_ci`).
+
 ```{r}
 #| label: fig-offending-reason-graph
 #| echo: false
@@ -1526,6 +1768,7 @@ offending_reason_scatterplot <- ggplot(merged_offending_reason_df, aes(x = pre_m
 print(offending_reason_scatterplot)
 
 ```
+
 The sliders t-test revealed a t-value of `r sliders_t_value` with a p-value of `r sliders_p_val`, indicating `r sliders_significance_status` between the change in experimental group subjects' willingness to converse about their topic and control group subjects' change in willingness (95% CI: `r sliders_ci`).
 
 ```{r}
@@ -1546,6 +1789,7 @@ sliders_scatterplot <- ggplot(merged_sliders_df, aes(x = pre_mean_score, y = pos
 print(sliders_scatterplot)
 
 ```
+
 The open-mindedness t-test revealed a t-value of `r openmindedness_t_value` with a p-value of `r openmindedness_p_val`, indicating `r openmindedness_significance_status` between the change in experimental group subjects' open-mindedness on their topic and control group subjects' change in open-mindedness (95% CI: `r openmindedness_ci`).
 
 ```{r}
@@ -1568,6 +1812,7 @@ print(sliders_scatterplot)
 ```
 
 ### Example table of changes in average willingness to converse (slider questions)
+
 ```{r}
 #| label: tbl-willingness-df
 #| echo: false
@@ -1652,6 +1897,7 @@ kable(example_conversation_transcripts, "html") %>%
 ```
 
 ### Free response feedback from chatbot group subjects
+
 ```{r}
 #| label: tbl-bot-feedback-df
 #| echo: false
@@ -1667,7 +1913,7 @@ bot_feedback_figure <- bot_feedback %>%
   select(-c(prolific_subject_id, pilot_iteration.x, word_count)) %>%
   rename(
     Condition = condition,
-    'Topic Choice' = topicChoice,
+    'Topic Choice' = 'topicChoiceAsString',
     'Did willingness increase?' = 'free-response',
     'Was conversation productive? Any parts affect willingness?' = 'convo-effect-on-willingness',
     'Any moments in convo open subject to new perspective?' = 'new-perspective',
@@ -1682,4 +1928,5 @@ kable(bot_feedback_figure, "html") %>%
 ```
 
 ## Discussion
+
 ## References
