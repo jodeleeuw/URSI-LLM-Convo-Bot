@@ -15,6 +15,7 @@ library(gt)
 library(gtsummary)
 library(kableExtra)
 library(stringr)
+library(ggridges)
 # library(knitr)
 # library(corrplot)
 # library(GGally)
@@ -654,11 +655,14 @@ attention_check <- surveys_df %>%
     TRUE ~ NA_character_
   )) %>%
   ungroup() %>%
-  select(flag, question, answer, prolific_subject_id, "Time taken (minutes)", condition)
+  select(flag, question, answer, prolific_subject_id, "Time taken (minutes)", condition) %>%
+  # REMOVE THIS FOR FULL EXPERIMENT, manually making one subject pass because i had an error in the experiment code that made the subject not receive one of the attention checks (nothing else was affected in their data)
+  mutate(flag = if_else(prolific_subject_id == "66ac39dd781146c974c07009", "pass", flag))
 
 # extract value for text 
 total_failed_attention_checks <- attention_check %>%
-  filter(flag == 'double fail') %>%
+  # excluding people for both fails
+  filter(flag == 'double fail' | flag == 'single fail') %>%
   # add distinct because there are two attention check questions so a failed subject gets flagged twice
   summarize(total_failed_attention_checks = n_distinct(prolific_subject_id)) %>%
   pull(total_failed_attention_checks)
@@ -678,7 +682,8 @@ failed_attention_checks_subject_ids <- attention_check %>%
 # remove bad subs
 raw_df <- raw_df %>%
   filter(!(prolific_subject_id %in% failed_copypaste_check_subject_ids)) %>%
-  filter(!(prolific_subject_id %in% failed_character_count_subject_ids))
+  filter(!(prolific_subject_id %in% failed_character_count_subject_ids)) %>%
+  filter(!(prolific_subject_id %in% total_failed_attention_checks))
     
 surveys_df <- surveys_df %>%
   filter(!prolific_subject_id %in% failed_copypaste_check_subject_ids)  %>%
@@ -697,7 +702,7 @@ total_num_clean_subjects_in_data <- nrow(raw_df %>%
 
 ### Participants
 
-We currently have data from `r total_num_subjects_in_data` subjects in our second pilot, which we gathered on Prolific. We restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of five dollars. After applying exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain. We excluded `r total_failed_attention_checks` subjects for failing the two attention checks in the surveys and `r failed_copypaste_check + failed_character_count_check` subjects for likely plagiarizing their conversation messages.
+We currently have data from `r total_num_subjects_in_data` subjects in our second pilot, which we gathered on Prolific. We restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of five dollars. After applying exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain. We excluded `r total_failed_attention_checks` subjects for failing one or more of the attention checks in the surveys and `r failed_copypaste_check + failed_character_count_check` subjects for likely plagiarizing their conversation messages.
 
 ```{r}
 #| label: Reverse code for quantitative analysis
@@ -1925,6 +1930,50 @@ kable(bot_feedback_figure, "html") %>%
   kable_styling() %>%
   column_spec(2, width = "5em") %>%
   column_spec(c(3,4,5,5), width = "40em")
+```
+
+```{r}
+#| label: fig-topic-ratings
+#| echo: false
+#| fig-cap: In the pre-intervention survey, each subject used a 7-pt scale to rate how comfortable they would be discussing each of the following topics. One of the subject's most strongly rated topics were randomly selected as the topic that the subject would focus on for the remainder of the experiment. The scale went from strongly uncomfortable (1), to moderately uncomfortable, a little uncomfortable, neutral (4), a little comfortable, moderately comfortable, and strongly comfortable (7).
+
+# create figure/table showing distribution of ratings on topics
+topic_ratings_df <- surveys_df %>%
+    filter(grepl("topic-", question)) %>%
+  mutate(answer = as.numeric(answer)) %>%
+  select(prolific_subject_id, question, answer, topicChoiceAsString)
+  
+topic_labels <- c(
+  "topic-mandating vaccines in the U.S." = 
+    "Mandating vaccines",
+  "topic-human euthanasia in the U.S." = 
+    "Human euthanasia",
+  "topic-the criminal justice system in the U.S." = 
+    "Criminal justice system",
+  "topic-same-sex marriage in the U.S." = 
+    "Same-sex marriage",
+  "topic-the role of the U.S. government in healthcare" = 
+    "Government in healthcare",
+  "topic-gender equality in the U.S." = 
+    "Gender equality",
+  "topic-the atomic bombings of Hiroshima and Nagasaki" = 
+    "Atomic bombings"
+)
+
+topic_ratings_plot <- ggplot(topic_ratings_df, aes(x = answer, y = question, fill = question)) +
+  geom_density_ridges() +
+  # give the qualitative meanings of 1-7
+  scale_x_continuous(breaks = seq(1, 7, by = 1)) +
+   scale_y_discrete(labels = topic_labels) +
+  # make it look nicer
+  theme_ridges() +      
+  # remove the legend
+  theme(legend.position = "none") +
+  labs(title = "Ridgeline Plot of Ratings by Topic",
+       x = "Rating",
+       y = "Contentious Topic")
+
+print(topic_ratings_plot)
 ```
 
 ## Discussion
