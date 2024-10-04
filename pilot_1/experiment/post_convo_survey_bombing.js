@@ -230,6 +230,13 @@ var post_convo_survey_bombing = {
       title:
         "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
     },
+    {
+      type: "html",
+      name: "bombing-slider3-post-placeholder",
+      title:
+        "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on the atomic bombings of Hiroshima and Nagasaki, where 0 is absolute unwillingness and 100 is absolute willingness.",
+      html: '<div id="bombing-slider3-post-placeholder"></div>', // Placeholder for the slider
+    },
     { type: "expression",
     name: "attention-check-slider-post",
     title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
