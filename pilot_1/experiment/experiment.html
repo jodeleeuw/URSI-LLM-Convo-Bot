@@ -88,8 +88,6 @@
             session_id: session_id
         });
 
-        // PRIOR TO LAUNCHING PILOT ADD JSPSYCH PIPE IN THE ASYNC FUNCTION AND CHANGE ALL JSON ISREQUIREDS TO TRUE 
-
         // disable right-click to prevent accesing browser console (to prevent user from seeing chat-bot prompt)
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
@@ -227,7 +225,7 @@
             }
 
             // Loop to check i or 8-i)
-            for (let i = 1; i <= 7; i++) {
+            for (let i = 1; i = 7; i++) {
                 // Check for i
                 relevantTopicChoiceRow = findTopicChoiceRowWithValue(i);
                 if (relevantTopicChoiceRow !== null) {
@@ -1164,7 +1162,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var neutral_survey = {
             data: {
-                phase: "pre-convo-independent-survey",
+                phase: "post-convo-independent-survey",
             },
             timeline: [
                 {
@@ -1188,7 +1186,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var other_survey = {
             data: {
-                phase: "post-convo-no-political-affiliation-survey",
+                phase: "post-convo-other-political-affiliation-survey",
             },
             timeline: [
                 {

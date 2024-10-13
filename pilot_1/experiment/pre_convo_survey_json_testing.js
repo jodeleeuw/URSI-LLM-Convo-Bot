@@ -442,6 +442,7 @@ var pre_convo_survey_json_testing = {
           text: "Same-sex marriage in the U.S.",
         },
       ],
+      rowsOrder: "random",
     },
   ],
 };
