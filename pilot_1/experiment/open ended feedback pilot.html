@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>URSI LLM Convo Bot Experiment</title>
+    <!-- loading jsPsych -->
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+
+    <!-- loading jsPsych plug-ins -->
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.1"></script> <!-- for data pipe -->
+    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script> <!-- condition assignment using data pipe -->
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="chat-plugin/index.browser.js"></script> <!--- local chat plug-in access-->
+    <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css" />
+    <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-text@2.0.0"></script> <!--- for control intervention--- 
+
+    <!-- loading react-->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script> <!-- -->
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script> <!--  -->
+
+    <!-- uploading pre-convo survey question jsons -->
+    <script src="pre_convo_topic_only.js"></script> <!-- survey -->
+ 
+    <!-- loading css -->
+    <link href="styles.css" rel="stylesheet" type="text/css"> <!-- local-ui access -->
+
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cantarell:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Exo:ital,wght@0,100..900;1,100..900&display=swap');
+
+    </style>
+</head>
+
+<body>
+    <script>
+
+        //Initialize jsPsych, redirect to prolific page upon completing experiment
+        var jsPsych = initJsPsych({
+            on_finish: function () {
+                jsPsych.data.displayData();
+                //jsPsych.data.get().localSave("csv", "llm_trial.csv"); //save chatbot conversation to local for when testing bot on computer.
+                window.location = "https://app.prolific.com/submissions/complete?cc=CVWBBA5S";
+            },
+        });
+
+        // capture info from Prolific
+        var prolific_subject_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
+        var study_id = jsPsych.data.getURLVariable('STUDY_ID');
+        var session_id = jsPsych.data.getURLVariable('SESSION_ID');
+
+        //add captured info into jsPsych data
+        jsPsych.data.addProperties({
+            prolific_subject_id: prolific_subject_id,
+            study_id: study_id,
+            session_id: session_id
+        });
+
+        // disable right-click to prevent accesing browser console (to prevent user from seeing chat-bot prompt)
+        //document.addEventListener('contextmenu', function (e) {
+          //  e.preventDefault();
+     //   });
+
+
+        // disable keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C')) {
+                e.preventDefault();
+            }
+        });
+
+        // disable text selection
+        document.addEventListener('selectstart', function (e) {
+            e.preventDefault();
+        });
+
+
+        // create timelines for conditions. the contents of each timeline are at the bottom of this doc
+        var combination_timeline = [];
+        var selection_timeline = [];
+
+ // REMEMBER TO CHANGE DATA PIPE SEQUENTIAL ASSIGNMENT TO BE ONLY 2 CONDITIONS 
+ // DDOOOOONNNTTTT FORGGGEEEETTTTT
+        // sequential condition assignment using data pipe. pushing a condition timeline into the timeline variable
+        var timeline = [];
+        async function createExperiment() {
+            const condition = 1 //await jsPsychPipe.getCondition("P09AXWX5b5t6");
+            if (condition == 0) { timeline = combination_timeline; }
+            if (condition == 1) { timeline = selection_timeline; }
+            jsPsych.run([...timeline, save_data]);
+        }
+
+        // setting subject_id and filename for confidential data analysis 
+        const subject_id = jsPsych.randomization.randomID(10);
+        const filename = `${subject_id}.csv`;
+
+        /*  welcome message  */
+        var welcome = {
+            data: {
+                phase: "welcome-message",
+            },
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: "Welcome to the experiment! Press any key to begin.",
+        };
+
+        /* brief instructions for people in bot convo timelines */
+        var preliminary_convo_instructions = {
+            data: {
+                phase: "convo-instructions",
+            },
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+                <p> In this experiment, you will have a short conversation with an AI chatbot about a disputed topic in America. </p>
+                <p> Before you chat with the bot, there is a short questionnaire for you to fill out. </p>
+                <div style='width: 700px;'>
+                </div>
+                <p> Press any key to proceed to the questionnaire. </p>
+                `,
+            post_trial_gap: 500,
+        };
+
+
+        /// EXTRACTING STRONGEST TOPIC CHOICE 
+
+        let topicChoiceResponse = [];
+        let topicChoiceAsString;
+
+        function extractRelevantTopicChoiceRow(responses) {
+            let relevantTopicChoiceRow = [];
+
+            // Function to find a row with specific column values
+            function findTopicChoiceRowWithValue(values) {
+                for (let row in responses) {
+                    let columnValue = responses[row];
+                    if (columnValue === values) {
+                        return [{ row }];
+                    }
+                }
+                return null;
+            }
+
+            // Loop to check i or 8-i)
+            for (let i = 1; i = 7; i++) {
+                // Check for i
+                relevantTopicChoiceRow = findTopicChoiceRowWithValue(i);
+                if (relevantTopicChoiceRow !== null) {
+                    return relevantTopicChoiceRow;
+                }
+            }
+        }
+
+
+        let topicChoice;
+
+        const pre_convo_topic_only_survey_trial = {
+            type: jsPsychSurvey,
+            survey_json: pre_convo_topic_only_json,
+            data: {
+                phase: "pre_convo_topic_only_survey_trial",
+            },
+            on_finish: (data) => {
+
+                // extract and process the responses for the specific question
+                let topicChoiceResponse = data.response["topic"];
+                if (topicChoiceResponse) {
+                    // extract most uncomfortable topic
+                    let relevanttopicChoiceRow = extractRelevantTopicChoiceRow(topicChoiceResponse);
+
+                    // convert topic into a string so it can be fed into chat later
+                    relevanttopicChoiceRow.forEach(rowObj => {
+                        data.topicChoiceAsString = rowObj;
+                        console.log(data.topicChoiceAsString);
+                        console.log(data.topicChoiceAsString["row"]);
+                        topicChoice = data.topicChoiceAsString["row"]
+                        console.log(topicChoice);
+                    });
+                }
+            }
+        }
+
+        /// EXTRACTING DEPOLARIZATION STRING FROM TOPIC-SPECIFIC PRE-CONVO SURVEYS
+        let polarizationResponses = [];
+
+        function extractRelevantPolarizationRow(responses) {
+            let relevantPolarizationRow = [];
+
+            // Function to find a row with specific column values
+            function findPolarizationRowWithValue(values) {
+                for (let row in responses) {
+                    let columnValue = responses[row];
+                    if (columnValue === values) {
+                        return [{ row }];
+                    }
+                }
+                return null;
+            }
+
+            // Loop to check i or 8-i)
+            for (let i = 1; i <= 4; i++) {
+                // Check for i
+                relevantPolarizationRow = findPolarizationRowWithValue(i);
+                if (relevantPolarizationRow !== null) {
+                    return relevantPolarizationRow;
+                }
+                // Check for 8 - i
+                relevantPolarizationRow = findPolarizationRowWithValue(8 - i);
+                if (relevantPolarizationRow !== null) {
+                    return relevantPolarizationRow;
+                }
+            }
+            return relevantPolarizationRow;
+
+        }
+
+        // TOPIC SPECIFIC PRE-CONVERSATION SURVEYS 
+
+        let polarizedStatement;
+
+
+var topic_polarization_bombing_survey = {
+    data: {
+        phase: "topic_polarization_survey",
+    },
+    timeline: [
+                {
+                    type: jsPsychSurvey,
+                }
+              ],
+    conditional_function: () => {
+        // const topic = topicChoice;
+        console.log("Evaluating conditional function for topic:", topicChoice);
+        return (topicChoice === 'the atomic bombings of Hiroshima and Nagasaki');
+    },
+    survey_json: () => {
+     //   // const topic = topicChoice; // get topic choice
+        return {
+                    elements: [
+                    {
+        type: "matrix",
+        name: "bombing-polarization",
+        title:
+          "How much do you agree or disagree with the following statements on the atomic bombings of Hiroshima and Nagasaki? ",
+        isRequired: true,
+        columns: [
+          {
+            value: 1,
+            text: "Disagree strongly",
+          },
+          {
+            value: 2,
+            text: "Disagree moderately",
+          },
+          {
+            value: 3,
+            text: "Disagree a little",
+          },
+          {
+            value: 4,
+            text: "Neither agree nor disagree",
+          },
+          {
+            value: 5,
+            text: "Agree a little",
+          },
+          {
+            value: 6,
+            text: "Agree moderately",
+          },
+          {
+            value: 7,
+            text: "Agree strongly",
+          },
+        ],
+        rows: [
+          {
+            value:
+              "A memorial should be established in the U.S. to honor the victims of the bombings",
+            text: "A memorial should be established in the U.S. to honor the victims of the bombings",
+          },
+          {
+            value:
+              "The U.S. government should provide financial reparations to the survivors and their families",
+            text: "The U.S. government should provide financial reparations to the survivors and their families",
+          },
+          {
+            value: "The bombings were justified to bring a swift end to the war",
+            text: "The bombings were justified to bring a swift end to the war",
+          },
+          {
+            value: "The bombings were morally wrong",
+            text: "The bombings were morally wrong",
+          },
+          {
+            value:
+              "Learning about the atomic bombings of Hiroshima and Nagasaki is essential for understanding the consequences of nuclear warfare",
+            text: "Learning about the atomic bombings of Hiroshima and Nagasaki is essential for understanding the consequences of nuclear warfare",
+          },
+          {
+            value: "The U.S. should take responsibility for the humanitarian impact of the bombings",
+            text: "The U.S. should take responsibility for the humanitarian impact of the bombings",
+          },
+          {
+            value:
+              "The U.S. should participate in international efforts to promote nuclear disarmament and non-proliferation",
+            text: "The U.S. should participate in international efforts to promote nuclear disarmament and non-proliferation",
+          },
+        ],
+        rowsOrder: "random",
+                    },
+            ],
+        };
+    },
+    on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["bombing-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                        polarizedStatement = data.rowAsString["row"];
+                    });
+                }
+            }
+};
+
+
+
+var topic_polarization_criminal_survey = {
+    data: {
+        phase: "topic_polarization_survey",
+    },
+    timeline: [
+                {
+                    type: jsPsychSurvey,
+                }
+              ],
+  //  type: jsPsychSurvey,
+    conditional_function: () => {
+       // // const topic = topicChoice;
+        console.log("Evaluating conditional function");
+        console.log("topic:", topicChoice); // Debugging statemen
+        return (topicChoice === 'the criminal justice system in the U.S.');
+    },
+    survey_json: () => {
+     //   // const topic = topicChoice; // get topic choice
+        return {
+                    elements: [
+                    {
+    type: "matrix",
+    name: "criminal-polarization",
+    title:
+      "How much do you agree or disagree with the following statements on the criminal justice system in the U.S.? ",
+    isRequired: true,
+    columns: [
+      {
+        value: 1,
+        text: "Disagree strongly",
+      },
+      {
+        value: 2,
+        text: "Disagree moderately",
+      },
+      {
+        value: 3,
+        text: "Disagree a little",
+      },
+      {
+        value: 4,
+        text: "Neither agree nor disagree",
+      },
+      {
+        value: 5,
+        text: "Agree a little",
+      },
+      {
+        value: 6,
+        text: "Agree moderately",
+      },
+      {
+        value: 7,
+        text: "Agree strongly",
+      },
+    ],
+    rows: [
+      {
+        value:
+          "Implementing comprehensive background checks for all individuals entering the criminal justice system is necessary",
+        text: "Implementing comprehensive background checks for all individuals entering the criminal justice system is necessary",
+      },
+      {
+        value:
+          "Enhancing mental health support services for incarcerated individuals would be worth the cost and resources",
+        text: "Enhancing mental health support services for incarcerated individuals would be worth the cost and resources",
+      },
+      {
+        value: "The use of solitary confinement as a punishment should be banned",
+        text: "The use of solitary confinement as a punishment should be banned",
+      },
+      {
+        value: "Inmates should have greater access to educational programs",
+        text: "Inmates should have greater access to educational programs",
+      },
+      {
+        value:
+          "Non-violent offenders should be permitted to serve sentences through community service or house arrest",
+        text: "Non-violent offenders should be permitted to serve sentences through community service or house arrest",
+      },
+      {
+        value: "The use of private prisons should be restricted",
+        text: "The use of private prisons should be restricted",
+      },
+      ],
+                    rowsOrder: "random",
+                },
+            ],
+        };
+    },
+    on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["criminal-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                        polarizedStatement = data.rowAsString["row"];
+                    });
+                }
+            }
+};
+
+
+var topic_polarization_euthanasia_survey = {
+    data: {
+        phase: "topic_polarization_survey",
+    },
+    timeline: [
+                {
+                    type: jsPsychSurvey,
+                }
+              ],
+    conditional_function: () => {
+    console.log("Evaluating conditional function");
+    console.log("topic:", topicChoice);
+     // const topic = topicChoice;
+     return (topicChoice === 'human euthanasia in the U.S.');
+    },
+    survey_json: () => {
+     //   // const topic = topicChoice; // get topic choice
+        return {
+                    elements: [
+                    {
+
+                        type: "matrix",
+        name: "euthanasia-polarization",
+        title:
+          "How much do you agree or disagree with the following statements on human euthanasia in the U.S.? ",
+        isRequired: true,
+        columns: [
+          {
+            value: 1,
+            text: "Disagree strongly",
+          },
+          {
+            value: 2,
+            text: "Disagree moderately",
+          },
+          {
+            value: 3,
+            text: "Disagree a little",
+          },
+          {
+            value: 4,
+            text: "Neither agree nor disagree",
+          },
+          {
+            value: 5,
+            text: "Agree a little",
+          },
+          {
+            value: 6,
+            text: "Agree moderately",
+          },
+          {
+            value: 7,
+            text: "Agree strongly",
+          },
+        ],
+        rows: [
+          {
+            value: "Euthanasia should be allowed for terminally ill patients who request it",
+            text: "Euthanasia should be allowed for terminally ill patients who request it",
+          },
+          {
+            value: "Legal protections should be provided for doctors who perform euthanasia",
+            text: "Legal protections should be provided for doctors who perform euthanasia",
+          },
+          {
+            value:
+              "It is not right for family members to request euthanasia on behalf of incapacitated patients",
+            text: "It is not right for family members to request euthanasia on behalf of incapacitated patients",
+          },
+          {
+            value:
+              "Euthanasia should only be allowed if the patient has received a psychological evaluation",
+            text: "Euthanasia should only be allowed if the patient has received a psychological evaluation",
+          },
+          {
+            value: "Euthanasia should be banned for patients with non-terminal conditions",
+            text: "Euthanasia should be banned for patients with non-terminal conditions",
+          },
+          {
+            value: "Euthanasia should be banned for all patients",
+            text: "Euthanasia should be banned for all patients",
+          },
+          {
+            value: "Euthanasia should not be performed at home",
+            text: "Euthanasia should not be performed at home",
+          },
+        ],
+        rowsOrder: "random",
+                    },
+            ],
+        };
+    },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["euthanasia-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                        polarizedStatement = data.rowAsString["row"];
+                    });
+                }
+            }
+};
+
+
+var topic_polarization_gender_survey = {
+    data: {
+        phase: "topic_polarization_survey",
+    },
+    timeline: [
+                {
+                    type: jsPsychSurvey,
+                }
+              ],
+    conditional_function: () => {
+      console.log("Evaluating conditional function");
+        console.log("topic:", topicChoice); // Debugging stateme
+      // // const topic = topicChoice;
+        return (topicChoice === 'gender equality in the U.S.');
+    },
+    survey_json: () => {
+        // const topic = topicChoice; // get topic choice
+return {
+                    elements: [
+                    {
+
+                        type: "matrix",
+    name: "gender-polarization",
+    title:
+      "How much do you agree or disagree with the following statements on gender equality in the U.S.? ",
+    isRequired: true,
+    columns: [
+      {
+        value: 1,
+        text: "Disagree strongly",
+      },
+      {
+        value: 2,
+        text: "Disagree moderately",
+      },
+      {
+        value: 3,
+        text: "Disagree a little",
+      },
+      {
+        value: 4,
+        text: "Neither agree nor disagree",
+      },
+      {
+        value: 5,
+        text: "Agree a little",
+      },
+      {
+        value: 6,
+        text: "Agree moderately",
+      },
+      {
+        value: 7,
+        text: "Agree strongly",
+      },
+    ],
+    rows: [
+      {
+        value: "Gender quotas should be enforced in political positions to ensure equal representation of men and women in government",
+        text: "Gender quotas should be enforced in political positions to ensure equal representation of men and women in government",
+      },
+      {
+        value:
+          "Policies that take gender into account often do more harm than good in achieving gender equality.",
+        text: "Policies that take gender into account often do more harm than good in achieving gender equality.",
+      },
+      {
+        value: "Companies should be required to have a minimum percentage of women in senior leadership roles",
+        text: "Companies should be required to have a minimum percentage of women in senior leadership roles",
+      },
+      {
+        value: "Businesses should receive tax incentives for implementing gender-based hiring practices",
+        text: "Businesses should receive tax incentives for implementing gender-based hiring practices",
+      },
+      {
+        value:
+          "Gender should be disregarded when selecting candidates for career advancement opportunities to ensure that selections are based on merit",
+          
+        text: "Gender should be disregarded when selecting candidates for career advancement opportunities to ensure that selections are based on merit",
+      },
+      {
+        value: "Educational institutions should implement gender-based affirmative action policies to achieve balanced gender representation among faculty",
+        text: "Educational institutions should implement gender-based affirmative action policies to achieve balanced gender representation among faculty",
+      },
+      {
+        value:
+          "Affirmative action policies for women in STEM fields should be implemented to address historical underrepresentation",
+        text: "Affirmative action policies for women in STEM fields should be implemented to address historical underrepresentation",
+      },
+    ],
+    rowsOrder: "random",
+                    },
+            ],
+        };
+    },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["gender-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                        polarizedStatement = data.rowAsString["row"];
+                    });
+                }
+            }
+};
+
+
+var topic_polarization_healthcare_survey = {
+    data: {
+        phase: "topic_polarization_survey",
+    },
+    timeline: [
+                {
+                    type: jsPsychSurvey,
+                }
+              ],
+    conditional_function: () => {
+       // // const topic = topicChoice;
+        console.log("Evaluating conditional function");
+        console.log("topic:", topicChoice); // Debugging statemen
+        return (topicChoice === 'the role of the U.S. government in healthcare');
+    },
+    survey_json: () => {
+        // const topic = topicChoice; // get topic choice
+return {
+                    elements: [
+                    {
+
+                        type: "matrix",
+        name: "healthcare-polarization",
+        title:
+          "How much do you agree or disagree with the following statements on the role of the U.S. government in healthcare? ",
+        isRequired: true,
+        columns: [
+          {
+            value: 1,
+            text: "Disagree strongly",
+          },
+          {
+            value: 2,
+            text: "Disagree moderately",
+          },
+          {
+            value: 3,
+            text: "Disagree a little",
+          },
+          {
+            value: 4,
+            text: "Neither agree nor disagree",
+          },
+          {
+            value: 5,
+            text: "Agree a little",
+          },
+          {
+            value: 6,
+            text: "Agree moderately",
+          },
+          {
+            value: 7,
+            text: "Agree strongly",
+          },
+        ],
+        rows: [
+          {
+            value: "A universal healthcare system should be implemented in the U.S.",
+            text: "A universal healthcare system should be implemented in the U.S.",
+          },
+          {
+            value: "Medicaid should be expanded to cover more low-income individuals",
+            text: "Medicaid should be expanded to cover more low-income individuals",
+          },
+          {
+            value: "Prescription drug prices should be regulated to make them more affordable",
+            text: "Prescription drug prices should be regulated to make them more affordable",
+          },
+          {
+            value: "Government subsidies should be provided for private health insurance",
+            text: "Government subsidies should be provided for private health insurance",
+          },
+          {
+            value: "The government should negotiate drug prices with pharmaceutical companies",
+            text: "The government should negotiate drug prices with pharmaceutical companies",
+          },
+          {
+            value: "Government funding should be increased for mental health services",
+            text: "Government funding should be increased for mental health services",
+          },
+          {
+            value: "The competitive market should drive healthcare prices",
+            text: "The competitive market should drive healthcare prices",
+          },
+        ],
+        rowsOrder: "random",
+                    },
+            ],
+        };
+    },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["healthcare-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                        polarizedStatement = data.rowAsString["row"];
+                    });
+                }
+            }
+};
+
+
+var topic_polarization_same_sex_survey = {
+    data: {
+        phase: "topic_polarization_survey",
+    },
+    timeline: [
+                {
+                    type: jsPsychSurvey,
+                }
+              ],
+    conditional_function: () => {
+      //  // const topic = topicChoice;
+        console.log("Evaluating conditional function");
+        console.log("topic:", topicChoice); // Debugging statemen
+        return (topicChoice === 'same-sex marriage in the U.S.');
+    },
+    survey_json: () => {
+        // const topic = topicChoice; // get topic choice
+ return {
+                    elements: [
+                    { 
+
+                        type: "matrix",
+    name: "same-sex-polarization",
+    title:
+      "How much do you agree or disagree with the following statements on same-sex marriage in the U.S.? ",
+    isRequired: true,
+    columns: [
+      {
+        value: 1,
+        text: "Disagree strongly",
+      },
+      {
+        value: 2,
+        text: "Disagree moderately",
+      },
+      {
+        value: 3,
+        text: "Disagree a little",
+      },
+      {
+        value: 4,
+        text: "Neither agree nor disagree",
+      },
+      {
+        value: 5,
+        text: "Agree a little",
+      },
+      {
+        value: 6,
+        text: "Agree moderately",
+      },
+      {
+        value: 7,
+        text: "Agree strongly",
+      },
+    ],
+    rows: [
+      {
+        value: "Same-sex marriage should remain legalized nationwide",
+        text: "Same-sex marriage should remain legalized nationwide",
+      },
+      {
+        value: "Adoption rights should be granted to married same-sex couples",
+        text: "Adoption rights should be granted to married same-sex couples",
+      },
+      {
+        value:
+          "Employment non-discrimination protections should be provided for gay and lesbian individuals",
+        text: "Employment non-discrimination protections should be provided for gay and lesbian individuals",
+      },
+      {
+        value:
+          "Same-sex couples should receive spousal benefits (e.g. health insurance; survivor benefits)",
+        text: "Same-sex couples should receive spousal benefits (e.g., health insurance, survivor benefits)",
+      },
+      {
+        value:
+          "It is not right to provide the same federal rights and support for same-sex couples as opposite-sex couples",
+        text: "It is not right to provide the same federal rights and support for same-sex couples as opposite-sex couples",
+      },
+      {
+        value:
+          "Discrimination against same-sex couples in housing and public accommodations should be banned",
+        text: "Discrimination against same-sex couples in housing and public accommodations should be banned",
+      },
+    ],
+    rowsOrder: "random",
+                    },
+            ],
+        };
+    },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["same-sex-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                        polarizedStatement = data.rowAsString["row"];
+                    });
+                }
+            }
+};
+
+
+var topic_polarization_vaccines_survey = {
+    data: {
+        phase: "topic_polarization_survey",
+    },
+    timeline: [
+                {
+                    type: jsPsychSurvey,
+                }
+              ],
+    conditional_function: () => {
+      //  // const topic = topicChoice;
+        console.log("Evaluating conditional function");
+        console.log("topic:", topicChoice); // Debugging statemen
+        return (topicChoice === 'mandating vaccines in the U.S.');
+    },
+    survey_json: () => {
+        // const topic = topicChoice; // get topic choice
+ return {
+                    elements: [
+                    {
+
+                        type: "matrix",
+      name: "vaccines-polarization",
+      title:
+        "How much do you agree or disagree with the following statements on vaccine mandates in the U.S.? ",
+      isRequired: true,
+      columns: [
+        {
+          value: 1,
+          text: "Disagree strongly",
+        },
+        {
+          value: 2,
+          text: "Disagree moderately",
+        },
+        {
+          value: 3,
+          text: "Disagree a little",
+        },
+        {
+          value: 4,
+          text: "Neither agree nor disagree",
+        },
+        {
+          value: 5,
+          text: "Agree a little",
+        },
+        {
+          value: 6,
+          text: "Agree moderately",
+        },
+        {
+          value: 7,
+          text: "Agree strongly",
+        },
+      ],
+      rows: [
+        {
+          value:
+            "Preventing people without vaccinations from entering public spaces and transportation would do more harm than good",
+          text: "Preventing people without vaccinations from entering public spaces and transportation would do more harm than good",
+        },
+        {
+          value: "Vaccines should be mandated for healthcare workers",
+          text: "Vaccines should be mandated for healthcare workers",
+        },
+        {
+          value: "Businesses should be allowed to require proof of vaccination for entry",
+          text: "Businesses should be allowed to require proof of vaccination for entry",
+        },
+        {
+          value:
+            "Businesses and institutions should be barred from discriminating based on vaccination status",
+          text: "Barring businesses and institutions from discriminating based on vaccination status is wrong",
+        },
+        {
+          value: "Schools should be allowed to require vaccinations for attendance",
+          text: "Schools should be allowed to require vaccinations for attendance",
+        },
+        {
+          value: "All government-approved vaccines should be mandated",
+          text: "All government-approved vaccines should be mandated",
+        },
+      ],
+      rowsOrder: "random",
+                    },
+            ],
+        };
+    },
+            on_finish: (data) => {
+                // extract and process the responses for the specific question
+                let polarizationResponses = data.response["vaccines-polarization"];
+                if (polarizationResponses) {
+                    // extract relevant rows
+                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
+
+                    // convert relevant row into a string so it can be fed into chat later
+                    relevantPolarizationRow.forEach(rowObj => {
+                        data.rowAsString = rowObj;
+                        console.log(data.rowAsString);
+                        polarizedStatement = data.rowAsString["row"];
+                    });
+                }
+            }
+};
+
+        /* break between pre-intervention survey and bot conversation */
+        var pre_bot_instructions_break = {
+            data: {
+                phase: "pre-bot-break",
+            },
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> You have now completed the pre-conversation questionnaire. </p>
+        <p> Feel free to take a short break if needed. </p>
+        <p> Press any key to proceed. </p>
+      `,
+            post_trial_gap: 1000,
+        };
+
+        var pre_convo_instructions = {
+            data: {
+                phase: "pre-convo-instructions",
+            },
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> You will be conversing with a chatbot designed for conversations about disputed topics. </p>
+        <p> Be as truthful to your beliefs as possible during the conversation, and try your best to give full responses to the bot. </p>
+        <p> The conversation will end after you and the bot exchange seven messages. There is no right or wrong answer, no good or bad response to the bot. </p>
+        <p> Copy-pasted messages to the bot will be detected and result in your participation being rejected. </p>
+        <p> Press any key when you are ready to begin the conversation. </p>
+      `,
+            post_trial_gap: 1000,
+        };
+
+        var post_convo_break = {
+            data: {
+                phase: "post-convo-break",
+            },
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> Great job! You have completed the conversation. Feel free to take a short break. <p>
+        <p> Before we send you back to Prolific, please complete a post-conversation questionnaire. <p>
+        <p> Press any key to proceed to the questionnaire.  <p>
+      `,
+            post_trial_gap: 1000,
+        };
+
+
+        //continue to next portion button will show up after 7 message exchanges
+        continue_button = {
+            message_trigger: 7,
+            message: "You have completed your rounds of seven messages! Click continue to proceed with the experiment.",
+        }
+
+        combination_prompts = [
+            {
+                message: "Welcome to the chatroom!",
+                role: "system-prompt",
+                message_trigger: 0
+            },
+            {
+                message: () => {
+                    //function to insert depolarization survey response statement into the bot's conversation starter
+                    const lowercaseFirstLetter = (str) => {
+                        if (!str) return str;  //return the string if it's empty or not a string
+                        return str.charAt(0).toLowerCase() + str.slice(1);
+                    };
+                     const topic = topicChoice;
+                    const statement = polarizedStatement;
+                    const statement_formatted = lowercaseFirstLetter(statement);
+                    console.log(topic);
+                    console.log(statement);
+                    console.log(statement_formatted);
+                    return `Hey there! I'm here to chat about ${topic}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether ${statement_formatted}?`;
+                },
+                role: "chatbot-message",
+                message_trigger: 0
+            },
+          ]
+
+        combination_prompt_chain = {
+            message_trigger: 0,
+            prompts: [
+                `Context: You are being fed a conversation log. The last paragraph following {"role", "user", "content"} is the most recent message that the user has input. This is the message that you should be responding to.
+
+              Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+
+Goal: Your goal is to make the user more willing to have conversations about their topic with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
+
+Style: You should be concise. You should match your response's length to the length of the user's most recent message.
+
+Task 1: You should consider the user's most recent message and determine which of the three following approaches would most effectively accomplish your goal: 
+
+        {1. Briefly acknowledge the user's stance and then respond to the other person's argument with a counterargument. Do not repeat the same arguments, but you can dive into more specific aspects or previous arguments if necessary. Never dive into asking the user how they would implement their views. Concisely present a specific argument that counters the user's perspective. Ask the user what they think. Ensure that your message includes a counterargument; never simply agree with the user.} 
+        {2. Briefly acknowledge the user's stance and then ask a question about the user's stance. Ask why the user thinks what they think or ask if there were any experiences that led to their views. Do not repeat questions, but you can dive deeper into previous questions if necessary.}
+        {3. Briefly acknowledge the user's stance and then identify a specific group of people who may have differing opinions from the user. Explain, in detail, their experiences and why they may disagree with the user's beliefs. Provide these alternative perspectives held by people with different jobs, positions in society, beliefs, etc. Give uniquely different perspectives in each message. Do not repeat viewpoints, but you can dive deeper into previously mentioned viewpoints if necessary. End your response with a question that asks the user what they think about those peoples' stances. Provide only one viewpoint per response.}
+        
+
+Task 2: Very briefly summarize the arguments that the "system" has already made so that, when you pass these to the next "system", the "system" knows what arguments to not repeat.
+
+What you should output: You are passing your output to another "system" that is going to write a response to the user. Thus, you should output your summary of the arguments that have already been made, the user's most recent message, and the approach that you selected. Ensure that you output the entirety of the approach, not just its number, so that the next bot knows what to do. 
+        `,
+                `
+            Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice "system", vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+
+Goal: Your goal is to make the user more willing to have conversations about their topic with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
+
+Style: You should be concise. You should match your response's length to the user's input.
+
+Task: A previous "system" has selected the approach that you should take when responding to the user. Write a response to the user message using the selected approach, but do not tell the user that you have selected an approach. You are mid-conversation, so do not greet the user. Do not repeat the same arguments or views that the assistant has already mentioned; instead, you can suggest new perspectives or dive into more specific ideas from prior points. Don't stray from the topic at hand. If the user says you are repeating yourself or that you didn't understand what they're saying, apologize and ask them what they think without summarizing their stance.
+
+Output your response.
+            `,
+            ],
+        };
+
+
+        const combination_trial = {
+            type: jsPsychChat,
+            ai_model: "gpt-4o",
+            ai_prompt: () => {
+                // function to insert depolarization survey response statement into the bot's conversation starter
+                const lowercaseFirstLetter = (str) => { //function to convert the first letter of the string into lowercase so it can be seamlessly inserted into the bot's question
+                    if (!str) return str;  // return the string if it's empty or not a string
+                    return str.charAt(0).toLowerCase() + str.slice(1);
+                };
+                return `  
+                Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+
+Style: You should be concise. You should match your response's length to the user's input.
+
+Task: Briefly acknowledge the user's stance and then ask a question about the user's stance. Ask why the user thinks what they think or ask if there were any experiences that led to their views. Do not repeat questions, but you can dive deeper into previous questions if necessary. Do not repeat the same arguments or views that the assistant has already mentioned; instead, you can suggest new perspectives or dive into more specific ideas from prior points.
+If the user says you are repeating yourself or that you didn't understand what they're saying, apologize and ask them what they think without summarizing their stance.`
+                    ; //the ai_prompt shouldn't ever be used because the chain prompt is triggered on message 0, but we put a prompt here anyway in case, for some reason, it does get used
+            },
+            continue_button: continue_button,
+            chat_field_placeholder: "Share your perspective...",
+            prompt_chain: combination_prompt_chain,
+            additional_prompts: combination_prompts,
+        };
+       // jsPsych.run([combination_trial]);
+
+
+        selection_prompts = [
+            //set role to 'chatbot' for specific message to be sent via the bot
+            {
+                message: "Welcome to the chatroom!",
+                role: "system-prompt",
+                message_trigger: 0
+            },
+            {
+                message: () => {
+                    // function to insert depolarization survey response statement into the bot's conversation starter
+                    const lowercaseFirstLetter = (str) => { //function to convert the first letter of the string into lowercase so it can be seamlessly inserted into the bot's question
+                        if (!str) return str;  // return the string if it's empty or not a string
+                        return str.charAt(0).toLowerCase() + str.slice(1);
+                    };
+                    const topic = topicChoice;
+                    const statement = polarizedStatement;
+                    const statement_formatted = lowercaseFirstLetter(statement);
+                    console.log(topic);
+                    console.log(statement);
+                    console.log(statement_formatted);
+                    return `Hey there! I'm here to chat about ${topic}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether ${statement_formatted}?`;
+                },
+                role: "chatbot-message",
+                message_trigger: 0
+            },
+            {
+                role: "chatbot-prompt",
+                message_trigger: 7,
+            }
+
+        ]
+
+        selection_prompt_election = {
+            prompts: [
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Task: You should always concisely respond to the other person's argument with a counterargument. Do not repeat the same arguments that the 'role: assistant' has brought up before, but you can dive into more specific aspects or previous arguments. You should never dive into asking the user how they would implement their views. You should always concisely present a specific argument that counters the user's perspective. At the end of your response, you should always ask the user what they think. You should always ensure that your message includes a counterargument; and you should never simply agree with the user.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Task: You should always concisely identify a specific group of people who may have differing opinions from the user. You should always explain, in detail, their experiences and why they may disagree with the user's beliefs. You should provide these alternative perspectives held by people with different jobs, positions in society, beliefs, etc. You should give uniquely different perspectives in each message. You should not repeat viewpoints that the 'role: assistant' brought up before, but you can dive deeper into previously mentioned viewpoints. You should always end your response with a question that asks the user what they think about those peoples' stances. You should provide only one viewpoint per response.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Task: You should always ask a question about the user's stance. You should always ask why the user thinks what they think or ask if there were any experiences that led to their views. You should not repeat questions that the 'role: assistant' asked before, but you can dive deeper into previous questions.`
+            ],
+            selection_prompt: `
+            
+Context: You are being fed a conversation log between a bot and a user. The last 'User message:' within "role":"selection_prompt" is the most recent message that the user has input to the conversation. Additionally, you are being fed three potential responses to this user's message. These response options are numbered as (0), (1), and (2) in "role":"content-choices"/chatbot-answers". A previous chatbot wrote them so that you can select the best response option.
+
+Task: You should select the response option that would most effectively help this conversation make the user more open-minded, more willing to talk about this topic with others, and more comfortable talking about the topic. You should consider each response's certain arguments, perspectives, and questions, as well as the user's conversation with the bot, to determine which response is most fitting.
+
+Your output: You should remove the number from your selection option, and then repeat your selected response option word for word without adding anything or removing any words.`,
+
+            message_trigger: 0,
+
+        }
+
+        const selection_trial = {
+            type: jsPsychChat,
+            ai_model: "gpt-4o",
+            ai_prompt: () => {
+                // function to insert depolarization survey response statement into the bot's conversation starter
+                const lowercaseFirstLetter = (str) => { //function to convert the first letter of the string into lowercase so it can be seamlessly inserted into the bot's question
+                    if (!str) return str;  // return the string if it's empty or not a string
+                    return str.charAt(0).toLowerCase() + str.slice(1);
+                };
+                    const topic = topicChoice;
+                    console.log(topic);
+                    return `
+            Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+            
+            Goal: Your goal is to make the user more willing to have conversations about ${topic} with other humans by helping them become more comfortable and open about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
+
+            Style: You should be concise. You should match your response's length to the user's input.
+
+            First task: Write three different responses to the user's message. The first should briefly acknowledge the user's stance, concisely present a specific argument that counters the user's perspective, and ask the user what they think; it should never repeat the same arguments, never dive into asking the user how they would implement their views, and never simply agree with the user. The second response should briefly acknowledge the user's stance and then ask a question about the user's stance, such as why the user thinks what they think or if there were any experiences that led to their views; it should never repeat questions. The third response should briefly acknowledge the user's stance, identify a specific group of people who may have differing opinions or alternative perspectives from the user, and explain, in detail, one viewpoint and why they may disagree with the user's beliefs; it should give uniquely different perspectives in each message and end its response with a question that asks the user what they think about those peoples' stances.}
+ 
+           Second task: Consider the user's input message and determine which of the three responses that you wrote is most appropriate given your goal. Output the response that you choose to the user. Do not tell the user which strategy you picked; output the message such that the user thinks you are just having a normal conversation.
+        `;
+            },
+            continue_button: continue_button,
+            chat_field_placeholder: "Share your perspective...",
+            //prompt_chain: prompt_chain, //previousl fed in chain prompting here.
+            additional_prompts: selection_prompts,
+            selection_prompt: selection_prompt_election,
+        };
+     //   jsPsych.run([selection_trial]);
+
+
+        var last_questions = {
+            data: {
+                phase: "post-convo-last-questions-survey",
+            },
+            type: jsPsychSurvey,
+            survey_json: () => {
+                // const topic = topicChoice; // get topic choice
+                var experimental_group_last_questions = {
+                    elements: [
+                        {
+                            type: "comment",
+                            name: "free-response-After your conversation with the chat bot, do you feel more willing to have a conversation with others about ? Please freely reflect in the space below.",
+                            title:
+                                `After your conversation with the chat bot, do you feel more willing to have a conversation with others about ${topic}? Please freely reflect in the space below.`,
+                            isRequired: true,
+                        },
+                        {
+                            type: "radiogroup",
+                            name: "willing-to-converse-likert-post-Rate this conversation's effect on your willingness to converse about",
+                            title:
+                                `Rate this conversation's effect on your willingness to converse about ${topic} with others. Rate on the seven point scale.`,
+                            isRequired: true,
+                            choices: [
+                                {
+                                    value: 1,
+                                    text: "Much less willing",
+                                },
+                                {
+                                    value: 2,
+                                    text: "Moderately less willing",
+                                },
+                                {
+                                    value: 3,
+                                    text: "Somewhat less willing",
+                                },
+                                {
+                                    value: 4,
+                                    text: "Neither more nor less willing",
+                                },
+                                {
+                                    value: 5,
+                                    text: "Somewhat more willing",
+                                },
+                                {
+                                    value: 6,
+                                    text: "Moderately more willing",
+                                },
+                                {
+                                    value: 7,
+                                    text: "Much more willing",
+                                },
+                            ],
+                        },
+                        {
+                            type: "comment",
+                            name: "convo-effect-on-willingness-post-what parts of this conversation, if any, affected your willingness to talk with someone who has different views about topic? What made you feel like the conversation was or was not productive?",
+                            title:
+                                `What parts of this conversation, if any, affected your willingness to talk with someone who has different views about ${topic}? What made you feel like the conversation was or was not productive?`,
+                            isRequired: true,
+                        },
+                        {
+                            type: "comment",
+                            name: "new-perspective-post-Throughout this conversation, were there any moments that opened you up to a new perspective about topic? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?",
+                            title:
+                                `Throughout this conversation, were there any moments that opened you up to a new perspective about ${topic}? If so, what occurred in these moments? If not, what made you feel like the conversation was not productive?`,
+                            isRequired: true,
+                        },
+                        {
+                            type: "comment",
+                            name: "still-contributes-post- What still contributes to your willingness or unwillingness to converse with others about topic? Please freely reflect in the space below",
+                            title:
+                                `What still contributes to your willingness or unwillingness to converse with others about ${topic}? Please freely reflect in the space below.`,
+                            isRequired: true,
+                        },
+                        {
+                            type: "comment",
+                            name: "feelings-about-bot-we are still working on improving our chatbot. How did you like talking with the bot? What do you wish were different? Please provide any feedback regarding your conversation that we have not already covered",
+                            title:
+                                `We are still working on improving our chatbot. How did you like talking with the bot? What do you wish were different? Please provide any feedback regarding your conversation that we have not already covered.`,
+                            isRequired: true,
+                        },
+                    ],
+                };
+                return experimental_group_last_questions
+            },
+        };
+
+        //goodbye message and brief explanation to user about our experimentation motive
+        var goodbye = {
+            data: {
+                phase: "goodbye",
+            },
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+        <p> You have completed the experiment! Thank you for your contribution to our research. </p>
+        <div style='width: 700px;'>
+        </div>
+        <p>We are investigating how conversations can increase Americans' willingness to discuss highly disputed topics. </p>
+        <p>Some existing research has examined the effects of different types of human to human conversations on this willingness, and we would like to explore these dynamics when one of the conversational partners is a chatbot. </p>
+        <p> By participating in our experiment, you have helped us learn more about how we can improve our conversational chatbot. </p>
+        <div style='width: 700px;'>
+        </div>
+        <p> Press any key to save your data and return to Prolific!  <p>
+      `,
+            post_trial_gap: 1000,
+        };
+
+        /* ------------- PUSHING TIMELINE FOR EACH CONDITION ----------------- */
+
+
+        combination_timeline.push(
+            welcome,
+            preliminary_convo_instructions,
+            pre_convo_topic_only_survey_trial,
+            topic_polarization_bombing_survey,
+            topic_polarization_criminal_survey,
+            topic_polarization_euthanasia_survey,
+            topic_polarization_gender_survey,
+            topic_polarization_healthcare_survey,
+            topic_polarization_same_sex_survey,
+            topic_polarization_vaccines_survey,
+            pre_bot_instructions_break,
+            pre_convo_instructions,
+            combination_trial,
+            post_convo_break,
+            last_questions,
+            goodbye
+        )
+
+        selection_timeline.push(
+            welcome,
+            preliminary_convo_instructions,
+            pre_convo_topic_only_survey_trial,
+            topic_polarization_bombing_survey,
+            topic_polarization_criminal_survey,
+            topic_polarization_euthanasia_survey,
+            topic_polarization_gender_survey,
+            topic_polarization_healthcare_survey,
+            topic_polarization_same_sex_survey,
+            topic_polarization_vaccines_survey,
+            pre_bot_instructions_break,
+            pre_convo_instructions,
+            selection_trial,
+            post_convo_break,
+            last_questions,
+            goodbye
+        )
+
+        //SAVE EXPERIMENT DATA TO OSF via datapipe
+        const save_data = {
+            type: jsPsychPipe,
+            action: "save",
+            experiment_id: "P09AXWX5b5t6",
+            filename: filename,
+            data_string: () => jsPsych.data.get().csv()
+        };
+
+        createExperiment();
+
+
+        //run experiment
+        // jsPsych.run(timeline);
+
+    </script>
+</body>
+
+</html>
