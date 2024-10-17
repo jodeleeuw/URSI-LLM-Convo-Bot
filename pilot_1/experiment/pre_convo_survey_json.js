@@ -2,6 +2,26 @@ var pre_convo_survey_json = {
   elements: [
     {
       type: "checkbox",
+      name: "commitment-check",
+      title: "The quality of our survey data plays an integral role in the accuracy of our experiment results. To draw accurate conclusions, it is important to us that you provide thoughtful answers to each survey question. Do you commit to providing thoughtful answers in the questions in this survey?",
+      isRequired: true,
+      choices: [
+        {
+          value: "maybe",
+          text: "I can't promise either way",
+        },
+        {
+          value: "yes",
+          text: "Yes, I do",
+        },
+        {
+          value: "no",
+          text: "No, I do not",
+        },
+      ],
+    },
+    {
+      type: "checkbox",
       name: "ethnicity",
       title: "What is your ethnicity? (Select all that apply)",
       isRequired: true,

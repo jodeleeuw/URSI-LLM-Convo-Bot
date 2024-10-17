@@ -48,6 +48,10 @@ var post_convo_survey_republican = {
           value: "rating-democrats-post-Democrats are generous",
           text: "Democrats are generous",
         },
+      { 
+        value: "attention-check",
+        text: "Select Strongly Unlikely for this line. This question is here to assess whether you are attending to the instructions."
+      },
         {
           value: "rating-democrats-post-Democrats are hypocritical @R@",
           text: "Democrats are hypocritical",
