@@ -225,14 +225,9 @@
 
 
             // Loop to check i or 8-i)
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 6; i++) {
                 // Check for i
                 relevantTopicChoiceRow = findTopicChoiceRowWithValue(i);
-                if (relevantTopicChoiceRow !== null) {
-                    return relevantTopicChoiceRow;
-                }
-                // Check for 8 - i
-                relevantTopicChoiceRow = findTopicChoiceRowWithValue(8 - i);
                 if (relevantTopicChoiceRow !== null) {
                     return relevantTopicChoiceRow;
                 }
@@ -294,15 +289,15 @@
                 return null;
             }
 
-            // Loop to check i or 8-i)
-            for (let i = 1; i <= 4; i++) {
+            // Loop to check i or 7-i)
+            for (let i = 1; i <= 3; i++) {
                 // Check for i
                 relevantPolarizationRow = findPolarizationRowWithValue(i);
                 if (relevantPolarizationRow !== null) {
                     return relevantPolarizationRow;
                 }
-                // Check for 8 - i
-                relevantPolarizationRow = findPolarizationRowWithValue(8 - i);
+                // Check for 7 - i
+                relevantPolarizationRow = findPolarizationRowWithValue(7 - i);
                 if (relevantPolarizationRow !== null) {
                     return relevantPolarizationRow;
                 }

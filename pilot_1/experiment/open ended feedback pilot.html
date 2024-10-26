@@ -146,7 +146,7 @@
             }
 
             // Loop to check i or 8-i)
-            for (let i = 1; i = 7; i++) {
+            for (let i = 1; i <= 6; i++) {
                 // Check for i
                 relevantTopicChoiceRow = findTopicChoiceRowWithValue(i);
                 if (relevantTopicChoiceRow !== null) {
@@ -201,15 +201,15 @@
                 return null;
             }
 
-            // Loop to check i or 8-i)
-            for (let i = 1; i <= 4; i++) {
+            // Loop to check i or 7-i)
+            for (let i = 1; i <= 3; i++) {
                 // Check for i
                 relevantPolarizationRow = findPolarizationRowWithValue(i);
                 if (relevantPolarizationRow !== null) {
                     return relevantPolarizationRow;
                 }
-                // Check for 8 - i
-                relevantPolarizationRow = findPolarizationRowWithValue(8 - i);
+                // Check for 7 - i
+                relevantPolarizationRow = findPolarizationRowWithValue(7 - i);
                 if (relevantPolarizationRow !== null) {
                     return relevantPolarizationRow;
                 }
@@ -221,118 +221,6 @@
         // TOPIC SPECIFIC PRE-CONVERSATION SURVEYS 
 
         let polarizedStatement;
-
-
-var topic_polarization_bombing_survey = {
-    data: {
-        phase: "topic_polarization_survey",
-    },
-    timeline: [
-                {
-                    type: jsPsychSurvey,
-                }
-              ],
-    conditional_function: () => {
-        // const topic = topicChoice;
-        console.log("Evaluating conditional function for topic:", topicChoice);
-        return (topicChoice === 'the atomic bombings of Hiroshima and Nagasaki');
-    },
-    survey_json: () => {
-     //   // const topic = topicChoice; // get topic choice
-        return {
-                    elements: [
-                    {
-        type: "matrix",
-        name: "bombing-polarization",
-        title:
-          "How much do you agree or disagree with the following statements on the atomic bombings of Hiroshima and Nagasaki? ",
-        isRequired: true,
-        columns: [
-          {
-            value: 1,
-            text: "Disagree strongly",
-          },
-          {
-            value: 2,
-            text: "Disagree moderately",
-          },
-          {
-            value: 3,
-            text: "Disagree a little",
-          },
-          {
-            value: 4,
-            text: "Neither agree nor disagree",
-          },
-          {
-            value: 5,
-            text: "Agree a little",
-          },
-          {
-            value: 6,
-            text: "Agree moderately",
-          },
-          {
-            value: 7,
-            text: "Agree strongly",
-          },
-        ],
-        rows: [
-          {
-            value:
-              "A memorial should be established in the U.S. to honor the victims of the bombings",
-            text: "A memorial should be established in the U.S. to honor the victims of the bombings",
-          },
-          {
-            value:
-              "The U.S. government should provide financial reparations to the survivors and their families",
-            text: "The U.S. government should provide financial reparations to the survivors and their families",
-          },
-          {
-            value: "The bombings were justified to bring a swift end to the war",
-            text: "The bombings were justified to bring a swift end to the war",
-          },
-          {
-            value: "The bombings were morally wrong",
-            text: "The bombings were morally wrong",
-          },
-          {
-            value:
-              "Learning about the atomic bombings of Hiroshima and Nagasaki is essential for understanding the consequences of nuclear warfare",
-            text: "Learning about the atomic bombings of Hiroshima and Nagasaki is essential for understanding the consequences of nuclear warfare",
-          },
-          {
-            value: "The U.S. should take responsibility for the humanitarian impact of the bombings",
-            text: "The U.S. should take responsibility for the humanitarian impact of the bombings",
-          },
-          {
-            value:
-              "The U.S. should participate in international efforts to promote nuclear disarmament and non-proliferation",
-            text: "The U.S. should participate in international efforts to promote nuclear disarmament and non-proliferation",
-          },
-        ],
-        rowsOrder: "random",
-                    },
-            ],
-        };
-    },
-    on_finish: (data) => {
-                // extract and process the responses for the specific question
-                let polarizationResponses = data.response["bombing-polarization"];
-                if (polarizationResponses) {
-                    // extract relevant rows
-                    let relevantPolarizationRow = extractRelevantPolarizationRow(polarizationResponses);
-
-                    // convert relevant row into a string so it can be fed into chat later
-                    relevantPolarizationRow.forEach(rowObj => {
-                        data.rowAsString = rowObj;
-                        console.log(data.rowAsString);
-                        polarizedStatement = data.rowAsString["row"];
-                    });
-                }
-            }
-};
-
 
 
 var topic_polarization_criminal_survey = {
@@ -1071,7 +959,7 @@ var topic_polarization_vaccines_survey = {
             prompts: [
                 `Context: You are being fed a conversation log. The last paragraph following {"role", "user", "content"} is the most recent message that the user has input. This is the message that you should be responding to.
 
-              Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+              Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, or human euthanasia.
 
 Goal: Your goal is to make the user more willing to have conversations about their topic with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
 
@@ -1089,7 +977,7 @@ Task 2: Very briefly summarize the arguments that the "system" has already made 
 What you should output: You are passing your output to another "system" that is going to write a response to the user. Thus, you should output your summary of the arguments that have already been made, the user's most recent message, and the approach that you selected. Ensure that you output the entirety of the approach, not just its number, so that the next bot knows what to do. 
         `,
                 `
-            Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice "system", vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+            Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice "system", vaccine mandates, or human euthanasia.
 
 Goal: Your goal is to make the user more willing to have conversations about their topic with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
 
@@ -1113,7 +1001,7 @@ Output your response.
                     return str.charAt(0).toLowerCase() + str.slice(1);
                 };
                 return `  
-                Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+                Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, or human euthanasia.
 
 Style: You should be concise. You should match your response's length to the user's input.
 
@@ -1197,7 +1085,7 @@ Your output: You should remove the number from your selection option, and then r
                     const topic = topicChoice;
                     console.log(topic);
                     return `
-            Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+            Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, or human euthanasia.
             
             Goal: Your goal is to make the user more willing to have conversations about ${topic} with other humans by helping them become more comfortable and open about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
 
@@ -1331,7 +1219,6 @@ Your output: You should remove the number from your selection option, and then r
             welcome,
             preliminary_convo_instructions,
             pre_convo_topic_only_survey_trial,
-            topic_polarization_bombing_survey,
             topic_polarization_criminal_survey,
             topic_polarization_euthanasia_survey,
             topic_polarization_gender_survey,
@@ -1350,7 +1237,6 @@ Your output: You should remove the number from your selection option, and then r
             welcome,
             preliminary_convo_instructions,
             pre_convo_topic_only_survey_trial,
-            topic_polarization_bombing_survey,
             topic_polarization_criminal_survey,
             topic_polarization_euthanasia_survey,
             topic_polarization_gender_survey,
