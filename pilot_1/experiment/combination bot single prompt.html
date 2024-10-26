@@ -32,7 +32,6 @@
     <script src="post_convo_survey_euthanasia.js"></script> <!-- survey -->
     <script src="post_convo_survey_healthcare.js"></script> <!-- survey -->
     <script src="post_convo_survey_vaccines.js"></script> <!-- survey -->
-    <script src="post_convo_survey_bombing.js"></script> <!-- survey -->
     <script src="post_convo_survey_gender.js"></script> <!-- survey -->
     <script src="post_convo_survey_same_sex.js"></script> <!-- survey -->
     <script src="post_convo_survey_criminal.js"></script> <!-- survey -->
@@ -200,7 +199,6 @@
                     "euthanasia-polarization",
                     "gender-polarization",
                     "healthcare-polarization",
-                    "bombing-polarization",
                     "vaccines-polarization",
                     "criminal-polarization",
                     "same-sex-polarization"
@@ -397,7 +395,7 @@
                 const bot_row_formatted = lowercaseFirstLetter(bot_row); // use lowercase function
                 const topicChoiceAsString = jsPsych.data.get().filter({ phase: "pre-convo-survey" }).values()[0].response["topicChoice"]; // get topic choice
                 return `   
-                Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, the Hiroshima Nagasaki atomic bombings, or human euthanasia.
+                Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice system, vaccine mandates, or human euthanasia.
 
 Goal: Your goal is to make the user more willing to have conversations about ${topicChoiceAsString} with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas.
 

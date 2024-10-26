@@ -445,10 +445,6 @@ var pre_convo_survey_json = {
           text: "The role of the U.S. government in healthcare",
         },
         {
-          value: "the atomic bombings of Hiroshima and Nagasaki",
-          text: "The atomic bombings of Hiroshima and Nagasaki",
-        },
-        {
           value: "mandating vaccines in the U.S.",
           text: "Mandating vaccines in the U.S.",
         },

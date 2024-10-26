@@ -378,7 +378,7 @@ var pre_convo_survey_json_testing = {
     },
     {
       type: "matrix",
-      name: "topicChoice",
+      name: "topic",
       title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. Rate how comfortable you would be talking about each of the following topics.",
       isRequired: false,
 
@@ -424,10 +424,6 @@ var pre_convo_survey_json_testing = {
         {
           value: "the role of the U.S. government in healthcare",
           text: "The role of the U.S. government in healthcare",
-        },
-        {
-          value: "the atomic bombings of Hiroshima and Nagasaki",
-          text: "The atomic bombings of Hiroshima and Nagasaki",
         },
         {
           value: "mandating vaccines in the U.S.",
