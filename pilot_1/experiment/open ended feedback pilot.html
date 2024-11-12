@@ -41,8 +41,8 @@
         var jsPsych = initJsPsych({
             on_finish: function () {
                 jsPsych.data.displayData();
-                //jsPsych.data.get().localSave("csv", "llm_trial.csv"); //save chatbot conversation to local for when testing bot on computer.
-                window.location = "https://app.prolific.com/submissions/complete?cc=CVWBBA5S";
+                jsPsych.data.get().localSave("csv", "llm_trial.csv"); //save chatbot conversation to local for when testing bot on computer.
+                //window.location = "https://app.prolific.com/submissions/complete?cc=CVWBBA5S";
             },
         });
 
@@ -84,15 +84,18 @@
         // create timelines for conditions. the contents of each timeline are at the bottom of this doc
         var combination_timeline = [];
         var selection_timeline = [];
+        var perception_of_other_side_timeline = [];
+
 
  // REMEMBER TO CHANGE DATA PIPE SEQUENTIAL ASSIGNMENT TO BE ONLY 2 CONDITIONS 
  // DDOOOOONNNTTTT FORGGGEEEETTTTT
         // sequential condition assignment using data pipe. pushing a condition timeline into the timeline variable
         var timeline = [];
         async function createExperiment() {
-            const condition = 1 //await jsPsychPipe.getCondition("P09AXWX5b5t6");
+            const condition = 2 //await jsPsychPipe.getCondition("P09AXWX5b5t6");
             if (condition == 0) { timeline = combination_timeline; }
             if (condition == 1) { timeline = selection_timeline; }
+            if (condition == 2) { timeline = perception_of_other_side_timeline; }
             jsPsych.run([...timeline, save_data]);
         }
 
@@ -924,7 +927,7 @@ var topic_polarization_vaccines_survey = {
 
         //continue to next portion button will show up after 7 message exchanges
         continue_button = {
-            message_trigger: 7,
+            message_trigger: 3,
             message: "You have completed your rounds of seven messages! Click continue to proceed with the experiment.",
         }
 
@@ -1105,6 +1108,86 @@ Your output: You should remove the number from your selection option, and then r
      //   jsPsych.run([selection_trial]);
 
 
+// creating prompts for the perception of other side bot, which starts with a chat completion prompt and then goes into the selection bot prompts except the selection bot prompts are their own set of prompts because the message trigger is at a different ime than the prompts for the actual selection bot
+perception_of_other_side_prompts = [
+            {
+                message: "Welcome to the chatroom!",
+                role: "system-prompt",
+                message_trigger: 0
+            },
+            //timer trigger in ms
+            //"chatbot" = chatbot will say the thing typed in the prompt
+            {
+                message: () => { //put this as message because it was reading errors if i didn't 
+                    // function is to insert depolarization string into the bot's prompt 
+                    const lowercaseFirstLetter = (str) => { //function to convert the first letter of the string into lowercase so it can be seamlessly inserted into the bot's question
+                        if (!str) return str;  // return the string if it's empty or not a string
+                        return str.charAt(0).toLowerCase() + str.slice(1);
+                    };
+                    const topic = topicChoice;
+                    const statement = polarizedStatement;
+                    const statement_formatted = lowercaseFirstLetter(statement);
+                    console.log(topic);
+                    console.log(statement);
+                    console.log(statement_formatted);
+                    return `Hey there! I'm here to chat about ${topic}, a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether ${statement_formatted}?`;
+                },
+                role: "chatbot-message",
+                message_trigger: 0
+            },
+            { // a lot of the content in this prompt is probably not necessary. would need to test more to make sure, so will leave it in for now
+                prompt: `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should be conversational but use technically precise language. Be concise. You should match your response length to the user's input length.
+                Context: The user has just shared their perspecive on a controversial topic. 
+                Task: You should ask the user what they think are the reasonings of people who disagree with them such that you get the user to explain what they perceive to be the opposing side's reasoning.`,
+                role: "chatbot-prompt",
+                message_trigger: 0,
+            },
+            // want it to go into selection timeline now which is perception_bot_selection_prompt_election
+        ]
+
+        perception_bot_selection_prompt_election = {
+            prompts: [
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational. Be concise.
+                Task: You should always concisely respond to the other person's argument with a counterargument. Do not repeat the same arguments that the 'role: assistant' has brought up before, but you can dive into more specific aspects or previous arguments. You should never dive into asking the user how they would implement their views. You should always concisely present a specific argument that counters the user's perspective. At the end of your response, you should always ask the user what they think. You should always ensure that your message includes a counterargument; and you should never simply agree with the user.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational. Be concise.
+                Task: You should always concisely identify a specific group of people who may have differing opinions from the user. You should always explain, in detail, their experiences and why they may disagree with the user's beliefs. You should provide these alternative perspectives held by people with different jobs, positions in society, beliefs, etc. You should give uniquely different perspectives in each message. You should not repeat viewpoints that the 'role: assistant' brought up before, but you can dive deeper into previously mentioned viewpoints. You should always end your response with a question that asks the user what they think about those peoples' stances. You should provide only one viewpoint per response.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational. Be concise.
+                Task: You should always ask a question about the user's stance. You should always ask why the user thinks what they think or ask if there were any experiences that led to their views. You should not repeat questions that the 'role: assistant' asked before, but you can dive deeper into previous questions.`
+            ],
+            selection_prompt: `
+            
+Context: You are being fed a conversation log between a bot and a user. The last 'User message:' within "role":"selection_prompt" is the most recent message that the user has input to the conversation. Additionally, you are being fed three potential responses to this user's message. These response options are numbered as (0), (1), and (2) in "role":"content-choices"/chatbot-answers". A previous chatbot wrote them so that you can select the best response option.
+
+Task: You should select the response option that would most effectively help this conversation make the user more open-minded, more willing to talk about this topic with others, and more comfortable talking about the topic. You should consider each response's certain arguments, perspectives, and questions, as well as the user's conversation with the bot, to determine which response is most fitting.
+
+Your output: You should remove the number from your selection option, and then repeat your selected response option word for word without adding anything or removing any words.`,
+
+            message_trigger: 1, // triggering on 1 so that a separate bot triggered on 0 asks about perception of other side's opinion 
+
+
+        }
+
+
+        const perception_of_other_side_trial = {
+            type: jsPsychChat,
+            ai_model: "gpt-4o",
+            //ai_prompt: "Always explain in detail the experiences of people with opposite views from the user without repeating the user's input. Provide the alternative viewpoints of people with different jobs, positions in society, beliefs, etc. Give different perspectives each time. Ask what the user thinks about those peoples' stances. Acknowledge the user's perpsective. Respond in 1 paragraph.",
+            ai_prompt: `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should be conversational but use technically precise language. Be concise. You should match your response length to the user's input length.
+                Task: You should always identify a specific group of people who may have differing opinions from the user. You should always explain, in detail, their experiences and why they may disagree with the user's beliefs. You should provide these alternative perspectives held by people with different jobs, positions in society, beliefs, etc. You should give uniquely different perspectives in each message. Do not repeat viewpoints, instead you can dive deeper into previously mentioned viewpoints. You should always end your response with a question that asks the user what they think about those peoples' stances. Provide only one viewpoint per response.`,
+            continue_button: continue_button,
+            chat_field_placeholder: "Share your perspective...",
+            additional_prompts: perception_of_other_side_prompts,
+            selection_prompt: perception_bot_selection_prompt_election,
+
+        };
+      //  jsPsych.run([viewpoint_trial]);
+
+
         var last_questions = {
             data: {
                 phase: "post-convo-last-questions-survey",
@@ -1251,6 +1334,23 @@ Your output: You should remove the number from your selection option, and then r
             goodbye
         )
 
+        perception_of_other_side_timeline.push(
+            welcome,
+            preliminary_convo_instructions,
+            pre_convo_topic_only_survey_trial,
+            topic_polarization_criminal_survey,
+            topic_polarization_euthanasia_survey,
+            topic_polarization_gender_survey,
+            topic_polarization_healthcare_survey,
+            topic_polarization_same_sex_survey,
+            topic_polarization_vaccines_survey,
+            pre_bot_instructions_break,
+            pre_convo_instructions,
+            perception_of_other_side_trial,
+            post_convo_break,
+           // last_questions,
+            goodbye         
+        )
         //SAVE EXPERIMENT DATA TO OSF via datapipe
         const save_data = {
             type: jsPsychPipe,
