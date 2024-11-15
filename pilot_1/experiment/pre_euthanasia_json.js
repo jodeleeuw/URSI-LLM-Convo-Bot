@@ -299,6 +299,18 @@ var pre_euthanasia_json = {
             value: "pre-euthanasia-offending-reason-...I would not want to be offended by someone",
             text: "...I would not want to be offended by someone",
           },
+          { // NEW REASON AS OF 10/26
+            value: "pre-euthanasia-offending-reason-...I know that the conversation will become unproductive", // know vs. think?
+            text: "...I know that the conversation would become unproductive",
+          },
+          { // NEW REASON 10/26
+            value: "pre-euthanasia-offending-reason-...I would not want to have to explain myself to others",
+            text: "...I would not want to have to explain myself to others",
+          },
+          { // NEW REASON 10/26
+            value: "pre-euthanasia-offending-reason-...I would not want to have to explain myself to others",
+            text: "...I know that the people with whom I disagree won't take the time to genuinely consider my stance.",
+          },
           {
             value:
               "pre-euthanasia-offending-reason-...I would not want to be in an awkward, tense, or confrontational situation",
