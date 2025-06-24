@@ -27,7 +27,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
 
     <!-- uploading pre-convo survey question jsons -->
-    <script src="pre_convo_survey_json.js"></script> <!-- survey -->
+    <script src="pre_convo_survey_json_testing.js"></script> <!-- survey -->
     <script src="pre_euthanasia_json.js"></script> <!-- survey -->
     <script src="pre_criminal_json.js"></script> <!-- survey -->
     <script src="pre_gender_json.js"></script> <!-- survey -->
@@ -121,11 +121,11 @@
         // sequential condition assignment using data pipe. pushing a condition timeline into the timeline variable
         var timeline = [];
         async function createExperiment() {
-            const condition = 2 //await jsPsychPipe.getCondition("P09AXWX5b5t6");
+            const condition = 3 //await jsPsychPipe.getCondition("P09AXWX5b5t6");
             if (condition == 0) { timeline = combination_timeline; }
             if (condition == 1) { timeline = selection_timeline; }
             if (condition == 2) { timeline = control_timeline; }
-            if (condition == 3) { timeline = perception_of_other_side_timeline}
+            if (condition == 3) { timeline = perception_of_other_side_timeline }
             jsPsych.run([...timeline, save_data]);
         }
 
@@ -205,6 +205,7 @@
 
 
         /// EXTRACTING STRONGEST TOPIC CHOICE 
+        // defining the function to extract the topic that people rate most strongly from the first survey so that we can give them a second survey based on their answer 
 
         let topicChoiceResponse = [];
         let topicChoiceAsString;
@@ -242,7 +243,7 @@
         /* pushing survey in timeline with both slider and non-slider questions */
         const pre_convo_survey_trial = {
             type: jsPsychSurvey,
-            survey_json: pre_convo_survey_json,
+            survey_json: pre_convo_survey_json_testing,
             survey_function: initializePreSlider,
             data: {
                 phase: "pre-convo-survey-initial",
@@ -322,7 +323,7 @@
                 }
             ],
             conditional_function: () => {
-               const topic = topicChoice;
+                const topic = topicChoice;
                 return (topicChoice === 'human euthanasia in the U.S.');
             },
             on_finish: (data) => {
@@ -502,6 +503,275 @@
             }
         }
 
+        var pre_convo_willingness_openmindedness_survey = {
+            data: {
+                phase: "pre-convo-willingness-survey",
+            },
+            type: jsPsychSurvey,
+            survey_function: initializePreSlider,
+            survey_json: () => {
+                const topic = topicChoice; // get topic choice
+                var pre_convo_willingness_openmindedness_survey_inner_var = {
+                    elements: [
+                        {
+                            type: "matrix",
+                            name: "pre-openmindedness",
+                            title:
+                                `Rate the following statements on the seven point scale: When I have conversations about ${topic}, I...`,
+                            isRequired: true,
+                            columns: [
+                                {
+                                    value: 1,
+                                    text: "Disagree strongly",
+                                },
+                                {
+                                    value: 2,
+                                    text: "Disagree moderately",
+                                },
+                                {
+                                    value: 3,
+                                    text: "Disagree a little",
+                                },
+                                {
+                                    value: 4,
+                                    text: "Neither agree nor disagree",
+                                },
+                                {
+                                    value: 5,
+                                    text: "Agree a little",
+                                },
+                                {
+                                    value: 6,
+                                    text: "Agree moderately",
+                                },
+                                {
+                                    value: 7,
+                                    text: "Agree strongly",
+                                },
+                            ],
+                            rows: [
+                                {
+                                    value:
+                                        "pre-openmindedness...have little patience for arguments that I disagree with @R@",
+                                    text: `...have little patience for arguments about ${topic} that I disagree with`,
+                                },
+                                {
+                                    value:
+                                        "pre-openmindedness...avoid messages that I disagree with @R@",
+                                    text: `...avoid messages ${topic} that I disagree with`,
+                                },
+                                {
+                                    value:
+                                        "pre-openmindedness...believe it is a waste of time to pay attention to certain political ideas about ${topic}",
+                                    text: `...believe it is a waste of time to pay attention to certain political ideas about ${topic}`,
+                                },
+                                {
+                                    value:
+                                        "pre-openmindedness...am open to considering other political viewpoints about ${topic}",
+                                    text: `...am open to considering other political viewpoints about ${topic}`,
+                                },
+                                {
+                                    value:
+                                        "pre-openmindedness...consider as many different opinions as possible about ${topic}",
+                                    text: `...consider as many different opinions as possible about ${topic}`,
+                                },
+                            ],
+                        },
+                        {
+                            type: "expression",
+                            name: "slider1",
+                            title:
+                                `Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about ${topic}, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.`,
+                        },
+                        {
+                            type: "html",
+                            name: "slider1-placeholder",
+                            title:
+                                "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about ${topic}, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
+                            html: '<div id="slider1-placeholder"></div>', // Placeholder for the slider
+                        },
+                        {
+                            type: "expression",
+                            name: "slider2",
+                            title:
+                                `Using the slider, please rate your willingness to have a conversation with someone who would push against your views about ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.`,
+                        },
+                        {
+                            type: "html",
+                            name: "slider2-placeholder",
+                            title:
+                                "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.",
+                            html: '<div id="slider2-placeholder"></div>', // Placeholder for the slider
+                        },
+                        {
+                            type: "expression",
+                            name: "attention-check-slider",
+                            title: `Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.`,
+                        },
+                        {
+                            type: "html",
+                            name: "attention-check-slider-pre-placeholder",
+                            title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+                            html: '<div id="attention-check-slider-pre-placeholder"></div>', // Placeholder for the slider
+                        }, /*
+                        {
+                            type: "expression",
+                            name: "slider3",
+                            title:
+                                `Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.`,
+                        },
+                        {
+                            type: "html",
+                            name: "slider3-placeholder",
+                            title:
+                                "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.",
+                            html: '<div id="slider3-placeholder"></div>', // Placeholder for the slider
+                        }, 
+                        {
+                            type: "expression",
+                            name: "slider4",
+                            title:
+                                `Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.`,
+                        },
+                        {
+                            type: "html",
+                            name: "slider4-placeholder",
+                            title:
+                                "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.",
+                            html: '<div id="slider4-placeholder"></div>', // Placeholder for the slider
+                        }, */
+                        {
+                            type: "matrix",
+                            name: "offending-reason",
+                            title:
+                                `Imagine you're asked to have a serious conversation about ${topic} with a group of people who mostly hold differing views from yours.<br><br>Below is a list of potential concerns that you might have in the conversation.<br><br>For each item, if it would concern you, rate how much it would affect your willingness to join the conversation on a scale from “Not at all” to “Extremely.” 
+
+                                If an item wouldn’t concern you, then mark “Not at all.” (You may reflect on past experiences you've had in similar situations.)`,
+                            isRequired: true,
+                            columns: [
+                                {
+                                    value: 1,
+                                    text: "Not at all",
+                                },
+                                {
+                                    value: 2,
+                                    text: "Slightly",
+                                },
+                                {
+                                    value: 3,
+                                    text: "Somewhat",
+                                },
+                                {
+                                    value: 4,
+                                    text: "Moderately",
+                                },
+                                {
+                                    value: 5,
+                                    text: "Quite a bit",
+                                },
+                                {
+                                    value: 6,
+                                    text: "Very much",
+                                },
+                                {
+                                    value: 7,
+                                    text: "Extremely",
+                                },
+                            ],
+                            rows: [
+                                {
+                                    value: "pre-offending-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
+                                    text: "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
+                                },
+                                {
+                                    value: "pre-offending-reason-Someone could criticize or show disapproval of my views",
+                                    text: "Someone could criticize or show disapproval of my views",
+                                },
+                                {
+                                    value:
+                                        "pre-offending-reason-I would feel like my opinion is unpopular amongst the group.",
+                                    text: "I would feel like my opinion is unpopular amongst the group.",
+                                },
+                                {
+                                    value:
+                                        "pre-offending-reason-My opinion is unpopular in general.",
+                                    text: "My opinion is unpopular in general.",
+                                },
+                                {
+                                    value:
+                                        "pre-offending-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
+                                    text: "Someone could challenge ideas or beliefs that play an important role in making me who I am",
+                                },
+                                {
+                                    value:
+                                        "pre-offending-reason-I could feel humiliated or embarrassed in the conversation",
+                                    text: "I could feel humiliated or embarrassed in the conversation",
+                                },
+                                {
+                                    value:
+                                        "pre-offending-reason-I might struggle to explain my views to the others and/or come across as uninformed",
+                                    text: "I might struggle to explain my views to the others and/or come across as uninformed",
+                                },
+                                {
+                                    value:
+                                        "pre-offending-reason-The others might not make a full effort to hear and understand me",
+                                    text: "The others might not make a full effort to hear and understand me",
+                                },
+                                {
+                                    value:
+                                        "pre-offending-reason-I don’t often participate in conversations like these",
+                                    text: "I don’t often participate in conversations like these",
+                                },
+                                {
+                                    value: "pre-offending-reason-The conversation could become awkward or tense",
+                                    text: "The conversation could become awkward or tense",
+                                },
+                                {
+                                    value: "pre-offending-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
+                                    text: "The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
+                                },
+                                {
+                                    value: "pre-offending-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
+                                    text: "The conversation could negatively affect how I feel about the world during and/or afterward",
+                                },
+                                {
+                                    value: "pre-offending-reason-Someone might take offense to what I say",
+                                    text: "Someone might take offense to what I say",
+                                },
+                                {
+                                    value: "pre-offending-reason-I might take offense to what someone says",
+                                    text: "I might take offense to what someone says",
+                                },
+                                {
+                                    value: "pre-offending-reason-I might feel disempowered, unheard, or invalidated",
+                                    text: "I might feel disempowered, unheard, or invalidated",
+                                },
+                                {
+                                    value: "pre-offending-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+                                    text: "I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+                                },
+                                {
+                                    value: "pre-offending-reason-I might struggle to remain productive and respectful",
+                                    text: "I might struggle to remain productive and respectful",
+                                },
+                                {
+                                    value: "pre-offending-reason-I would not want to listen to the others discuss their views",
+                                    text: "I would not want to listen to the others discuss their views",
+                                },
+                                {
+                                    value: "pre-offending-reason-My views wouldn’t change",
+                                    text: "My views wouldn’t change",
+                                },
+                            ],
+                        },
+                    ],
+                    rowsOrder: "random",
+                };
+                return pre_convo_willingness_openmindedness_survey_inner_var
+            },
+            survey_function: initializePreSlider
+        };
+
         /* break between pre-intervention survey and bot conversation */
         var pre_bot_instructions_break = {
             data: {
@@ -604,6 +874,15 @@
 
         // Declaring the prompts for three chat bot conditions: counter bot (only argues), question bot (only ask question), viewpoint bot (provide alternative viewpoint)
 
+
+        // ----EXPLANATION OF WHAT THE DIF THINGS ARE FOR EACH BOT ----------
+
+        // _prompts contains some or all of the various prompts for a chatbot that get triggered throughout the conversation
+        // contains all of them if the primary prompt for the bot is a normal singular instructions. the chains and selections are separate from _prompts
+        // const is where a bot is actually created and specific. provides the basic framework (model of gpt, etc.) for the bot and all the things like _prompts to make the bot unique
+        // _election provides the series of prompts for a bot to use in a response election method  
+        // _chain provides the series of prompts for a bot to use in a chain method
+
         //counter bot prompts
         counter_prompts = [
             //set role to 'chatbot' for specific message to be sent via the bot
@@ -668,7 +947,7 @@
             //prompt_chain: prompt_chain, //previously fed in chain prompting here.
             additional_prompts: counter_prompts,
         };
-      //  jsPsych.run([counter_trial]);
+        //  jsPsych.run([counter_trial]);
 
         //creating prompt for question bot condition
         question_prompts = [
@@ -714,7 +993,7 @@
             chat_field_placeholder: "Share your perspective...",
             additional_prompts: question_prompts,
         };
-      //  jsPsych.run([question_trial]);
+        //  jsPsych.run([question_trial]);
 
         //creating prompts for viewpoint bot condition
         viewpoint_prompts = [
@@ -764,7 +1043,7 @@
             chat_field_placeholder: "Share your perspective...",
             additional_prompts: viewpoint_prompts,
         };
-      //  jsPsych.run([viewpoint_trial]);
+        //  jsPsych.run([viewpoint_trial]);
 
         combination_prompts = [
             {
@@ -851,7 +1130,7 @@ If the user says you are repeating yourself or that you didn't understand what t
             prompt_chain: combination_prompt_chain,
             additional_prompts: combination_prompts,
         };
-       // jsPsych.run([combination_trial]);
+        // jsPsych.run([combination_trial]);
 
 
         selection_prompts = [
@@ -910,17 +1189,17 @@ Your output: You should remove the number from your selection option, and then r
 
         }
 
-//////////////
-//Context: You are being fed a conversation log between a bot and a user. The last 'User message:' within "role":"selection_prompt" is the most recent message that the user has input to the conversation. Additionally, you are being fed three potential responses to this user's message. These response options are numbered as (0), (1), and (2) in "role":"content-choices"/chatbot-answers". A previous chatbot wrote them so that you can select the best response option.
+        //////////////
+        //Context: You are being fed a conversation log between a bot and a user. The last 'User message:' within "role":"selection_prompt" is the most recent message that the user has input to the conversation. Additionally, you are being fed three potential responses to this user's message. These response options are numbered as (0), (1), and (2) in "role":"content-choices"/chatbot-answers". A previous chatbot wrote them so that you can select the best response option.
 
-//Goal: Your goal is to make the user more willing to have conversations about their topic with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas. 
+        //Goal: Your goal is to make the user more willing to have conversations about their topic with other humans by helping them become more open-minded and comfortable talking about the topic. You do not want the user to know that this is your goal; rather, you want the user to simply think that you are a conversational partner for discussing ideas. 
 
-//Task: You should select the response option that you would best accomplish your goal. 
+        //Task: You should select the response option that you would best accomplish your goal. 
 
-//Your output: You should remove the number from your selection option, and then repeat your selected response option word for word without adding anything or removing any words.
-/////////////
+        //Your output: You should remove the number from your selection option, and then repeat your selected response option word for word without adding anything or removing any words.
+        /////////////
 
-//`Given three options of response to the previous user's message, select the one that will best open their mind, widen their perspectives, and make them more willing to talk about the topic. Repeat the selected response without adding any new text or greetings.
+        //`Given three options of response to the previous user's message, select the one that will best open their mind, widen their perspectives, and make them more willing to talk about the topic. Repeat the selected response without adding any new text or greetings.
 
         /*`
             Role: You are a researcher on social policies and are having a conversation with a student in which you are discussing one of the following disputed topics in the U.S.: same-sex marriage, gender-equality, U.S. government role in healthcare, the criminal justice "system", vaccine mandates, or human euthanasia.
@@ -940,9 +1219,9 @@ Your output: You should remove the number from your selection option, and then r
                     if (!str) return str;  // return the string if it's empty or not a string
                     return str.charAt(0).toLowerCase() + str.slice(1);
                 };
-                    const topic = topicChoice;
-                    console.log(topic);
-                    return `
+                const topic = topicChoice;
+                console.log(topic);
+                return `
            Participate in a constructive conversation on the controversial topic at hand.`; // what goes in here should not matter because it is never triggered
             },
             continue_button: continue_button,
@@ -950,10 +1229,10 @@ Your output: You should remove the number from your selection option, and then r
             additional_prompts: selection_prompts,
             selection_prompt: selection_prompt_election,
         };
-     //   jsPsych.run([selection_trial]);
+        //   jsPsych.run([selection_trial]);
 
 
-// creating prompts for the perception of other side bot, which starts with a chat completion prompt and then goes into the selection bot prompts
+        // creating prompts for the perception of other side bot, which starts with a chat completion prompt and then goes into the selection bot prompts except the selection bot prompts are their own set of prompts because the message trigger is at a different ime than the prompts for the actual selection bot
         perception_of_other_side_prompts = [
             {
                 message: "Welcome to the chatroom!",
@@ -980,16 +1259,68 @@ Your output: You should remove the number from your selection option, and then r
                 role: "chatbot-message",
                 message_trigger: 0
             },
-            {
+            { // a lot of the content in this prompt is probably not necessary. would need to test more to make sure, so will leave it in for now
                 prompt: `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
                 Style: You should be conversational but use technically precise language. Be concise. You should match your response length to the user's input length.
                 Context: The user has just shared their perspecive on a controversial topic. 
-                Task: You should ask the user what they think are the reasonings of people who disagree with them. That is, get the user to explain what they perceive to be the opposing side's reasoning.`,
+                Task: You should ask the user what they think are the reasonings of people who disagree with them such that you get the user to explain what they perceive to be the opposing side's reasoning.`,
                 role: "chatbot-prompt",
-                message_trigger: 1,
+                message_trigger: 0,
             },
             // want it to go into selection timeline now 
         ]
+        // this selection prompt series is specifically for responding to the user's perception of the other side. created this so we can give the bot context to this specific part of the conversation so that it won't respond as supportively
+        first_perception_bot_selection_prompt_election = {
+            prompts: [
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Context/Goal: A previous bot asked the user what they think of the other side's opinion on this topic. Throughout your conversation, you want to help the user realize that their perception of the other side isn't the full picture. 
+                Task: You should always concisely respond to the other person's argument with a counterargument. Do not repeat the same arguments that the 'role: assistant' has brought up before, but you can dive into more specific aspects or previous arguments. You should never dive into asking the user how they would implement their views. You should always concisely present a specific argument that counters the user's perspective. At the end of your response, you should always ask the user what they think. You should always ensure that your message includes a counterargument; and you should never simply agree with the user.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Context/Goal: A previous bot asked the user what they think of the other side's opinion on this topic. Throughout your conversation, you want to help the user realize that their perception of the other side isn't the full picture. 
+                Task: You should always concisely identify a specific group of people who may have differing opinions from the user. You should always explain, in detail, their experiences and why they may disagree with the user's beliefs. You should provide these alternative perspectives held by people with different jobs, positions in society, beliefs, etc. You should give uniquely different perspectives in each message. You should not repeat viewpoints that the 'role: assistant' brought up before, but you can dive deeper into previously mentioned viewpoints. You should always end your response with a question that asks the user what they think about those peoples' stances. You should provide only one viewpoint per response.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Context/Goal: A previous bot asked the user what they think of the other side's opinion on this topic. Throughout your conversation, you want to help the user realize that their perception of the other side isn't the full picture. 
+                Task: You should always ask a question about the user's stance. You should always ask why the user thinks what they think or ask if there were any experiences that led to their views. You should not repeat questions that the 'role: assistant' asked before, but you can dive deeper into previous questions.`
+            ],
+            selection_prompt: `
+            
+Context: You are being fed a conversation log between a bot and a user. The last 'User message:' within "role":"selection_prompt" is the most recent message that the user has input to the conversation. Additionally, you are being fed three potential responses to this user's message. These response options are numbered as (0), (1), and (2) in "role":"content-choices"/chatbot-answers". A previous chatbot wrote them so that you can select the best response option.
+
+Task: You should select the response option that would most effectively help this conversation make the user more open-minded, more willing to talk about this topic with others, and more comfortable talking about the topic. You should consider each response's certain arguments, perspectives, and questions, as well as the user's conversation with the bot, to determine which response is most fitting.
+
+Your output: You should remove the number from your selection option, and then repeat your selected response option word for word without adding anything or removing any words.`,
+
+            message_trigger: 1, // triggering on 1 so that a separate bot triggered on 0 asks about perception of other side's opinion 
+
+        }
+
+        // this selection prompt series is for the majority of conversation; is the same as the selection prompts for the selection bot 
+        second_perception_bot_selection_prompt_election = {
+            prompts: [
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Task: You should always concisely respond to the other person's argument with a counterargument. Do not repeat the same arguments that the 'role: assistant' has brought up before, but you can dive into more specific aspects or previous arguments. You should never dive into asking the user how they would implement their views. You should always concisely present a specific argument that counters the user's perspective. At the end of your response, you should always ask the user what they think. You should always ensure that your message includes a counterargument; and you should never simply agree with the user.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Task: You should always concisely identify a specific group of people who may have differing opinions from the user. You should always explain, in detail, their experiences and why they may disagree with the user's beliefs. You should provide these alternative perspectives held by people with different jobs, positions in society, beliefs, etc. You should give uniquely different perspectives in each message. You should not repeat viewpoints that the 'role: assistant' brought up before, but you can dive deeper into previously mentioned viewpoints. You should always end your response with a question that asks the user what they think about those peoples' stances. You should provide only one viewpoint per response.`,
+                `Role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. 
+                Style: You should match the length of your response to the length of the most recent "role":"user":"content". You should be conversational but use technically precise language. Be concise.
+                Task: You should always ask a question about the user's stance. You should always ask why the user thinks what they think or ask if there were any experiences that led to their views. You should not repeat questions that the 'role: assistant' asked before, but you can dive deeper into previous questions.`
+            ],
+            selection_prompt: `
+            
+Context: You are being fed a conversation log between a bot and a user. The last 'User message:' within "role":"selection_prompt" is the most recent message that the user has input to the conversation. Additionally, you are being fed three potential responses to this user's message. These response options are numbered as (0), (1), and (2) in "role":"content-choices"/chatbot-answers". A previous chatbot wrote them so that you can select the best response option.
+
+Task: You should select the response option that would most effectively help this conversation make the user more open-minded, more willing to talk about this topic with others, and more comfortable talking about the topic. You should consider each response's certain arguments, perspectives, and questions, as well as the user's conversation with the bot, to determine which response is most fitting.
+
+Your output: You should remove the number from your selection option, and then repeat your selected response option word for word without adding anything or removing any words.`,
+
+            message_trigger: 2, // triggering on 1 so that a separate bot triggered on 0 asks about perception of other side's opinion 
+
+        }
 
         const perception_of_other_side_trial = {
             type: jsPsychChat,
@@ -1001,11 +1332,28 @@ Your output: You should remove the number from your selection option, and then r
             continue_button: continue_button,
             chat_field_placeholder: "Share your perspective...",
             additional_prompts: perception_of_other_side_prompts,
-            selection_prompt: selection_prompt_election,
+            selection_prompt: first_perception_bot_selection_prompt_election, second_perception_bot_selection_prompt_election
 
         };
-      //  jsPsych.run([viewpoint_trial]);
+        //  jsPsych.run([viewpoint_trial]);
 
+        var string_bot_prompts = {
+
+            // INSERT STUFF
+        }
+        var string_bot_selection_prompts = {
+            // INSERT STUFF 
+        }
+
+        const string_bot = {
+            type: jsPsychChat,
+            ai_model: "gpt-4o",
+            ai_prompt: `this shouldn't matter because we're inserting other prompts that get triggered for every message`,
+            continue_button: continue_button,
+            chat_field_placeholder: "Share your perspective...",
+            additional_prompts: string_bot_prompts,
+            selection_prompt: string_bot_selection_prompts
+        }
         var start_time;
 
         // Function to check elapsed time without inactivity
@@ -1254,7 +1602,6 @@ Your output: You should remove the number from your selection option, and then r
             },
         };
 
-
         var healthcare_post_survey = {
             data: {
                 phase: "post-convo-healthcare-survey",
@@ -1289,7 +1636,6 @@ Your output: You should remove the number from your selection option, and then r
             },
         };
 
-
         var criminal_post_survey = {
             data: {
                 phase: "post-convo-criminal-survey",
@@ -1322,6 +1668,273 @@ Your output: You should remove the number from your selection option, and then r
                 const topic = topicChoice;
                 return (topic === 'same-sex marriage in the U.S.');
             },
+        };
+
+
+        var post_convo_willingness_openmindedness_survey = {
+            data: {
+                phase: "post-convo-willingness-survey",
+            },
+            type: jsPsychSurvey,
+            survey_function: initializePostSlider,
+            survey_json: () => {
+                const topic = topicChoice; // get topic choice
+                var post_convo_willingness_openmindedness_survey_inner_var = {
+                    elements: [
+                        {
+                            type: "matrix",
+                            name: "post-openmindedness",
+                            title:
+                                `Rate the following statements on the seven point scale: When I have conversations about ${topic}, I...`,
+                            isRequired: true,
+                            columns: [
+                                {
+                                    value: 1,
+                                    text: "Disagree strongly",
+                                },
+                                {
+                                    value: 2,
+                                    text: "Disagree moderately",
+                                },
+                                {
+                                    value: 3,
+                                    text: "Disagree a little",
+                                },
+                                {
+                                    value: 4,
+                                    text: "Neither agree nor disagree",
+                                },
+                                {
+                                    value: 5,
+                                    text: "Agree a little",
+                                },
+                                {
+                                    value: 6,
+                                    text: "Agree moderately",
+                                },
+                                {
+                                    value: 7,
+                                    text: "Agree strongly",
+                                },
+                            ],
+                            rows: [
+                                {
+                                    value:
+                                        "post-openmindedness...have little patience for arguments that I disagree with @R@",
+                                    text: `...have little patience for arguments about ${topic} that I disagree with`,
+                                },
+                                {
+                                    value:
+                                        "post-openmindedness...avoid messages that I disagree with @R@",
+                                    text: `...avoid messages ${topic} that I disagree with`,
+                                },
+                                {
+                                    value:
+                                        "post-openmindedness...believe it is a waste of time to pay attention to certain political ideas about ${topic}",
+                                    text: `...believe it is a waste of time to pay attention to certain political ideas about ${topic}`,
+                                },
+                                {
+                                    value:
+                                        "post-openmindedness...am open to considering other political viewpoints about ${topic}",
+                                    text: `...am open to considering other political viewpoints about ${topic}`,
+                                },
+                                {
+                                    value:
+                                        "post-openmindedness...consider as many different opinions as possible about ${topic}",
+                                    text: `...consider as many different opinions as possible about ${topic}`,
+                                },
+                            ],
+                        },
+                        {
+                            type: "expression",
+                            name: "slider1",
+                            title:
+                                `Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about ${topic}, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.`,
+                        },
+                        {
+                            type: "html",
+                            name: "slider1-placeholder",
+                            title:
+                                "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about ${topic}, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
+                            html: '<div id="slider1-placeholder"></div>', // Placeholder for the slider
+                        },
+                        {
+                            type: "expression",
+                            name: "slider2",
+                            title:
+                                `Using the slider, please rate your willingness to have a conversation with someone who would push against your views about ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.`,
+                        },
+                        {
+                            type: "html",
+                            name: "slider2-placeholder",
+                            title:
+                                "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.",
+                            html: '<div id="slider2-placeholder"></div>', // Placeholder for the slider
+                        },
+                        {
+                            type: "expression",
+                            name: "attention-check-slider",
+                            title: `Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.`,
+                        },
+                        {
+                            type: "html",
+                            name: "attention-check-slider-post-placeholder",
+                            title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
+                            html: '<div id="attention-check-slider-post-placeholder"></div>', // Placeholder for the slider
+                        }, /*
+                        {
+                            type: "expression",
+                            name: "slider3",
+                            title:
+                                `Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.`,
+                        },
+                        {
+                            type: "html",
+                            name: "slider3-placeholder",
+                            title:
+                                "Using the slider, please rate your willingness to have a conversation with someone who would challenge your perspective on ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.",
+                            html: '<div id="slider3-placeholder"></div>', // Placeholder for the slider
+                        },
+                        {
+                            type: "expression",
+                            name: "slider4",
+                            title:
+                                `Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.`,
+                        },
+                        {
+                            type: "html",
+                            name: "slider4-placeholder",
+                            title:
+                                "Using the slider, please rate your willingness to have a conversation with someone who is heavily invested in ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.",
+                            html: '<div id="slider4-placeholder"></div>', // Placeholder for the slider
+                        }, */
+                        {
+                            type: "matrix",
+                            name: "offending-reason",
+                            title:
+                                `Imagine you're asked to have a serious conversation about ${topic} with a group of people who mostly hold differing views from yours.<br><br>Below is a list of potential concerns that you might have in the conversation. For each item, if it would concern you, rate how much it would affect your willingness to join the conversation on a scale from “Not at all” to “Extremely."<br><br>If an item wouldn’t concern you, then mark “Not at all.” (You may reflect on past experiences you've had in similar situations.)`,
+                            isRequired: true,
+                            columns: [
+                                {
+                                    value: 1,
+                                    text: "Not at all",
+                                },
+                                {
+                                    value: 2,
+                                    text: "Slightly",
+                                },
+                                {
+                                    value: 3,
+                                    text: "Somewhat",
+                                },
+                                {
+                                    value: 4,
+                                    text: "Moderately",
+                                },
+                                {
+                                    value: 5,
+                                    text: "Quite a bit",
+                                },
+                                {
+                                    value: 6,
+                                    text: "Very much",
+                                },
+                                {
+                                    value: 7,
+                                    text: "Extremely",
+                                },
+                            ],
+                            rows: [
+                                {
+                                    value: "post-offending-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
+                                    text: "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
+                                },
+                                {
+                                    value: "post-offending-reason-Someone could criticize or show disapproval of my views",
+                                    text: "Someone could criticize or show disapproval of my views",
+                                },
+                                {
+                                    value:
+                                        "post-offending-reason-I would feel like my opinion is unpopular amongst the group.",
+                                    text: "I would feel like my opinion is unpopular amongst the group.",
+                                },
+                                {
+                                    value:
+                                        "post-offending-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
+                                    text: "Someone could challenge ideas or beliefs that play an important role in making me who I am",
+                                },
+                                {
+                                    value:
+                                        "post-offending-reason-I could feel humiliated or embarrassed in the conversation",
+                                    text: "I could feel humiliated or embarrassed in the conversation",
+                                },
+                                {
+                                    value:
+                                        "post-offending-reason-I might struggle to explain my views to the others and/or come across as uninformed",
+                                    text: "I might struggle to explain my views to the others and/or come across as uninformed",
+                                },
+                                {
+                                    value:
+                                        "post-offending-reason-The others might not make a full effort to hear and understand me",
+                                    text: "The others might not make a full effort to hear and understand me",
+                                },
+                                {
+                                    value:
+                                        "post-offending-reason-I don’t often participate in conversations like these",
+                                    text: "I don’t often participate in conversations like these",
+                                },
+                                {
+                                    value: "post-offending-reason-The conversation could become awkward or tense",
+                                    text: "The conversation could become awkward or tense",
+                                },
+                                {
+                                    value: "post-offending-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
+                                    text: "The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
+                                },
+                                {
+                                    value: "post-offending-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
+                                    text: "The conversation could negatively affect how I feel about the world during and/or afterward",
+                                },
+                                {
+                                    value: "post-offending-reason-Someone might take offense to what I say",
+                                    text: "Someone might take offense to what I say",
+                                },
+                                {
+                                    value: "post-offending-reason-I might take offense to what someone says",
+                                    text: "I might take offense to what someone says",
+                                },
+                                {
+                                    value: "post-offending-reason-I might feel disempowered, unheard, or invalidated",
+                                    text: "I might feel disempowered, unheard, or invalidated",
+                                },
+                                {
+                                    value: "post-offending-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+                                    text: "I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+                                },
+                                {
+                                    value: "post-offending-reason-I might struggle to remain productive and respectful.",
+                                    text: "I might struggle to remain productive and respectful.",
+                                },
+                                {
+                                    value: "post-offending-reason-I would find the whole endeavor too frustrating and/or draining.",
+                                    text: "I would find the whole endeavor too frustrating and/or draining.",
+                                },
+                                {
+                                    value: "post-offending-reason-I would not want to listen to the others discuss their views",
+                                    text: "I would not want to listen to the others discuss their views",
+                                },
+                                {
+                                    value: "post-offending-reason-My views wouldn’t change",
+                                    text: "My views wouldn’t change",
+                                },
+                            ],
+                        },
+                    ],
+                    rowsOrder: "random",
+                };
+                return post_convo_willingness_openmindedness_survey_inner_var
+            },
+            survey_function: initializePostSlider
         };
 
         var last_questions = {
@@ -1445,6 +2058,7 @@ Your output: You should remove the number from your selection option, and then r
             pre_convo_vaccines_survey,
             pre_convo_criminal_survey,
             pre_convo_same_sex_survey,
+            pre_convo_willingness_openmindedness_survey,
             pre_bot_instructions_break,
             pre_convo_instructions,
             counter_trial,
@@ -1460,6 +2074,7 @@ Your output: You should remove the number from your selection option, and then r
             criminal_post_survey,
             same_sex_post_survey,
             last_questions,
+            post_convo_willingness_openmindedness_survey,
             goodbye
         )
 
@@ -1473,6 +2088,7 @@ Your output: You should remove the number from your selection option, and then r
             pre_convo_vaccines_survey,
             pre_convo_criminal_survey,
             pre_convo_same_sex_survey,
+            pre_convo_willingness_openmindedness_survey,
             pre_bot_instructions_break,
             pre_convo_instructions,
             question_trial,
@@ -1487,6 +2103,7 @@ Your output: You should remove the number from your selection option, and then r
             vaccines_post_survey,
             criminal_post_survey,
             same_sex_post_survey,
+            post_convo_willingness_openmindedness_survey,
             last_questions,
             goodbye
         )
@@ -1501,6 +2118,7 @@ Your output: You should remove the number from your selection option, and then r
             pre_convo_vaccines_survey,
             pre_convo_criminal_survey,
             pre_convo_same_sex_survey,
+            pre_convo_willingness_openmindedness_survey,
             pre_bot_instructions_break,
             pre_convo_instructions,
             viewpoint_trial,
@@ -1515,6 +2133,7 @@ Your output: You should remove the number from your selection option, and then r
             vaccines_post_survey,
             criminal_post_survey,
             same_sex_post_survey,
+            post_convo_willingness_openmindedness_survey,
             last_questions,
             goodbye
         )
@@ -1529,6 +2148,7 @@ Your output: You should remove the number from your selection option, and then r
             pre_convo_vaccines_survey,
             pre_convo_criminal_survey,
             pre_convo_same_sex_survey,
+            pre_convo_willingness_openmindedness_survey,
             pre_bot_instructions_break,
             pre_convo_instructions,
             combination_trial,
@@ -1543,6 +2163,7 @@ Your output: You should remove the number from your selection option, and then r
             vaccines_post_survey,
             criminal_post_survey,
             same_sex_post_survey,
+            post_convo_willingness_openmindedness_survey,
             last_questions,
             goodbye
         )
@@ -1557,6 +2178,7 @@ Your output: You should remove the number from your selection option, and then r
             pre_convo_vaccines_survey,
             pre_convo_criminal_survey,
             pre_convo_same_sex_survey,
+            pre_convo_willingness_openmindedness_survey,
             pre_bot_instructions_break,
             pre_convo_instructions,
             selection_trial,
@@ -1571,6 +2193,7 @@ Your output: You should remove the number from your selection option, and then r
             vaccines_post_survey,
             criminal_post_survey,
             same_sex_post_survey,
+            post_convo_willingness_openmindedness_survey,
             last_questions,
             goodbye
         )
@@ -1585,6 +2208,7 @@ Your output: You should remove the number from your selection option, and then r
             pre_convo_vaccines_survey,
             pre_convo_criminal_survey,
             pre_convo_same_sex_survey,
+            pre_convo_willingness_openmindedness_survey,
             pre_bot_instructions_break,
             pre_convo_instructions,
             perception_of_other_side_trial,
@@ -1599,6 +2223,7 @@ Your output: You should remove the number from your selection option, and then r
             vaccines_post_survey,
             criminal_post_survey,
             same_sex_post_survey,
+            post_convo_willingness_openmindedness_survey,
             last_questions,
             goodbye
         )
@@ -1613,6 +2238,7 @@ Your output: You should remove the number from your selection option, and then r
             pre_convo_vaccines_survey,
             pre_convo_criminal_survey,
             pre_convo_same_sex_survey,
+            pre_convo_willingness_openmindedness_survey,
             pre_control_break,
             control_intervention,
             post_control_break,
@@ -1626,6 +2252,7 @@ Your output: You should remove the number from your selection option, and then r
             vaccines_post_survey,
             criminal_post_survey,
             same_sex_post_survey,
+            post_convo_willingness_openmindedness_survey,
             goodbye
         )
 
