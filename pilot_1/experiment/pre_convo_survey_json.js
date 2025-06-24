@@ -399,7 +399,7 @@ var pre_convo_survey_json = {
     {
       type: "matrix",
       name: "topic",
-      title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. Rate how comfortable you would be talking about each of the following topics.",
+      title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following potential conversation topics, rate how willing you would be to join the conversation.",
       isRequired: true,
       columns: [
         {
