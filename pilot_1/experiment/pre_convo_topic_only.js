@@ -3,7 +3,7 @@ var pre_convo_topic_only_json = {
       {
         type: "matrix",
         name: "topic",
-        title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. Rate how comfortable you would be talking about each of the following topics.",
+        title: "Imagine you're asked to have a serious conversation about [topic] with a group of people who mostly hold differing views from yours. Below is a list of potential concerns that you might have in the conversation. For each item, if it would concern you, rate how much it would affect your willingness to join the conversation on a scale from “Not at all” to “Extremely.” If an item wouldn’t concern you, then mark “Not at all.” (You may reflect on past experiences you've had in similar situations.)",
         isRequired: true,
         columns: [
           {
