@@ -171,7 +171,7 @@ var pre_convo_survey_json = {
     {
       type: "matrix",
       name: "rating-republicans",
-      visibleIf: "{political-affiliation} <> 'Republican'",
+      visibleIf: "{political-affiliation} != 'Republican'",
       title: "How strongly do you agree or disagree with the following statements?",
       isRequired: true,
       columns: [
@@ -234,7 +234,7 @@ var pre_convo_survey_json = {
     {
       type: "matrix",
       name: "rating-democrats",
-      visibleIf: "{political-affiliation} <> 'Democrat'",
+      visibleIf: "{political-affiliation} != 'Democrat'",
       title: "How strongly do you agree or disagree with the following statements?",
       isRequired: true,
       columns: [
@@ -297,7 +297,7 @@ var pre_convo_survey_json = {
     {
       type: "matrix",
       name: "interacting-with-republicans",
-      visibleIf: "{political-affiliation} <> 'Republican'",
+      visibleIf: "{political-affiliation} != 'Republican'",
       title: "To what extent do these statements apply to you?",
       isRequired: true,
       columns: [
@@ -348,7 +348,7 @@ var pre_convo_survey_json = {
     {
       type: "matrix",
       name: "interacting-with-democrats",
-      visibleIf: "{political-affiliation} <> 'Democrat'",
+      visibleIf: "{political-affiliation} != 'Democrat'",
       title: "To what extent do these statements apply to you?",
       isRequired: true,
       columns: [
@@ -399,20 +399,24 @@ var pre_convo_survey_json = {
     {
       type: "matrix",
       name: "topic",
-      title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following potential conversation topics, rate how willing you would be to join the conversation.",
+      title: `Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following conversation topics, rate how willing you would be to engage in the conversation.
+      
+     Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following potential topics, how willing would you be to actively engage in the conversation? 'Engage' here means not just observing, but also expressing your own views, listening openly to others, and participating respectfully.
+      
+     Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following potential topics, rate how unwilling would you be to actively engage in the conversation? 'Engage' here means not just observing, but also expressing your own views, listening openly to others, and participating respectfully.`,
       isRequired: true,
       columns: [
         {
           value: 1,
-          text: "Strongly uncomfortable",
+          text: "Strongly unwilling",
         },
         {
           value: 2,
-          text: "Moderately uncomfortable",
+          text: "Moderately unwilling",
         },
         {
           value: 3,
-          text: "A little uncomfortable",
+          text: "A little unwilling",
         },
         {
           value: 4,
@@ -420,15 +424,15 @@ var pre_convo_survey_json = {
         },
         {
           value: 5,
-          text: "A little comfortable",
+          text: "A little unwilling",
         },
         {
           value: 6,
-          text: "Moderately comfortable",
+          text: "Moderately unwilling",
         },
         {
           value: 7,
-          text: "Strongly comfortable",
+          text: "Strongly unwilling",
         },
       ],
       rows: [
