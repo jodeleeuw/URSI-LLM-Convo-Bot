@@ -151,7 +151,7 @@ var pre_convo_survey_json_testing = {
     {
       type: "matrix",
       name: "rating-republicans",
-      visibleIf: "{political-affiliation} <> 'Republican'",
+      visibleIf: "{political-affiliation} != 'Republican'",
       title: "How strongly do you agree or disagree with the following statements?",
       isRequired: false,
       columns: [
@@ -214,7 +214,7 @@ var pre_convo_survey_json_testing = {
     {
       type: "matrix",
       name: "rating-democrats",
-      visibleIf: "{political-affiliation} <> 'Democrat'",
+      visibleIf: "{political-affiliation} != 'Democrat'",
       title: "How strongly do you agree or disagree with the following statements?",
       isRequired: false,
       columns: [
@@ -277,7 +277,7 @@ var pre_convo_survey_json_testing = {
     {
       type: "matrix",
       name: "interacting-with-republicans",
-      visibleIf: "{political-affiliation} <> 'Republican'",
+      visibleIf: "{political-affiliation} != 'Republican'",
       title: "To what extent do these statements apply to you?",
       isRequired: false,
       columns: [
@@ -328,7 +328,7 @@ var pre_convo_survey_json_testing = {
     {
       type: "matrix",
       name: "interacting-with-democrats",
-      visibleIf: "{political-affiliation} <> 'Democrat'",
+      visibleIf: "{political-affiliation} != 'Democrat'",
       title: "To what extent do these statements apply to you?",
       isRequired: false,
       columns: [
