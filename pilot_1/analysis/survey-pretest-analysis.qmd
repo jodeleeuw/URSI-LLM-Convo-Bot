@@ -1,0 +1,955 @@
+---
+title: "survey-pretest-analysis"
+format: html
+editor: visual
+---
+
+*# intended for summer 2025
+
+```{r}
+#| label: Data Fetching. Load R packages
+#| include: false 
+
+library(osfr) 
+library(ez) 
+library(tidyverse) 
+library(gt)
+library(gtsummary)
+library(kableExtra)
+library(stringr)
+library(ggridges)
+library(lubridate)  # for date handling
+library(psych) # for factor analysis 
+library(pheatmap) # for factor analysis heat map 
+library(corrplot) # for correlation matrix 
+library(broom) # for correlation tests
+library(purrr) # for correlation tests 
+# library(GGally)
+# library(car)
+# library(MASS)
+# library(glmnet)
+
+```
+
+```{r}
+#| label: Prolific demographics data
+#| include: false 
+
+## add which round of the pilot it was by reading in demographics files so we know completion dates
+
+#read in prolific demographics files 
+pretest_demo_df <- read_csv("[insert actual csv]prolific_export_66a7f5efd46ad7a2b78cc200.csv") %>%
+  mutate(Age = as.numeric(Age))
+
+#merge files (if multiple)
+full_prolific_demographics_df <- bind_rows(pretest_demo_df) 
+
+#clean df
+full_prolific_demographics_df <- full_prolific_demographics_df %>%
+# make name the same as in data csvs so merging is easier
+rename("prolific_subject_id" = "Participant id") %>%
+# filter out people who didn't finish
+filter(Status != "RETURNED") %>%
+#rename "Started at" to make grepl function easier to use later on
+rename("start" = "Started at") %>%
+# make time more readable but keep the seconds version for analysis stuff later
+mutate(`Time taken (minutes)` = as.numeric(`Time taken`) / 60) %>%
+# name the round of the pilot that the person was in 
+  mutate(pilot_iteration = case_when(
+    grepl("2025-07-15", start) ~ "Willingness Survey Pretest",
+    TRUE ~ NA_character_
+  )) 
+```
+
+```{r}
+#| label: Retrieve data for the specific date of the willingness pretest from our OSF project. Loading into a data folder, which  we manually create
+#| include: false 
+
+
+# list all files
+files <- osf_retrieve_node("x32pv") %>%
+  osf_ls_files(n_max = Inf)
+
+# filter for the correct date
+files_filtered <- files %>%
+  mutate(date_created = as_date(created_utc)) %>%
+  filter(date_created == as_date("2025-07-15"))
+
+# download files for the correct date 
+osf_download(files_filtered, path = "data", conflicts = "skip")
+
+```
+
+```{r}
+#| label: Bind csv's
+#| include: false 
+
+osf_csv_filenames <- list.files(path = "data/")
+raw_dfs_tibbles <- map(osf_csv_filenames, ~read_csv(file.path("data/", .)))
+rawwwwwww_df <- bind_rows(raw_dfs_tibbles)
+
+```
+
+```{r}
+#| label: Merge prolific demos + create a condition type column
+#| include: false 
+
+raw_df <- rawwwwwww_df %>%
+  # inner join with the demographics df from pilot 2 so we can eliminate pilot 1 subjects
+  inner_join(full_prolific_demographics_df, by = "prolific_subject_id") %>%
+  # remove unnecessary syntax from rowAsString and topicChoiceAsString for readability later
+  mutate(rowAsString = gsub('\\{"row":"', '', rowAsString)) %>%
+  mutate(rowAsString = gsub('"}', '', rowAsString)) %>%
+  mutate(topicChoiceAsString = gsub('\\{"row":"', '', topicChoiceAsString)) %>%
+  mutate(topicChoiceAsString = gsub('"}', '', topicChoiceAsString)) %>%
+  # fill condition column and row and topic strings
+  group_by(prolific_subject_id) %>%
+  fill(condition, .direction = "downup") %>%
+  fill(rowAsString, .direction = "downup") %>%
+  fill(topicChoiceAsString, .direction = "downup") %>%
+  ungroup() 
+
+# number of subjects in data 
+total_num_subjects_in_data <- nrow(raw_df %>%
+  group_by(prolific_subject_id) %>%
+  summarize(total_num_subjects_in_data = n()))
+
+```
+
+```{r}
+#| label: clean the survey df
+#| include: false
+
+surveys_cleaning_df <- raw_df %>%
+  # Filter for only surveys
+  filter(trial_type == "survey") %>%
+  # Remove control interventions (these are coded as surveys)
+  filter(phase != "control-intervention") %>%
+  # Remove the matrix question titles because they mess with separating questions from answers
+  # republican/democrat (pre-convo)
+  mutate(across(everything(), ~ gsub(',"rating-republicans":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub(',"rating-democrats":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-republicans":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-democrats":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans":null', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats":null', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-republicans":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-democrats":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats":', '', .))) %>%
+  # republican/democrat (post-convo)
+  mutate(across(everything(), ~ gsub('"rating-republicans-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-democrats-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-republicans-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"rating-democrats-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-republicans-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"interacting-with-democrats-post":', '', .))) %>%
+  #topic-specific polarization (pre-convo)
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization":', '', .))) %>%
+  #topic-specific polarization (post-convo)
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization-post":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"euthanasia-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"gender-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"healthcare-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"bombing-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"vaccines-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"criminal-polarization-post":', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"same-sex-polarization-post":', '', .))) %>%
+  # the name of the question in 2.1 run of the experiment
+  mutate(across(everything(), ~ gsub('topicChoice":', '', .))) %>%
+  # the name of the question in future runs of the experiment
+  mutate(across(everything(), ~ gsub('topic":', '', .))) %>%
+  mutate(across(everything(), ~ gsub(',null,', '', .))) 
+
+  
+surveys_df <- surveys_cleaning_df %>%
+  # Remove weird characters but don't remove quotations because we need them for separating questions
+  mutate(across(everything(), ~ gsub('}', '', .))) %>%
+  mutate(across(everything(), ~ gsub('\\{', '', .))) %>%
+  mutate(across(everything(), ~ gsub('\\[', '', .))) %>%
+  mutate(across(everything(), ~ gsub('\\]', '', .))) %>%
+  # Make each question its own row
+  separate_rows(response, sep = ',"') %>%
+  # Remove any leftover quotation marks
+  mutate(across(everything(), ~ gsub('"', '', .))) %>%
+  # Move answers to a new column
+  separate(response, into = c("question", "answer"), sep = ":", extra = "merge", fill = "right") %>%
+  # Remove all remaining questions that were answered with null (like the slider questions, because the slider 'placeholder' questions are where people actually answer the slider questions)
+  filter(!is.na(answer) & answer != 'null' & answer != 'null,null') %>%
+  # Remove the gender polarization line that we currently don't know how to code 
+  filter(!grepl("Gender should be disregarded when selecting candidates for career advancement opportunities", question)) %>%
+  # Bin the religious affiliations because they were free response 
+   mutate(answer = case_when(
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "christian") ~ "Christian/Catholic",
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "catholic") ~ "Christian/Catholic",
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "atheis|none|") ~ "Atheist/None",
+    question == "religious-affiliation" & str_detect(str_to_lower(answer), "Nothing in Particular") ~ "Atheist/None",
+    TRUE ~ answer
+  )) 
+
+```
+
+```{r}
+#| label: Create a df that flags people who failed the attention check
+#| include: false
+
+attention_check <- surveys_df %>%
+  filter(question == "attention-check-slider-post-placeholder" | question == "attention-check-slider-pre-placeholder") %>%
+  group_by(prolific_subject_id) %>%
+  mutate(flag = case_when(
+    sum(answer == "0.00") == 0 ~ "double fail", #double fail means we should reject their data
+    sum(answer == "0.00") == 1 ~ "single fail", #single fail is not means for rejecting data
+    sum(answer == "0.00") == 2 ~ "pass", #good subject :3
+    TRUE ~ NA_character_
+  )) %>%
+  ungroup() %>%
+  select(flag, question, answer, prolific_subject_id, "Time taken (minutes)", condition) 
+
+# extract value for text 
+total_failed_attention_checks <- attention_check %>%
+  # excluding people for both fails
+  filter(flag == 'double fail' | flag == 'single fail') %>%
+  # add distinct because there are two attention check questions so a failed subject gets flagged twice
+  summarize(total_failed_attention_checks = n_distinct(prolific_subject_id)) %>%
+  pull(total_failed_attention_checks)
+
+# get count of how many ppl double failed
+failed_attention_checks_subject_ids <- attention_check %>%
+  filter(flag == 'double fail') %>%
+  distinct(prolific_subject_id) %>%
+  pull(prolific_subject_id)
+
+```
+
+```{r}
+#| label: Remove subs who failed attention check 
+#| include: false
+
+# remove bad subs
+raw_df <- raw_df %>%
+  filter(!(prolific_subject_id %in% total_failed_attention_checks))
+    
+surveys_df <- surveys_df %>%
+  filter(!prolific_subject_id %in% failed_attention_checks_subject_ids) 
+  
+total_num_clean_subjects_in_data <- nrow(raw_df %>%
+  group_by(prolific_subject_id) %>%
+  summarize(total_num_clean_subjects_in_data = n()))
+
+```
+
+## Introduction
+
+Existing literature indicates that a complex interplay of psychological factors—including fear of social isolation (Spiral of Silence), identity protection (Social Identity Theory), communication anxiety (Communication Apprehension), and emotional dysregulation—converge with sociocultural influences like opinion climate, misinformation, and cognitive biases to deter open dialogue. People avoid controversial discussions primarily due to perceived threats to their social standing, personal identity, and emotional well-being. This avoidance is often a coping mechanism, reinforced by group dynamics and the spread of misinformation, ultimately hindering constructive discourse and critical thinking. Understanding this phenomenon is critical for fostering democratic citizenship, promoting critical thinking, and cultivating inclusive learning environments.
+
+These problems can be combated on systemic and individual levels. Based on the information that will follow in this report, interventions on the individual level can include reducing communication apprehension, providing tools for difficult conversations, and building skills such as emotional regulation, respectful dissent, sensitivity towards others, and open-minded perspective-taking. We are focusing on the individual level through one-on-one human-chatbot conversations. These conversations are about controversial topics with strong moral components, which are thought to evoke many of the factors that play into individual unwillingness to converse. By curating a space where users are led to cultivate and practice the individual-level interventions which should increase users’ competencies in navigating difficult conversations, we hope to increase users’ willingness to participate in these difficult conversations.
+
+Intervention Limitations
+
+The literature clearly indicates that while individual skills like emotional regulation, communication competence, and conflict management are vital for engaging in difficult conversations, their effective application is deeply intertwined with the social environment. Thus, by not directly intervening on the systemic level, which includes aspects such as creating a psychologically safe environment, challenging negative norms, and promoting inclusivity, we are missing pieces of the puzzle that significantly influence individual willingness, especially “psychological safety.” 
+
+Psychological safety is the belief that one can speak openly and truthfully about problems without fear of reprisal; it is built upon three core pillars: care, consistency, and normalizing mistakes. Psychological safety is suggested to largely relate to group culture and norms in a conversation. Through developing greater abilities to navigate difficult conversations, users of our intervention may influence future group climates, which, in turn, could contribute to each member’s sense of psychological safety. This idea goes hand in hand with the finding that widespread individual avoidance can contribute to the formation of a silent, unsupportive opinion climate. However, the literature suggests that psychological safety is largely curated through systemic changes, especially for creating an environment where people from marginalized communities can experience the same sense of psychological safety as conventionally celebrated voices. Future research could explore applications of chatbots for systemic interventions.
+
+Our primary goal, though, is to focus on the direct effects of individual interventions. By focusing solely on the individual level, perhaps users will grow in their abilities to navigate these difficult conversations even in spaces with poor group cultures or norms. 
+
+## Methods
+
+### Participants and Procedure 
+
+We currently have data from `r total_num_subjects_in_data` subjects in our willingness survey questions pretest experiment, which we gathered on Prolific. To remain consistent with the demographic that our main experiment will target, we restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of one dollar. We excluded `r total_failed_attention_checks` subjects for failing one or more of the attention checks. After applying this exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain. 
+
+Upon agreeing to participate in this experiment, participants were brought to the experiment webpage, http://54.234.217.37/jdeleeuw/ursi2024/experiment/experiment.html, where they were asked to complete our questionnaire. The questionnaire was composed of basic demographic questions, a question to ascertain which of our six topics the participant was most unwilling to discuss, and then our willingness survey questions. After completing the questionnaire, participants were sent back to Prolific.
+
+
+```{r}
+#| label: Reverse code for quantitative analysis
+#| include: false
+
+reverse_coded_scores_df <- surveys_df %>%
+   # In the experiment code, we put '@R@' in all statements that are supposed to be reverse coded. So we can grab all of those statements here and reverse them. The only statements that don't have @R@ are the pre-convo survey polarization statements because those were converted into strings for the chatbot to use
+   mutate(answer = ifelse(
+         grepl("@R@", question) | 
+         grepl("It is not right for family members to request euthanasia on behalf of incapacitated patients", question) | 
+         grepl("Euthanasia should be banned for patients with non-terminal conditions", question) |
+         grepl("Euthanasia should be banned for all patients", question) |
+         grepl("Euthanasia should not be performed at home", question) |
+         grepl("The competitive market should drive healthcare prices", question) |
+        grepl("Policies that take gender into account often do more harm than good in achieving gender equality", question) | 
+          grepl("Gender should be disregarded when selecting candidates for career advancement opportunities to ensure that selections are based on merit", question) | 
+          grepl("Policies aimed at reducing inequality for women often create unfair advantages for women over men", question) |
+         grepl("The bombings were justified to bring a swift end to the war", question) |
+         grepl("Preventing people without vaccinations from entering public spaces and transportation would do more harm than good", question)  |
+         grepl("Businesses and institutions should be barred from discriminating based on vaccination status", question) |
+         grepl("It is not right to provide the same federal rights and support for same-sex couples as opposite-sex couples", question),
+     7 - as.numeric(answer),
+     answer
+   )) 
+
+sliders_df <- reverse_coded_scores_df %>%
+filter(grepl("slider", question))
+
+#change to be based around 0
+reverse_coded_mean_zero_scores_df <- reverse_coded_scores_df %>%
+filter(!grepl("slider", question)) %>%
+  mutate(answer = recode(as.numeric(answer),
+                         `7` = 3,
+                         `6` = 2,
+                         `5` = 1,
+                         `4` = 0,
+                         `3` = -1,
+                         `2` = -2,
+                         `1` = -3,
+                         .default = as.numeric(answer)
+  ))
+```
+
+```{r}
+#| label: Time taken on surveys
+#| echo: false 
+
+#Find time taken on first survey and time taken on second survey. Also subtract for the different. Also, look at whether there's a difference for control people versus chatbot people
+
+#finding time taken on pre survey
+pre_intervention_survey_time_df <- raw_df %>%
+  filter(grepl('survey', phase), grepl('pre', phase)) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(pre_time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
+  select(prolific_subject_id, condition, pre_time_minutes)
+
+#removing duplicate rows
+pre_intervention_survey_time_df <- unique(pre_intervention_survey_time_df)
+
+#finding time taken on post survey
+post_intervention_survey_time_df <- raw_df %>%
+  filter(grepl('survey', phase), grepl('post', phase)) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(post_time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
+  select(prolific_subject_id, post_time_minutes)
+
+#removing duplicates
+post_intervention_survey_time_df <- unique(post_intervention_survey_time_df)
+
+#merge dfs to view differences 
+survey_time_df <- pre_intervention_survey_time_df %>%
+  full_join(post_intervention_survey_time_df, by = "prolific_subject_id") %>%
+  mutate(difference_pre_post_time_minutes = pre_time_minutes - post_time_minutes) %>%
+  ungroup()
+
+```
+
+```{r}
+#| label: Word counts
+#| echo: false
+
+free_response_word_counts <- free_response %>%
+  filter(!is.na(word_count))
+
+conversations_messages_word_counts <- conversations_df %>%
+  filter(grepl('USER', logs)) %>%
+  mutate(across(everything(), ~ gsub('","time":.*', '', .))) %>%
+  mutate(across(everything(), ~ gsub('USER:"', '', .))) %>%
+  mutate(conversation_word_count = str_count(logs, '\\S+')) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(avg_convo_message_word_count = mean(as.numeric(conversation_word_count), na.rm = TRUE)) %>%
+  select(prolific_subject_id, avg_convo_message_word_count, logs, conversation_word_count)
+
+reflections_word_counts <- reflections_df %>% 
+  mutate(reflection_word_count = str_count(response, '\\S+')) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(avg_reflection_word_count = mean(as.numeric(reflection_word_count), na.rm = TRUE)) %>%
+  select(prolific_subject_id, avg_reflection_word_count, response, reflection_word_count)
+
+```
+
+```{r}
+#| label: Values from word count & time spent 
+#| include: false 
+
+avg_free_response_word_count <- round(mean(free_response_word_counts$word_count, na.rm = TRUE), 1)
+
+range_free_response_word_count <- round(range(free_response_word_counts$word_count, na.rm = TRUE), 1)
+
+```
+
+```{r}
+#| label: tbl-basic-demographics-table
+#| echo: false
+#| tbl-cap: Table of basic demographics.
+
+#we already read in demographics earlier 
+
+#create a demographics table from the demographics questions in our survey. turn the demographics questions from question column into their own columns with answer as the entries within the column
+survey_demographics_df <- surveys_df %>%
+filter(question == 'ethnicity' | question == 'political-affiliation' | question == 'gender-identification' | question == 'education-level' | question == 'religious-affiliation' | question == 'political-ideology') %>%
+select(question, answer, prolific_subject_id, condition) %>%
+pivot_wider(names_from = question, values_from = answer)
+
+#merge our two demographics tables
+demo_table_df <- survey_demographics_df %>%
+  left_join(full_prolific_demographics_df, by = "prolific_subject_id", suffix = c("_prolific", ""))
+
+#make a region column because showing each state is excessive
+demo_table_df$Region <- ifelse(demo_table_df$`Current u.s state of residence` %in% c("California (CA)", "Colorado (CO)", "Utah (UT)", "Utah(UT)", "Idaho (ID)", "Alaska (AK)", "Hawaii (HI)", "Washington (WA)", "Oregon (OR)", "Nevada (NV)", "New Mexico (NM)", "Montana (MT)", "Arizona (AZ)", "Wyoming (WY)"), "West",
+                     ifelse(demo_table_df$`Current u.s state of residence` %in% c("Texas (TX)", "Florida (FL)", "Georgia (GA)", "North Carolina (NC)", "Tennessee (TN)", "South Carolina (SC)", "Alabama (AL)", "Mississippi (MS)", "Louisiana (LA)", "Delaware (DE)", "Maryland (MD)", "Virginia (VA)", "Washington, D.C. (DC)", "West Virginia (WV)", "Kentucky (KY)", "Arkansas (AR)", "Oklahoma (OK)"), "South",
+                            ifelse(demo_table_df$`Current u.s state of residence` %in% c("New York (NY)", "New Jersey (NJ)", "Massachusetts (MA)", "Pennsylvania (PA)", "Connecticut (CT)", "Rhode Island (RI)", "Vermont (VT)", "New Hampshire (NH)", "Maine (ME)"), "Northeast",
+                                   ifelse(demo_table_df$`Current u.s state of residence` %in% c("Michigan (MI)", "Illinois (IL)", "Ohio (OH)", "Indiana (IN)", "Wisconsin (WI)", "Minnesota (MN)", "Iowa (IA)", "Missouri (MO)", "Kansas (KS)", "Nebraska (NE)", "South Dakota (SD)", "North Dakota (ND)"), "Midwest", NA))))
+
+
+# define the levels in categorical variables so that they are organized in the table 
+demo_table_df$'political-affiliation' <- fct_relevel(
+  demo_table_df$'political-affiliation',
+  "Republican",
+  "Democrat",
+  "Independent",
+)
+
+
+demo_table_df$'education-level' <- fct_relevel(
+  demo_table_df$'education-level',
+  "High school diploma or GED",
+   "Some college; no degree",
+  "Associate degree",
+  "Bachelor's degree",
+   "Master's degree",
+)
+
+
+demo_table_df$'political-ideology' <- fct_relevel(
+  demo_table_df$'political-ideology',
+"Very conservative",
+"Conservative",
+"Somewhat conservative",
+"Moderate",
+"Somewhat liberal",
+"Liberal",
+"Very liberal"
+)
+
+demo_table_df <- demo_table_df %>%
+  mutate(across(where(is.factor), ~ droplevels(.)))
+
+demographics_table <- tbl_summary(demo_table_df,
+ by = NULL,
+  label = list(
+    `Time taken (minutes)` = "Time taken (minutes)",
+    `Region` = "Current U.S. region of residence",
+    Age = "Age (years)",
+    Sex = "Sex",
+    `Ethnicity simplified` = "Ethnicity simplified",
+    `political-affiliation` = "Political affiliation",
+    `education-level` = "Education level",
+    `religious-affiliation` = "Religious affiliation",
+    `political-ideology` = "Political ideology"
+  ),
+  statistic = NULL,
+#list(
+  #  all_continuous() ~ "{mean} ({sd})",
+  #  all_categorical() ~ "{n} ({p}%)"
+#),
+  type = list(
+    `Time taken (minutes)` = "continuous",
+    `Region` = "categorical",
+    `Age` = "continuous",
+    `gender-identification` = "categorical",
+   `Sex` = "categorical",
+    `Ethnicity simplified` = "categorical",
+    `political-affiliation` = "categorical",
+    `education-level` = "categorical",
+    `religious-affiliation` = "categorical",
+    `political-ideology` = "categorical"
+  ),
+  digits = list(
+    all_continuous() ~ 2,
+    all_categorical() ~ 0
+  ),
+  value = NULL,
+  missing = NULL,
+  missing_text = NULL,
+  sort = NULL,
+  percent = NULL,
+ include = c(
+'Time taken (minutes)', 
+'Region', 
+'Age', 
+'Sex', 
+'Ethnicity simplified', 
+'political-affiliation', 
+'education-level', 
+'religious-affiliation', 
+'political-ideology'
+))
+ # %>%  modify_header(label = "**whatever label i want**")
+
+# Print the table
+as_gt(demographics_table)
+
+```
+
+```{r}
+#| label: calculating average times
+#| echo: false
+
+time_figure_df <- time_plot_df %>%
+  group_by(Condition) %>%
+  select(-condition_general) %>%
+  summarise(
+    Mean = round(mean(time_minutes, na.rm = TRUE), 1),
+    Min = round(min(time_minutes, na.rm = TRUE), 1),
+    Max = round(max(time_minutes, na.rm = TRUE), 1)
+  ) %>%
+  rename(
+    'Survey time (mean, min–max in minutes)' = Mean
+  )
+
+time_stats <- time_figure_df
+mean_survey_time <- time_stats$`Survey time (mean, min–max in minutes)`
+min_survey_time <- time_stats$Min
+max_survey_time <- time_stats$Max
+
+```
+
+### Materials
+
+#### Supporting Literature
+
+We developed our willingness questions based on existing literature about the concerns and reason that contribute to a person's unwillingness to participate in conversations, especially conversations about divisive topics. 
+
+Elisabeth Noelle-Neumann's Spiral of Silence theory, developed in the 1960s and '70s, offers a foundational understanding of how individuals' willingness to express opinions on controversial public issues is influenced by their perception of those opinions as popular or unpopular. This theory suggests that the prevailing opinion held by the majority in a specific social setting, such as a classroom or public forum, profoundly influences an individual's willingness to participate in discussions. If one's view is perceived as opposed to the majority, individuals are less likely to express it, a phenomenon directly linked to the Spiral of Silence. Individual psychological factors, such as communication apprehension and fear of conflict, are not isolated but are significantly influenced by the prevailing opinion climate.
+
+The theory's key elements revolve around a fundamental human apprehension: the fear of social isolation, which is triggered by the belief that others will consider the individual not merely mistaken, but morally deficient. Individuals thus tend to refrain from publicly stating their views on controversial matters when they perceive that doing so would attract criticism, scorn, laughter, or other signs of disapproval.
+
+The Social Identity Theory (SIT) suggests that when controversial issues are discussed, individuals may experience "identity threat" if their ideas and feelings about these issues are deeply connected to their identity or in-group, such as their race. Identity threat is defined as "experiences appraised as indicating potential harm to the value, meanings, or enactment of an identity.” 
+
+The accentuation of differences between in-groups and out-groups, coupled with the desire for positive distinctiveness, can intensify intergroup hostility and conflict, especially when competition or perceived threats exist. This can lead to negative perceptions of out-groups, even bordering on dehumanization, where less of certain human attributes are ascribed to the "other". Such vilifying views, often marked by beliefs that opponents are "wicked and untrustworthy", make constructive dialogue exceedingly difficult, as the "other" is seen as an adversary rather than a conversational partner. 
+
+This strong in-group cohesion, while providing social support and validation, can paradoxically foster communication siloing. SIT highlights that people identify with in-groups to enhance their self-esteem and perceive their in-group favorably. This desire for "positive distinctiveness" motivates them to accentuate differences with out-groups. When controversial topics arise, challenging an in-group's perspective can be perceived as an "identity threat", leading to defensive behaviors like derogating or distancing from out-group views. This process also contributes to "group polarization," where discussions with like-minded peers strengthen original beliefs and lead to more extreme stances.
+
+Communication Apprehension (CA) is a broad term referring to an individual's "fear or anxiety associated with either real or anticipated communication with another person or persons". It is thought to be a fundamental psychological response to evaluation. Research indicates that approximately 70% of individuals in the US experience CA when giving a speech, with 20% having severe CA that leads to avoidance of oral communication in personal, public, and professional settings. A significant driver of communication avoidance is the fear of conflict. People often avoid communication when it is likely to lead to an unpleasant outcome, such as offending someone or entering into conflict. This avoidance is primarily driven by a desire to minimize perceived threats to self-esteem and well-being, including the fear of rejection, disapproval, criticism, humiliation, or loss of security.
+
+CA suggests that the fear of conflict can lead people to systematically avoid "zero-sum situations"—where one party's gains are offset by another's losses—even when such avoidance is costly. This belief can erode interpersonal trust and increase hostility. Moreover, avoiding necessary difficult conversations leads to "conflict debt," which breeds resentment and allows unaddressed concerns to escalate into crises.
+
+Individuals with high CA experience significant fear and anxiety when faced with communication. This internal discomfort, along with a fear of negative outcomes like conflict or rejection, leads them to actively avoid communication. This avoidance, while providing immediate relief from anxiety, prevents the individual from experiencing that the feared outcomes might not occur or that they can cope with the anxiety. This creates a negative reinforcement loop: avoidance reduces immediate discomfort, but simultaneously strengthens the underlying fear and the avoidance habit, making it harder to engage in future difficult conversations.
+
+The concepts of emotional avoidance, emotional dysregulation, and affective forecasting,  reveal that avoidance is not just about external threats, but also an internal struggle. Emotional avoidance refers to the deliberate effort to suppress, ignore, or distract oneself from experiencing unpleasant feelings such as fear, sadness, anger, or vulnerability. Common tactics include denial, suppression, distraction, busyness, and steering clear of situations, people, or places that might evoke uncomfortable emotions.
+
+Emotional dysregulation (ED) is defined as the inability to regulate the intensity and quality of emotions to generate an appropriate emotional response. Emotional regulation strategies involve the ability to recognize, evaluate, modify, and manage emotions in a personal and socially acceptable way to maintain mental control over strong feelings and achieve adaptive functioning.
+
+Affective forecasting, or hedonic forecasting, is the prediction of how one will feel in the future. Research consistently demonstrates that people are poor predictors of their future well-being. They tend to overestimate the impact and duration of negative emotions in response to loss or difficult situations. This inaccuracy occurs because individuals often focus more on what they will lose than on what will stay the same (focalism), fail to envision how their own coping skills will lessen their unhappiness (immune neglect), and fail to envision how they might develop new values (adaptation). 
+
+Thus, avoidance is also an internal struggle to manage uncomfortable feelings and a flawed prediction of future emotional states, making the perceived "cost" of engagement seem higher than it might be.
+
+If a significant portion of a population struggles with emotional regulation and relies on avoidance as a primary coping mechanism for unpleasant feelings, this has implications beyond individual mental health. When collective emotional dysregulation is widespread, it can hinder a society's capacity for constructive dialogue on complex, emotionally charged issues. Individuals less equipped to handle the inherent discomfort of disagreement may resort to withdrawal, aggression, or rigid adherence to existing beliefs, rather than engaging in nuanced discussion. This suggests that the inability to manage emotions constructively during controversial discussions can lead to societal fragmentation, increased polarization, and a diminished capacity to find common ground or collectively problem-solve issues that require navigating diverse, often conflicting, emotional responses.
+
+#### Willingness survey design
+
+Based on this existing research, we developed a Likert-scale questionnaire which lists 19 concerns that might contribute to users' unwillingness to engage in a conversation about a topic that they are unwilling to discuss with others. We also created two questions which ask users to rate, on a scale from 0 to 100, their willingness to "have a conversation with someone who strongly disagrees with [them] about [conversation topic]" and "to have a conversation with someone who would push against [their] views about [conversation topic]," where a score of 0 is complete unwillingness, a score of 50 is neutral, and a score of 100 is absolute willingness to converse. 
+
+In our full-scale experiment, we intend to administer this questionnaire both before and after our chatbot intervention to assess which concerns, if any, our chatbot can mitigate. To ensure that this survey captures all of the primary reasons that contribute to unwillingness and can be targeted on the individual level, this pre-test experiment administered the questionnaire once and with a free-response question at the end: "What other reasons, if any, make you less willing to engage in conversations about [conversation topic]?"
+
+## Results
+
+### Basic stats
+
+On average, participants completed the questionnaire in `r mean_survey_minutes` minutes (`r min_survey_minutes`, `r max_survey_minutes`).
+
+```{r}
+#| label: tbl-time-df
+#| echo: false
+#| tbl-cap: Table showing time spent on survey.
+
+kable(time_figure_df)
+```
+
+
+```{r}
+#| label: fig-topic-ratings
+#| echo: false
+#| fig-cap: In the pre-intervention survey, each subject used a 7-pt scale to rate how comfortable they would be discussing each of the following topics. One of the subject's most strongly rated topics were randomly selected as the topic that the subject would focus on for the remainder of the experiment. The scale went from strongly uncomfortable (1), to moderately uncomfortable, a little uncomfortable, neutral (4), a little comfortable, moderately comfortable, and strongly comfortable (7).
+
+# create figure/table showing distribution of ratings on topics
+topic_ratings_df <- surveys_df %>%
+    filter(grepl("topic-", question)) %>%
+  mutate(answer = as.numeric(answer)) %>%
+  select(prolific_subject_id, question, answer, topicChoiceAsString, condition)
+  
+topic_labels <- c(
+  "topic-mandating vaccines in the U.S." = 
+    "Mandating vaccines",
+  "topic-human euthanasia in the U.S." = 
+    "Human euthanasia",
+  "topic-the criminal justice system in the U.S." = 
+    "Criminal justice system",
+  "topic-same-sex marriage in the U.S." = 
+    "Same-sex marriage",
+  "topic-the role of the U.S. government in healthcare" = 
+    "Government in healthcare",
+  "topic-gender equality in the U.S." = 
+    "Gender equality"
+)
+
+topic_ratings_plot <- ggplot(topic_ratings_df, aes(x = answer, y = question, fill = question)) +
+  geom_density_ridges() +
+  # give the qualitative meanings of 1-7
+  scale_x_continuous(breaks = seq(1, 7, by = 1)) +
+   scale_y_discrete(labels = topic_labels) +
+  # make it look nicer
+  theme_ridges() +      
+  # remove the legend
+  theme(legend.position = "none") +
+  labs(title = "Ridgeline Plot of Ratings by Topic",
+       x = "Rating",
+       y = "Contentious Topic")
+
+print(topic_ratings_plot)
+```
+
+```{r}
+#| label: fig-polarization-hist
+#| echo: false
+#| fig-cap: Histogram of mean ratings of opinions on topic-specific statements. Subjects rated their opinions on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
+
+polarization_hist <- ggplot(polarization_df, aes(mean_score, color = condition)) +
+  geom_hist() +  
+  labs(y = "Mean rating", title = "Mean ratings of olarization of topic-specific beliefs.", color = "Group")
+
+print(polarization_hist)
+
+```
+
+```{r}
+#| label: fig-offending-reason-hist
+#| echo: false
+#| fig-cap: Histogram with mean ratings of reasons subjects might be unwilling to converse about their topic. Subjects rated how true the reasons were to them on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
+
+offending_reason_hist <- ggplot(offending_reason_df, aes(mean_score, color = condition)) +
+  geom_hist() + 
+  labs(y = "Mean rating", title = "Change in how much different concerns affect willingness to converse.", color = "Group")
+
+print(offending_reason_hist)
+
+```
+
+```{r}
+#| label: fig-sliders-hist
+#| echo: false
+#| fig-cap: Histogram with mean ratings of willingness to converse. Subjects rated their willingness on a slider from 0 to 100, where a rating of 0 meant subject was absolutely unwilling and a rating of 100 meant subject was absolutely willing.
+
+
+sliders_hist <- ggplot(merged_sliders_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in willingness to converse about selected topic with others.", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(sliders_hist)
+
+```
+
+```{r}
+#| label: fig-openmindedness-hist
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of subjects' open-mindedness when discussing their topic. Subjects rated their open-mindedness on a scale from 0 to 7, where a rating of 0 meant subject was not open-minded and a rating of 7 meant subject was open-minded.
+
+openmindedness_hist <- ggplot(merged_openmindedness_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in open-mindedness ratings before and after conversations.", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(sliders_hist)
+
+
+```
+
+### Free response 
+
+We conducted two primary analyses. First, we analyzed free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data. This analysis was performed manually. We found that [list results].
+
+```{r}
+#| label: tbl-bot-free-response-examples
+#| echo: false
+#| tbl-cap: Table showing examples of subjects' responses to free response question.
+
+free_response_figure <- free_response %>%
+  # turn each question into its own column so one subject can be one row
+  pivot_wider(names_from = question, values_from = answer) %>%
+  # for each subject, smash all the rows together into one
+  group_by(prolific_subject_id) %>%
+  reframe(across(everything(), ~ paste(unique(na.omit(.)), collapse = "; "))) %>%
+  # unnecessary columns for visual display
+  select(-c(prolific_subject_id, pilot_iteration.x, word_count)) %>%
+  rename(
+    Condition = condition,
+    'Topic Choice' = 'topicChoiceAsString',
+    'Other reasons for unwillingness?' = 'willingness-free-response'
+    )
+
+kable(free_response_figure, "html") %>%
+  kable_styling() %>%
+  column_spec(2, width = "5em") %>%
+  column_spec(c(3,4,5,5), width = "40em")
+```
+
+```{r}
+#| label: tbl-bot-free-response-df
+#| echo: false
+#| tbl-cap: Table showing subjects' responses to free response question.
+
+# CHANGE THIS CODE AS NEEDED BASED ON HOW THE DF IS STRUCTURED 
+
+free_response_bar_plot <- ggplot(INSERT_DF_NAME_HERE, aes(x = count, y = reorder(statement, count))) +
+  geom_col(fill = "cornflowerblue") +
+  labs(
+    x = "Number of Participants",
+    y = NULL,
+    title = "Number of Participants Endorsing Each Statement"
+  ) +
+  theme_minimal(base_size = 13)
+
+print(free_response_bar_plot)
+
+```
+
+
+### Factor analysis
+
+Secondly, we conducted a factor analysis on the 19 given items to determine which concerns, if any, are correlated with each other. We found that [list results]. 
+
+```{r}
+#| label: KMO, Bartlett's test, parallel analysis on 19-item matrix
+#| echo: false
+
+# create short labels for each question
+question_key_for_fa <- surveys_df %>%
+  distinct(question) %>%
+  arrange(question) %>%  # ensure consistent order
+  mutate(short_label = paste0("Q0", row_number()))
+
+# join short labels back to the main data
+surveys_df_labeled_questions <- surveys_df %>%
+  left_join(question_key_for_fa, by = "question")
+
+concerns <- survey_df %>% select(starts_with("Q0"))
+
+# KMO and Bartlett’s test
+KMO(concerns)
+cortest.bartlett(cor(concerns), n = nrow(concerns))
+
+# Parallel analysis
+fa.parallel(concerns, fa = "fa")
+
+```
+
+```{r}
+#| label: Factor analysis on 19 items 
+#| echo: false
+
+
+# select relevant columns and pivot to wide format using short labels
+factor_analysis_wide_df <- surveys_df_labeled_questions %>%
+  select(prolific_subject_id, short_label, answer) %>%
+  pivot_wider(
+    names_from = short_label,
+    values_from = answer
+  )
+
+# remove any rows with missing values (there shouldn't be any though)
+factor_analysis_wide_complete_df <- factor_analysis_wide_df %>%
+  drop_na()
+
+# determine number of factors with parallel analysis
+fa.parallel(factor_analysis_wide_complete_df[-1], 
+            fa = "fa", 
+            n.iter = 100)
+
+# run factor analysis with the chosen number of factors
+fa_result <- fa(
+  factor_analysis_wide_complete_df[-1], 
+  nfactors = [INSERT_NUMBER_OF_FACTORS], 
+  rotate = "oblimin", 
+  fm = "ml"
+  )
+
+# print results
+print(fa_result, cutoff = 0.3)  # show loadings above .3 NOT SURE IF THIS IS A GOOD CHOICE OF CUTOFF 
+```
+
+```{r}
+#| label: tbl-correlation-matrix
+#| echo: false
+#| tbl-cap: Correlation matrix of reasons for unwillingness
+
+cor_matrix <- cor(concerns, use = "pairwise.complete.obs")
+corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
+
+```
+
+```{r}
+#| label: Check internal consistency 
+#| echo: false
+
+psych::alpha(concerns)
+
+```
+
+```{r}
+#| label: tbl-factor-loadings-visual
+#| echo: false
+#| tbl-cap: Table visualizing factor loadings.
+
+# visualize factor loadings
+loadings_df <- as.data.frame(fa_result$loadings[1:19, ])
+loadings_df$short_label <- rownames(loadings_df)
+
+loadings_long <- loadings_df %>%
+  pivot_longer(-question, names_to = "factor", values_to = "loading")
+
+factor_loadings_plot <- ggplot(loadings_long, aes(x = reorder(question, loading), y = loading, fill = factor)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Factor Loadings",
+    x = "Question",
+    y = "Loading",
+    fill = "Factor"
+  ) +
+  theme_minimal()
+
+print(factor_loadings_plot)
+
+```
+
+```{r}
+#| label: tbl-fa-heat-map-df
+#| echo: false
+#| tbl-cap: Table showing factor analysis heat map.
+
+fa_heat_map <- ggplot(loadings_long, aes(x = factor, y = reorder(question, desc(question)), fill = loading)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(
+    low = "blue", mid = "white", high = "red",
+    midpoint = 0, limit = c(-1, 1), name = "Loading"
+  ) +
+  labs(
+    title = "Heat Map of Factor Loadings",
+    x = "Factor",
+    y = "Question"
+  ) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 10))
+
+print(fa_heat_map)
+
+```
+
+
+### Additional analyses 
+
+Additionally, we looked for any correlations between polarization and willingness concerns. 
+
+```{r}
+#| label: Correlations polarization vs. willingness concerns 
+#| echo: false
+#| tbl-cap: Correlation matrix of polarization vs. willingness concerns 
+
+# look at correlation between polarization score and each willingness concern
+cor_results <- concerns %>%
+  map_dfr(~ tidy(cor.test(.x, survey_df$polarization_score)), .id = "item")
+
+# view results
+cor_results %>%
+  select(item, estimate, p.value) %>%
+  arrange(p.value)
+
+```
+
+```{r}
+#| label: Correlations willingness sliders vs. willingness concerns 
+#| echo: false
+
+survey_df$slider_avg <- rowMeans(survey_df %>% select(slider_1, slider_2), na.rm = TRUE)
+
+apply(concerns, 2, function(x) cor(x, survey_df$slider_avg, use = "pairwise.complete.obs"))
+
+```
+
+Next, we looked for correlations between willingness concerns and overall willingness as indicated by the slider questions.
+
+```{r}
+#| label: Look at concerns as predictors of overall willingness 
+#| echo: false 
+
+model <- lm(willingness_avg ~ ., data = cbind(survey_df["slider_avg"], concerns))
+summary(model)
+
+# Multicollinearity check
+library(car)
+vif(model)
+
+```
+
+Then, we assessed whether any willingness concerns are significant predictors of overall willingness through the use of a multiple linear regression model. We found that [results].
+
+```{r}
+#| label: Cluster analysis
+#| echo: false 
+
+# Scale data
+concerns_scaled <- scale(concerns)
+
+# Determine optimal number of clusters
+library(factoextra)
+fviz_nbclust(concerns_scaled, kmeans, method = "wss")
+
+# K-means with k = 3 (example)
+set.seed(123)
+kmeans_result <- kmeans(concerns_scaled, centers = 3)
+survey_df$cluster <- kmeans_result$cluster
+
+# Visualize clusters with PCA
+library(ggfortify)
+autoplot(prcomp(concerns_scaled), data = survey_df, colour = 'cluster')
+```
+We also conducted cluster analysis to determine whether participants generally fell into certain categories of concerns. 
+
+```{r}
+# If you have a 'topic' variable
+manova_result <- manova(as.matrix(concerns) ~ survey_df$topic)
+summary(manova_result)
+
+# Follow-up ANOVAs
+aov_results <- lapply(concerns, function(item) aov(item ~ survey_df$topic))
+lapply(aov_results, summary)
+
+```
+
+Finally, we ran ANOVAs to determine whether there were significant differences in how participants with different conversation topics responded to our survey. 
+
+## Discussion
+
+## References
