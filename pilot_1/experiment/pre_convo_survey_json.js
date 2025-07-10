@@ -397,9 +397,15 @@ var pre_convo_survey_json = {
       ],
     },
     {
+      type: "html",
+      name: "image-intro",
+      html: `<img src="conversation.png" alt="Conversation Illustration" style="width: 50%; height: auto; display: block; margin: 0 auto 1em auto;" />`
+    },
+    {
       type: "matrix",
       name: "topic",
-      title: `Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following conversation topics, rate how willing you would be to engage in the conversation.
+      title: `
+    Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following conversation topics, rate how willing you would be to engage in the conversation.
       
      Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following potential topics, how willing would you be to actively engage in the conversation? 'Engage' here means not just observing, but also expressing your own views, listening openly to others, and participating respectfully.
       
