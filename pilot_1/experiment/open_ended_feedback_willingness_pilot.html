@@ -366,10 +366,14 @@
               html: '<div id="attention-check-slider-pre-placeholder"></div>', // Placeholder for the slider
             },
             {
-              type: "matrix",
-              name: "offending-reason",
-              title:
-                `Imagine you're asked to have a serious conversation about ${topic} with a group of people who mostly hold differing views from yours. Below is a list of potential concerns that you might have in the conversation. For each item, if it would concern you, rate how much it would affect your willingness to join the conversation on a scale from “Not at all” to “Extremely.” If an item wouldn’t concern you, then mark “Not at all.” (You may reflect on past experiences you've had in similar situations.)`,
+                type: "matrix",
+                name: "unwillingness-reason",
+                title:
+                    `Imagine you're asked to have a serious conversation about ${topic} with a group of people who mostly hold differing views from yours. Below is a list of potential concerns that you might have in the conversation. 
+                    
+                    If an item wouldn’t concern you, mark “Does not concern me.” If an item would concern you, rate how much it would impact your willingness to engage, from “Not at all” to “Extremely.” (You may reflect on past experiences you've had in similar situations.) 
+                    
+                    For example, if you are concerned that somebody might criticize or show disapproval of yours views and this concern makes you completely unwilling to engage, then mark that it affects your willingness "Extremely."`,
               isRequired: true,
               columns: [
                 {
@@ -400,89 +404,93 @@
                   value: 7,
                   text: "Extremely",
                 },
+                {
+                  value: 8,
+                  text: "Does not concern me",
+                },
               ],
               rows: [
                 {
-                  value: "offending-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
+                  value: "unwillingness-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
                   text: "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
                 },
                 {
-                  value: "offending-reason-Someone could criticize or show disapproval of my views",
+                  value: "unwillingness-reason-Someone could criticize or show disapproval of my views",
                   text: "Someone could criticize or show disapproval of my views",
                 },
                 {
                   value:
-                    "offending-reason-I would feel like my opinion is unpopular amongst the group.",
+                    "unwillingness-reason-I would feel like my opinion is unpopular amongst the group.",
                   text: "I would feel like my opinion is unpopular amongst the group.",
                 },
                 {
                   value:
-                    "offending-reason-My opinion is unpopular in general.",
+                    "unwillingness-reason-My opinion is unpopular in general.",
                   text: "My opinion is unpopular in general.",
                 },
                 {
                   value:
-                    "offending-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
+                    "unwillingness-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
                   text: "Someone could challenge ideas or beliefs that play an important role in making me who I am",
                 },
                 {
                   value:
-                    "offending-reason-I could feel humiliated or embarrassed in the conversation",
+                    "unwillingness-reason-I could feel humiliated or embarrassed in the conversation",
                   text: "I could feel humiliated or embarrassed in the conversation",
                 },
                 {
                   value:
-                    "offending-reason-I might struggle to explain my views to the others and/or come across as uninformed",
+                    "unwillingness-reason-I might struggle to explain my views to the others and/or come across as uninformed",
                   text: "I might struggle to explain my views to the others and/or come across as uninformed",
                 },
                 {
                   value:
-                    "offending-reason-The others might not make a full effort to hear and understand me",
+                    "unwillingness-reason-The others might not make a full effort to hear and understand me",
                   text: "The others might not make a full effort to hear and understand me",
                 },
                 {
                   value:
-                    "offending-reason-I don’t often participate in conversations like these",
+                    "unwillingness-reason-I don’t often participate in conversations like these",
                   text: "I don’t often participate in conversations like these",
                 },
                 {
-                  value: "offending-reason-The conversation could become awkward or tense",
+                  value: "unwillingness-reason-The conversation could become awkward or tense",
                   text: "The conversation could become awkward or tense",
                 },
                 {
-                  value: "offending-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
+                  value: "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
                   text: "The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
                 },
                 {
-                  value: "offending-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
+                  value: "unwillingness-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
                   text: "The conversation could negatively affect how I feel about the world during and/or afterward",
                 },
                 {
-                  value: "offending-reason-Someone might take offense to what I say",
+                  value: "unwillingness-reason-Someone might take offense to what I say",
                   text: "Someone might take offense to what I say",
                 },
                 {
-                  value: "offending-reason-I might take offense to what someone says",
+                  value: "unwillingness-reason-I might take offense to what someone says",
                   text: "I might take offense to what someone says",
                 },
                 {
-                  value: "offending-reason-I might feel disempowered, unheard, or invalidated",
+                  value: "unwillingness-reason-I might feel disempowered, unheard, or invalidated",
                   text: "I might feel disempowered, unheard, or invalidated",
                 },
                 {
-                  value: "offending-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+                  value: "unwillingness-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
                   text: "I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
                 },
                 {
-                  value: "offending-reason-I might struggle to remain productive and respectful",
+                  value: "unwillingness-reason-I might struggle to remain productive and respectful",
                   text: "I might struggle to remain productive and respectful",
                 },
                 {
-                  value: "offending-reason-I would not want to listen to the others discuss their views",
+                  value: "unwillingness-reason-I would not want to listen to the others discuss their views",
                   text: "I would not want to listen to the others discuss their views",
                 },
                 {
-                  value: "offending-reason-My views wouldn’t change",
+                  value: "unwillingness-reason-My views wouldn’t change",
                   text: "My views wouldn’t change",
                 },
               ],
