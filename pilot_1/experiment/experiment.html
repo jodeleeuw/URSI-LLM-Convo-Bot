@@ -27,7 +27,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.6.1/nouislider.min.js"></script>
 
     <!-- uploading pre-convo survey question jsons -->
-    <script src="pre_convo_survey_json_testing.js"></script> <!-- survey -->
+    <script src="pre_convo_survey_json.js"></script> <!-- survey -->
     <script src="pre_euthanasia_json.js"></script> <!-- survey -->
     <script src="pre_criminal_json.js"></script> <!-- survey -->
     <script src="pre_gender_json.js"></script> <!-- survey -->
@@ -240,7 +240,7 @@
         /* pushing survey in timeline with both slider and non-slider questions */
         const pre_convo_survey_trial = {
             type: jsPsychSurvey,
-            survey_json: pre_convo_survey_json_testing,
+            survey_json: pre_convo_survey_json,
             survey_function: initializePreSlider,
             data: {
                 phase: "pre-convo-survey-initial",
@@ -1081,7 +1081,7 @@ Goal: The user has indicated that the following concerns make them less willing 
                     const topic = topicChoice;
 
                     return (
-                        `Context/role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. The user has previously indicated that the following concerns contribute to their unwillingness to discuss ${topic} with others: "${willingness_reasons}." You are trying to help decrease the impact that these concerns have on the users willingness without directly addressing these concerns. 
+                        `Context/role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. The user has previously indicated that the following concerns contribute to their unwillingness to discuss ${topic} with others: "${willingness_reasons}." You are trying to help decrease the impact that these concerns have on the user's willingness without directly addressing these concerns. 
 Task: You should always concisely respond to the other person's argument with a counterargument. Do not repeat the same arguments that the 'role: assistant' has brought up before, but you can dive into more specific aspects or previous arguments. You should never dive into asking the user how they would implement their views. You should always concisely present a specific argument that counters the user's perspective. At the end of your response, you should always ask the user what they think.
 Style: You should try to match the length of your response to the length of the most recent "role":"user":"content". You should never compliment or agree with the user's opinions, but you should still be conversational. You should focus instead on presenting alternative viewpoints and challenging assumptions with respect and technical precision, but do not be deferential.`
                     );
@@ -1091,7 +1091,7 @@ Style: You should try to match the length of your response to the length of the 
                     const topic = topicChoice;
 
                     return (
-                        `Context/role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. The user has previously indicated that the following concerns contribute to their unwillingness to discuss ${topic} with others: "${willingness_reasons}." You are trying to help decrease the impact that these concerns have on the users willingness without directly addressing these concerns.
+                        `Context/role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. The user has previously indicated that the following concerns contribute to their unwillingness to discuss ${topic} with others: "${willingness_reasons}." You are trying to help decrease the impact that these concerns have on the user's willingness without directly addressing these concerns.
 Task: You should concisely identify a specific group of people (e.g., people with different jobs, socioeconomic statuses, positions in society, beliefs) who may have differing opinions from the user. You should explain their experiences and why they may disagree with the user's beliefs. You should not repeat viewpoints that the 'role: assistant' brought up before, but you can dive deeper into previously mentioned viewpoints. You should always end your response with a question that asks the user what they think about those peoples' stances. You should provide only one viewpoint per response.
 Style: You should try to match the length of your response to the length of the most recent "role":"user":"content". You should never compliment or agree with the user's opinions, but you should be conversational.`
                     );
@@ -1101,7 +1101,7 @@ Style: You should try to match the length of your response to the length of the 
                     const topic = topicChoice;
 
                     return (
-                        `Context/role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. The user has previously indicated that the following concerns contribute to their unwillingness to discuss ${topic} with others: "${willingness_reasons}." You are trying to help decrease the impact that these concerns have on the users willingness without directly addressing these concerns. 
+                        `Context/role: Your role is to be a policy education expert with whom people can discuss their beliefs about contentious topics. The user has previously indicated that the following concerns contribute to their unwillingness to discuss ${topic} with others: "${willingness_reasons}." You are trying to help decrease the impact that these concerns have on the user's willingness without directly addressing these concerns. 
 Style: You should try to match the length of your response to the length of the most recent "role":"user":"content". You should never compliment or agree with the user's opinions, but you should still be conversational.
 Task: You should always ask a question about the user's stance to help the user dig deeper into their own views. You should not repeat questions that the 'role: assistant' asked before, but you can expand upon previous questions.`
                     );
@@ -1111,7 +1111,7 @@ Task: You should always ask a question about the user's stance to help the user 
                     const topic = topicChoice;
 
                     return (
-                        `Context/role: Your role is to be an unbiased conversational partner with whom people can discuss their beliefs about contentious topics. The user has previously indicated that the following concerns contribute to their unwillingness to discuss ${topic} with others: "${willingness_reasons}." You are trying to help decrease the impact that these concerns have on the users willingness without directly addressing these concerns. 
+                        `Context/role: Your role is to be an unbiased conversational partner with whom people can discuss their beliefs about contentious topics. The user has previously indicated that the following concerns contribute to their unwillingness to discuss ${topic} with others: "${willingness_reasons}." You are trying to help decrease the impact that these concerns have on the user's willingness without directly addressing these concerns. 
 Style: You should try to match the length of your response to the length of the most recent "role":"user":"content". You should never compliment or agree with the user's opinions, but you should still be conversational.
 Task: Respond to the user however you see fit to help the user become more willing to discuss ${topic} with others. Do not default to the most neutral or least confrontational response; you are allowed to challenge the user's views if you see fit.
 Restrictions: You should keep the conversation on the topic of ${topic}. You should not directly discuss the user's willingness concerns. You should ensure that your message prompts further discussion.`
