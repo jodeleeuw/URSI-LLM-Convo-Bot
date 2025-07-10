@@ -1,10 +1,13 @@
 ---
 title: "survey-pretest-analysis"
 format: html
+bibliography: mocareferences.bib
+citation-location: document
+reference-location: section
 editor: visual
 ---
 
-*# intended for summer 2025
+\*# intended for summer 2025
 
 ```{r}
 #| label: Data Fetching. Load R packages
@@ -267,22 +270,21 @@ Existing literature indicates that a complex interplay of psychological factors�
 
 These problems can be combated on systemic and individual levels. Based on the information that will follow in this report, interventions on the individual level can include reducing communication apprehension, providing tools for difficult conversations, and building skills such as emotional regulation, respectful dissent, sensitivity towards others, and open-minded perspective-taking. We are focusing on the individual level through one-on-one human-chatbot conversations. These conversations are about controversial topics with strong moral components, which are thought to evoke many of the factors that play into individual unwillingness to converse. By curating a space where users are led to cultivate and practice the individual-level interventions which should increase users’ competencies in navigating difficult conversations, we hope to increase users’ willingness to participate in these difficult conversations.
 
-Intervention Limitations
+### Limitations
 
-The literature clearly indicates that while individual skills like emotional regulation, communication competence, and conflict management are vital for engaging in difficult conversations, their effective application is deeply intertwined with the social environment. Thus, by not directly intervening on the systemic level, which includes aspects such as creating a psychologically safe environment, challenging negative norms, and promoting inclusivity, we are missing pieces of the puzzle that significantly influence individual willingness, especially “psychological safety.” 
+The literature clearly indicates that while individual skills like emotional regulation, communication competence, and conflict management are vital for engaging in difficult conversations, their effective application is deeply intertwined with the social environment. Thus, by not directly intervening on the systemic level, which includes aspects such as creating a psychologically safe environment, challenging negative norms, and promoting inclusivity, we are missing pieces of the puzzle that significantly influence individual willingness, especially “psychological safety.”
 
 Psychological safety is the belief that one can speak openly and truthfully about problems without fear of reprisal; it is built upon three core pillars: care, consistency, and normalizing mistakes. Psychological safety is suggested to largely relate to group culture and norms in a conversation. Through developing greater abilities to navigate difficult conversations, users of our intervention may influence future group climates, which, in turn, could contribute to each member’s sense of psychological safety. This idea goes hand in hand with the finding that widespread individual avoidance can contribute to the formation of a silent, unsupportive opinion climate. However, the literature suggests that psychological safety is largely curated through systemic changes, especially for creating an environment where people from marginalized communities can experience the same sense of psychological safety as conventionally celebrated voices. Future research could explore applications of chatbots for systemic interventions.
 
-Our primary goal, though, is to focus on the direct effects of individual interventions. By focusing solely on the individual level, perhaps users will grow in their abilities to navigate these difficult conversations even in spaces with poor group cultures or norms. 
+Our primary goal, though, is to focus on the direct effects of individual interventions. By focusing solely on the individual level, perhaps users will grow in their abilities to navigate these difficult conversations even in spaces with poor group cultures or norms.
 
 ## Methods
 
-### Participants and Procedure 
+### Participants and Procedure
 
-We currently have data from `r total_num_subjects_in_data` subjects in our willingness survey questions pretest experiment, which we gathered on Prolific. To remain consistent with the demographic that our main experiment will target, we restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of one dollar. We excluded `r total_failed_attention_checks` subjects for failing one or more of the attention checks. After applying this exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain. 
+Through Prolific, we gathered data from `r total_num_subjects_in_data` subjects. To remain consistent with the demographic that our main experiment will target, we restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of one dollar. We excluded `r total_failed_attention_checks` subjects for failing one or more of the attention checks. After applying this exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain.
 
 Upon agreeing to participate in this experiment, participants were brought to the experiment webpage, http://54.234.217.37/jdeleeuw/ursi2024/experiment/experiment.html, where they were asked to complete our questionnaire. The questionnaire was composed of basic demographic questions, a question to ascertain which of our six topics the participant was most unwilling to discuss, and then our willingness survey questions. After completing the questionnaire, participants were sent back to Prolific.
-
 
 ```{r}
 #| label: Reverse code for quantitative analysis
@@ -330,68 +332,47 @@ filter(!grepl("slider", question)) %>%
 #| label: Time taken on surveys
 #| echo: false 
 
-#Find time taken on first survey and time taken on second survey. Also subtract for the different. Also, look at whether there's a difference for control people versus chatbot people
-
 #finding time taken on pre survey
-pre_intervention_survey_time_df <- raw_df %>%
-  filter(grepl('survey', phase), grepl('pre', phase)) %>%
+survey_time_df <- raw_df %>%
+  filter(grepl('survey', phase)) %>%
   group_by(prolific_subject_id) %>%
-  mutate(pre_time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
-  select(prolific_subject_id, condition, pre_time_minutes)
+  mutate(time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
+  select(prolific_subject_id, condition, time_minutes)
 
 #removing duplicate rows
-pre_intervention_survey_time_df <- unique(pre_intervention_survey_time_df)
+survey_time_df <- unique(survey_time_df)
 
-#finding time taken on post survey
-post_intervention_survey_time_df <- raw_df %>%
-  filter(grepl('survey', phase), grepl('post', phase)) %>%
-  group_by(prolific_subject_id) %>%
-  mutate(post_time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
-  select(prolific_subject_id, post_time_minutes)
 
-#removing duplicates
-post_intervention_survey_time_df <- unique(post_intervention_survey_time_df)
+###  another df where i did the same thing but differently? check with one is right when i actually have data 
+time_figure_df <- time_plot_df %>%
+  group_by(Condition) %>%
+  select(-condition_general) %>%
+  summarise(
+    Mean = round(mean(time_minutes, na.rm = TRUE), 1),
+    Min = round(min(time_minutes, na.rm = TRUE), 1),
+    Max = round(max(time_minutes, na.rm = TRUE), 1)
+  ) %>%
+  rename(
+    'Survey time (mean, min–max in minutes)' = Mean
+  )
 
-#merge dfs to view differences 
-survey_time_df <- pre_intervention_survey_time_df %>%
-  full_join(post_intervention_survey_time_df, by = "prolific_subject_id") %>%
-  mutate(difference_pre_post_time_minutes = pre_time_minutes - post_time_minutes) %>%
-  ungroup()
+time_stats <- time_figure_df
+mean_survey_time <- time_stats$`Survey time (mean, min–max in minutes)`
+min_survey_time <- time_stats$Min
+max_survey_time <- time_stats$Max
 
 ```
 
 ```{r}
-#| label: Word counts
+#| label: Word counts in free response question
 #| echo: false
 
 free_response_word_counts <- free_response %>%
   filter(!is.na(word_count))
 
-conversations_messages_word_counts <- conversations_df %>%
-  filter(grepl('USER', logs)) %>%
-  mutate(across(everything(), ~ gsub('","time":.*', '', .))) %>%
-  mutate(across(everything(), ~ gsub('USER:"', '', .))) %>%
-  mutate(conversation_word_count = str_count(logs, '\\S+')) %>%
-  group_by(prolific_subject_id) %>%
-  mutate(avg_convo_message_word_count = mean(as.numeric(conversation_word_count), na.rm = TRUE)) %>%
-  select(prolific_subject_id, avg_convo_message_word_count, logs, conversation_word_count)
-
-reflections_word_counts <- reflections_df %>% 
-  mutate(reflection_word_count = str_count(response, '\\S+')) %>%
-  group_by(prolific_subject_id) %>%
-  mutate(avg_reflection_word_count = mean(as.numeric(reflection_word_count), na.rm = TRUE)) %>%
-  select(prolific_subject_id, avg_reflection_word_count, response, reflection_word_count)
-
-```
-
-```{r}
-#| label: Values from word count & time spent 
-#| include: false 
-
 avg_free_response_word_count <- round(mean(free_response_word_counts$word_count, na.rm = TRUE), 1)
 
 range_free_response_word_count <- round(range(free_response_word_counts$word_count, na.rm = TRUE), 1)
-
 ```
 
 ```{r}
@@ -508,42 +489,19 @@ as_gt(demographics_table)
 
 ```
 
-```{r}
-#| label: calculating average times
-#| echo: false
-
-time_figure_df <- time_plot_df %>%
-  group_by(Condition) %>%
-  select(-condition_general) %>%
-  summarise(
-    Mean = round(mean(time_minutes, na.rm = TRUE), 1),
-    Min = round(min(time_minutes, na.rm = TRUE), 1),
-    Max = round(max(time_minutes, na.rm = TRUE), 1)
-  ) %>%
-  rename(
-    'Survey time (mean, min–max in minutes)' = Mean
-  )
-
-time_stats <- time_figure_df
-mean_survey_time <- time_stats$`Survey time (mean, min–max in minutes)`
-min_survey_time <- time_stats$Min
-max_survey_time <- time_stats$Max
-
-```
-
 ### Materials
 
 #### Supporting Literature
 
-We developed our willingness questions based on existing literature about the concerns and reason that contribute to a person's unwillingness to participate in conversations, especially conversations about divisive topics. 
+We developed our willingness questions based on existing literature about the concerns and reason that contribute to a person's unwillingness to participate in conversations, especially conversations about divisive topics.
 
 Elisabeth Noelle-Neumann's Spiral of Silence theory, developed in the 1960s and '70s, offers a foundational understanding of how individuals' willingness to express opinions on controversial public issues is influenced by their perception of those opinions as popular or unpopular. This theory suggests that the prevailing opinion held by the majority in a specific social setting, such as a classroom or public forum, profoundly influences an individual's willingness to participate in discussions. If one's view is perceived as opposed to the majority, individuals are less likely to express it, a phenomenon directly linked to the Spiral of Silence. Individual psychological factors, such as communication apprehension and fear of conflict, are not isolated but are significantly influenced by the prevailing opinion climate.
 
 The theory's key elements revolve around a fundamental human apprehension: the fear of social isolation, which is triggered by the belief that others will consider the individual not merely mistaken, but morally deficient. Individuals thus tend to refrain from publicly stating their views on controversial matters when they perceive that doing so would attract criticism, scorn, laughter, or other signs of disapproval.
 
-The Social Identity Theory (SIT) suggests that when controversial issues are discussed, individuals may experience "identity threat" if their ideas and feelings about these issues are deeply connected to their identity or in-group, such as their race. Identity threat is defined as "experiences appraised as indicating potential harm to the value, meanings, or enactment of an identity.” 
+The Social Identity Theory (SIT) suggests that when controversial issues are discussed, individuals may experience "identity threat" if their ideas and feelings about these issues are deeply connected to their identity or in-group, such as their race. Identity threat is defined as "experiences appraised as indicating potential harm to the value, meanings, or enactment of an identity.”
 
-The accentuation of differences between in-groups and out-groups, coupled with the desire for positive distinctiveness, can intensify intergroup hostility and conflict, especially when competition or perceived threats exist. This can lead to negative perceptions of out-groups, even bordering on dehumanization, where less of certain human attributes are ascribed to the "other". Such vilifying views, often marked by beliefs that opponents are "wicked and untrustworthy", make constructive dialogue exceedingly difficult, as the "other" is seen as an adversary rather than a conversational partner. 
+The accentuation of differences between in-groups and out-groups, coupled with the desire for positive distinctiveness, can intensify intergroup hostility and conflict, especially when competition or perceived threats exist. This can lead to negative perceptions of out-groups, even bordering on dehumanization, where less of certain human attributes are ascribed to the "other". Such vilifying views, often marked by beliefs that opponents are "wicked and untrustworthy", make constructive dialogue exceedingly difficult, as the "other" is seen as an adversary rather than a conversational partner.
 
 This strong in-group cohesion, while providing social support and validation, can paradoxically foster communication siloing. SIT highlights that people identify with in-groups to enhance their self-esteem and perceive their in-group favorably. This desire for "positive distinctiveness" motivates them to accentuate differences with out-groups. When controversial topics arise, challenging an in-group's perspective can be perceived as an "identity threat", leading to defensive behaviors like derogating or distancing from out-group views. This process also contributes to "group polarization," where discussions with like-minded peers strengthen original beliefs and lead to more extreme stances.
 
@@ -553,11 +511,11 @@ CA suggests that the fear of conflict can lead people to systematically avoid "z
 
 Individuals with high CA experience significant fear and anxiety when faced with communication. This internal discomfort, along with a fear of negative outcomes like conflict or rejection, leads them to actively avoid communication. This avoidance, while providing immediate relief from anxiety, prevents the individual from experiencing that the feared outcomes might not occur or that they can cope with the anxiety. This creates a negative reinforcement loop: avoidance reduces immediate discomfort, but simultaneously strengthens the underlying fear and the avoidance habit, making it harder to engage in future difficult conversations.
 
-The concepts of emotional avoidance, emotional dysregulation, and affective forecasting,  reveal that avoidance is not just about external threats, but also an internal struggle. Emotional avoidance refers to the deliberate effort to suppress, ignore, or distract oneself from experiencing unpleasant feelings such as fear, sadness, anger, or vulnerability. Common tactics include denial, suppression, distraction, busyness, and steering clear of situations, people, or places that might evoke uncomfortable emotions.
+The concepts of emotional avoidance, emotional dysregulation, and affective forecasting, reveal that avoidance is not just about external threats, but also an internal struggle. Emotional avoidance refers to the deliberate effort to suppress, ignore, or distract oneself from experiencing unpleasant feelings such as fear, sadness, anger, or vulnerability. Common tactics include denial, suppression, distraction, busyness, and steering clear of situations, people, or places that might evoke uncomfortable emotions.
 
 Emotional dysregulation (ED) is defined as the inability to regulate the intensity and quality of emotions to generate an appropriate emotional response. Emotional regulation strategies involve the ability to recognize, evaluate, modify, and manage emotions in a personal and socially acceptable way to maintain mental control over strong feelings and achieve adaptive functioning.
 
-Affective forecasting, or hedonic forecasting, is the prediction of how one will feel in the future. Research consistently demonstrates that people are poor predictors of their future well-being. They tend to overestimate the impact and duration of negative emotions in response to loss or difficult situations. This inaccuracy occurs because individuals often focus more on what they will lose than on what will stay the same (focalism), fail to envision how their own coping skills will lessen their unhappiness (immune neglect), and fail to envision how they might develop new values (adaptation). 
+Affective forecasting, or hedonic forecasting, is the prediction of how one will feel in the future. Research consistently demonstrates that people are poor predictors of their future well-being. They tend to overestimate the impact and duration of negative emotions in response to loss or difficult situations. This inaccuracy occurs because individuals often focus more on what they will lose than on what will stay the same (focalism), fail to envision how their own coping skills will lessen their unhappiness (immune neglect), and fail to envision how they might develop new values (adaptation).
 
 Thus, avoidance is also an internal struggle to manage uncomfortable feelings and a flawed prediction of future emotional states, making the perceived "cost" of engagement seem higher than it might be.
 
@@ -565,9 +523,9 @@ If a significant portion of a population struggles with emotional regulation and
 
 #### Willingness survey design
 
-Based on this existing research, we developed a Likert-scale questionnaire which lists 19 concerns that might contribute to users' unwillingness to engage in a conversation about a topic that they are unwilling to discuss with others. We also created two questions which ask users to rate, on a scale from 0 to 100, their willingness to "have a conversation with someone who strongly disagrees with [them] about [conversation topic]" and "to have a conversation with someone who would push against [their] views about [conversation topic]," where a score of 0 is complete unwillingness, a score of 50 is neutral, and a score of 100 is absolute willingness to converse. 
+Based on this existing research, we developed a Likert-scale questionnaire which lists 19 concerns that might contribute to users' unwillingness to engage in a conversation about a topic that they are unwilling to discuss with others. We also created two questions which ask users to rate, on a scale from 0 to 100, their willingness to "have a conversation with someone who strongly disagrees with \[them\] about \[conversation topic\]" and "to have a conversation with someone who would push against \[their\] views about \[conversation topic\]," where a score of 0 is complete unwillingness, a score of 50 is neutral, and a score of 100 is absolute willingness to converse.
 
-In our full-scale experiment, we intend to administer this questionnaire both before and after our chatbot intervention to assess which concerns, if any, our chatbot can mitigate. To ensure that this survey captures all of the primary reasons that contribute to unwillingness and can be targeted on the individual level, this pre-test experiment administered the questionnaire once and with a free-response question at the end: "What other reasons, if any, make you less willing to engage in conversations about [conversation topic]?"
+In our full-scale experiment, we intend to administer this questionnaire both before and after our chatbot intervention to assess which concerns, if any, our chatbot can mitigate. To ensure that this survey captures all of the primary reasons that contribute to unwillingness and can be targeted on the individual level, this pre-test experiment administered the questionnaire once and with a free-response question at the end: "What other reasons, if any, make you less willing to engage in conversations about \[conversation topic\]?"
 
 ## Results
 
@@ -582,7 +540,6 @@ On average, participants completed the questionnaire in `r mean_survey_minutes` 
 
 kable(time_figure_df)
 ```
-
 
 ```{r}
 #| label: fig-topic-ratings
@@ -686,9 +643,9 @@ print(sliders_hist)
 
 ```
 
-### Free response 
+### Free response
 
-We conducted two primary analyses. First, we analyzed free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data. This analysis was performed manually. We found that [list results].
+We conducted two primary analyses. First, we analyzed free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data. This analysis was performed manually. We found that \[list results\].
 
 ```{r}
 #| label: tbl-bot-free-response-examples
@@ -735,10 +692,9 @@ print(free_response_bar_plot)
 
 ```
 
-
 ### Factor analysis
 
-Secondly, we conducted a factor analysis on the 19 given items to determine which concerns, if any, are correlated with each other. We found that [list results]. 
+Secondly, we conducted a factor analysis on the 19 given items to determine which concerns, if any, are correlated with each other. We found that \[list results\].
 
 ```{r}
 #| label: KMO, Bartlett's test, parallel analysis on 19-item matrix
@@ -867,10 +823,9 @@ print(fa_heat_map)
 
 ```
 
+### Additional analyses
 
-### Additional analyses 
-
-Additionally, we looked for any correlations between polarization and willingness concerns. 
+Additionally, we looked for any correlations between polarization and willingness concerns.
 
 ```{r}
 #| label: Correlations polarization vs. willingness concerns 
@@ -935,7 +890,8 @@ survey_df$cluster <- kmeans_result$cluster
 library(ggfortify)
 autoplot(prcomp(concerns_scaled), data = survey_df, colour = 'cluster')
 ```
-We also conducted cluster analysis to determine whether participants generally fell into certain categories of concerns. 
+
+We also conducted cluster analysis to determine whether participants generally fell into certain categories of concerns.
 
 ```{r}
 # If you have a 'topic' variable
@@ -948,7 +904,7 @@ lapply(aov_results, summary)
 
 ```
 
-Finally, we ran ANOVAs to determine whether there were significant differences in how participants with different conversation topics responded to our survey. 
+Finally, we ran ANOVAs to determine whether there were significant differences in how participants with different conversation topics responded to our survey.
 
 ## Discussion
 
