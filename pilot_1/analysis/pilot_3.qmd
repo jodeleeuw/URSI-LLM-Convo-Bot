@@ -9,7 +9,7 @@ editor: visual
 
 ## Abstract
 
-In an era of rising polarization, Americans face increasing challenges when engaging in respectful conversations across ideological divides (Klein, 2020). While human-to-human conversations have been shown to increase empathy and reduce polarization (e.g., Broockman & Kalla, 2016, Combs et al., 2023, and Elnakouri et al., 2024), they are often difficult to initiate and sustain, particularly in socially or politically charged environments. As existing research has found that large language models (LLMs) can impact user beliefs (e.g., Chalaguine et al., 2019 & Costello et al., 2024), this study investigates whether LLMs can serve as accessible tools to support and encourage more open-minded human-to-human conversations. Drawing on prior research into conversational styles that promote civility and perspective-taking, we developed a specialized chatbot using ChatGPT and tested it in this experiment. American participants discussed one of seven controversial topics with the chatbot and completed surveys before and after the conversation to assess changes in willingness to engage, open-mindedness, and belief extremity. Results suggest that certain chatbot styles may positively influence users’ attitudes in ways that support productive future dialogue. This research positions LLMs as scalable, private, and low-risk tools that can help prepare individuals for more thoughtful engagement with those they disagree with. Future applications could revolutionize educational settings and online platforms, where dissenting views often face social penalties.
+In an era of rising polarization, Americans face increasing challenges when engaging in respectful conversations across ideological divides (Klein, 2020). While human-to-human conversations have been shown to increase empathy and reduce polarization (e.g., Broockman & Kalla, 2016, Combs et al., 2023, and Elnakouri et al., 2024), they are often difficult to initiate and sustain, particularly in socially or politically charged environments. As existing research has found that large language models (LLMs) can impact user beliefs (e.g., Chalaguine et al., 2019 & Costello et al., 2024), this study investigates whether LLMs can serve as accessible tools to support and encourage more open-minded human-to-human conversations. Drawing on prior research into conversational styles that promote civility and perspective-taking, we developed a specialized chatbot using ChatGPT and tested it in this experiment. American participants discussed one of seven controversial topics with the chatbot and completed surveys before and after the conversation to assess changes in willingness to engage, open-mindedness, and belief extremity. Results suggest that certain chatbot styles may positively influence users’ attitudes in ways that support productive future dialogue. This research positions LLMs as scalable, private, and low-risk tools that can help prepare individuals for more thoughtful engagement with those they disagree with. Applications could revolutionize educational settings and online platforms, where dissenting views often face social penalties. Future research should administer the chatbot intervention and then assess changes in key measures by having subjects participate in a human-to-human conversation . 
 
 ```{r}
 #| label: Data Fetching. Load R packages
@@ -376,19 +376,48 @@ total_num_clean_subjects_in_data <- nrow(raw_df %>%
 
 ## Introduction
 
-Previous research indicates that AI chatbots can be persuasive in changing people’s opinions on highly disputed topics (Altay et al., 2022; Andrews et al., 2008; Chalaguine et al., 2019; Costello et al., 2024) and increasing their open-mindedness (Elnakouri et al., 2024). The present pilot study will leverage these insights to explore conversational LLMs as tools for increasing willingness to converse about highly disputed topics.
+Americans are increasingly unwilling to engage in conversations about emotionally charged or politically divisive topics—discussions that are essential for fostering empathy, intellectual humility, and democratic resilience (@finkel2020; @iyengar2019). While human-to-human conversations have been shown to increase open-mindedness and reduce polarization (e.g., @broockman2016; @combs2023; @elnakouri2024; @fernbach2013), these same conversations can also become unproductive and inaccessible, leaving participants even more reluctant to engage in future dialogue (cite). This growing reluctance presents a societal challenge: how can we foster greater willingness in Americans to engage with each other across ideological divides?
 
-We worked with six divisive topics in the U.S.: human euthanasia, the role of the government in healthcare, same-sex marriage, mandating vaccines, the criminal justice system, and gender equality. We also worked with the topic of atomic bombings during our initial pilot phases, but eventually excluded the topic because data indicated that subjects did not feel as strongly about it as we had anticipated.
+Recent findings suggest that artificial intelligence (AI), particularly conversational large language models (LLMs), can promote open-mindedness and persuade users. Research has shown that AI can shift user beliefs, increase receptiveness to opposing views, and encourage intellectual humility (@altay2022; @chalaguine2019; @costello2024; @matz2024). While these characteristics are thought to be closely linked with willingness to converse (cite), research has not directly tested whether conversations with a conversational LLM can increase willingness to converse about divisive topics in the U.S..
 
-“Psychologists define ‘‘open-mind’’ thinking as the willingness to consider alternative perspectives, evaluate contradictory evidence, and be flexible rather than dogmatic (Stanovich, 1999, p190-191)” (https://doi.org/10.1016/j.socec.2023.102152).
+We propose that conversational large language models (LLMs) could serve as a low-stakes, scalable, and emotionally neutral entry point into difficult dialogues—one that increases users' willingness to engage in productive, open-minded conversations. To explore this, we developed the Mind-Opening Conversational Agent (MOCA), a response-election chatbot system designed specifically to increase users’ willingness to engage in discussions about polarizing issues. 
 
-Several research findings suggest that political discussions can easily turn toxic, fueling, rather than curbing, intergroup hostility (Brady, Wills, Jost, Tucker, & Van Bavel, 2017; Chen & Rohla, 2018; Finkel et al., 2020; Hutchens, Hmielowski, & Beam, 2019; Hwang, Kim, & Kim, 2018; Mendelberg & Oleske, 2000; Santoro & Broockman, 2021), in part because political discussions are often motivated by a desire to signal one’s political identity rather than arrive at the truth (Kahan & Braman, 2006; Van Bavel & Pereira, 2018; Van Bavel, Sternisko, Harris, & Robertson, 2020). Thus, while cross-partisan discussions serve as an opportunity for an open-minded exchange, these discussions more often end up as arenas where people advertise their political stripes, especially when facing off with someone they disagree with (Walsh, 2010). Cognitive scientists have found that inviting people to explain (rather than freely reflect on) the contentious political issues may help reduce intergroup toxicity in these discussions (Fernbach, Rogers, Fox, & Sloman, 2013).
+MOCA is comprised of four chatbots that generate potential responses and a fifth chatbot that selects and outputs the response that it deems most likely to increase willingness to converse (Figure 1). We based three of the four response-generating chatbots' approaches on findings in the human-to-human research (e.g., @broockman2016; @combs2023; @elnakouri2024; @fernbach2013), but left the fourth approach as minimal as possible to increase MOCA's autonomy. In this way, there are two avenues through which MOCA could influence users: through literature-backed, prompt-engineered approaches and through MOCA's own approach.
 
-Confronted with their lack of understanding, people might then become more moderate as well as forgiving towards those they disagree with on the issue. Indeed, Fernbach et al. (2013) observed that invitations to explain (vs. freely reflect on) a policy position resulted in more moderate policy convictions and lower hostility towards political outgroup members. However, subsequent scholarship either found no evidence for the effect (Crawford & Ruscio, 2021) or found it to be constrained to specific topics (Sloman & Vives, 2022) or personalities (Voelkel, Brandt, & Colombo, 2018). That is, inviting people to explain specific policy positions did not consistently lead to less extreme policy positions, nor did it influence how they felt about political partisans
+```{r}
+#| label: flowchart-selection-bot
+#| echo: false
+#| tbl-cap: Graphic of selection bot process.
 
-Another possibility is that explanations might still hold some promise, changing the process of how people think rather than the content of what people believe. Specifically, inviting people to explain themselves could encourage information search via consulting others’ viewpoints and integration of multiple perspectives, opening the door for wiser, more open-minded political thinking (Baron, 2019; Grossmann et al., 2021; Grossmann & Kross, 2014; Kross & Ayduk, 2017; Stanovich & West, 1997; see Grossmann et al., 2021, Porter et al., 2022, for reviews)
+grViz("
+digraph chatbot_flow {
+  
+  graph [layout = dot, rankdir = LR]
 
-Papers like Altays, Chalaguine, Andrews, use variations of argumentation, i.e argument type, argument selection, phrasing, etc., and in an attempt to overcome the inability of domain general interaction of GOFAI bots, to create algorithms of argumentative response between bot and user. These, with the specificity of their strategy, focus more on the actual content of argument rather than the ‘vibes’ from the bot, i.e the extent to which it can mimic human behavior/demeanor. Because of the limitation of earlier bots, the long line of argumentative strategy from the psychology domain, which focuses mostly on emotional appeal, in-group creation, etc. had yet a chance to shine in the creation of AI bots. With GPT, however, perhaps there is the chance. Yet, due to controversy of tricking participants into believing the AI is human, we have decided to avoid that strategy. Now that AI can mimic real humans, and the literature of human-human persuasion from psychology could actually be applied, practical concerns still prevent its ethical use, a topic to be considered for the future of AI persuasion.
+  node [shape = note, style = filled, fillcolor = lightblue]
+
+  user_input [label = 'User\\nmessage\\ninput']
+  counter_response [label = 'Bot generates\\ncounter-argument\\nresponse', shape = box]
+  question_response [label = 'Bot generates\\nquestion\\nresponse', shape = box]
+  viewpoint_response [label = 'Bot generates\\nviewpoint\\nresponse', shape = box]
+  bot_decision [label = 'Bot chooses\\nbest\\nresponse', shape = circle, width=1.2]
+  final_output [label = 'Bot\\nmessage\\noutput']
+
+  user_input -> counter_response
+  user_input -> question_response
+  user_input -> viewpoint_response
+
+  counter_response -> bot_decision
+  question_response -> bot_decision
+  viewpoint_response -> bot_decision
+
+  bot_decision -> final_output
+}
+")
+```
+
+We worked with six divisive topics in the U.S. during the development of our chatbot approaches and will have users select one of these for their conversation: human euthanasia, the role of the government in healthcare, same-sex marriage, mandating vaccines, the criminal justice system, and gender equality. To evaluate MOCA’s effectiveness, we will administer pre- and post-intervention surveys assessing open-mindedness, polarization, and willingness to converse. If MOCA is effective, we expect to observe increased open-mindedness and willingness to converse, alongside reduced polarization, when comparing pre- and post-intervention survey responses. By adapting techniques shown to be effective in human-human conversations to a modern AI framework, we aim to evaluate whether LLMs can serve as scalable tools for encouraging open dialogue on contentious issues.
+
 
 ## Methods
 
@@ -1362,9 +1391,17 @@ We used custom software written with the jsPsych framework (@jspsychcite), which
 
 #### Intervention development
 
-There are findings from human-to-human research on approaches, techniques, and situational factors that can make people more willing to have conversations on controversial topics and be more productive/open-minded. Though the findings were abundant and there were thus a myriad of approaches which we could have taken, we extracted three general approaches: providing counterarguments, asking questions about the user's views, and explaining why others might have alternative perspectives. \[cite the research for each one\].
+There are findings from human-to-human research on approaches, techniques, and situational factors that can make people more willing to have conversations on controversial topics and be more productive/open-minded. 
+
+Some cognitive scientists have found that inviting people to explain, rather than freely reflect on, a contentious political issue may help reduce intergroup toxicity in these discussions (@fernbach2013. @fernbach2013 explained that the attempt to explain the issue often leads people to become confronted with their lack of understanding, which in turn might lead them to become more moderate as well as less hostility towards political outgroup members. However, subsequent scholarship either found no evidence for the effect (Crawford & Ruscio, 2021) or found it to be constrained to specific topics (Sloman & Vives, 2022) or personalities (Voelkel, Brandt, & Colombo, 2018). That is, inviting people to explain specific policy positions did not consistently lead to less extreme policy positions, nor did it influence how they felt about political partisans. Another possibility is that explanations might still hold some promise, changing the process of how people think rather than the content of what people believe. Specifically, inviting people to explain themselves could encourage information search via consulting others’ viewpoints and integration of multiple perspectives, opening the door for wiser, more open-minded political thinking (Baron, 2019; Grossmann et al., 2021; Grossmann & Kross, 2014; Kross & Ayduk, 2017; Stanovich & West, 1997; see Grossmann et al., 2021, Porter et al., 2022, for reviews). 
+
+Research has also found that inviting people to explain a problem to somebody who is unfamiliar with the topic can increase open-mindedness (@elnakouri2024).
+
+Though the findings were abundant and there were thus a myriad of approaches which we could have taken, we extracted three general approaches: providing counterarguments, asking questions about the user's views, and explaining why others might have alternative perspectives. \[cite the research for each one\].
 
 The chatbot that we created for this experiment uses a response election approach: four chatbots, each with a different chat completion prompt, generate a unique response to a user message. Then, a final chatbot selects and outputs one of the responses. Three of the four approaches were those gathered in the human-to-human research. The fourth approach gave the bot as much agency as possible in its choice of response through the most minimal prompting that still produced a conversational response (see Appendix: Prompts). We developed these prompts through methods suggested by leading guides on prompt engineering (cite) and iterative refinement until we reached a satisfactory result. In this way, we hoped to give the chatbot two opportunities to affect users: either through our manipulation of its capabilities or through its own manipulation.
+
+[discuss @matz2024 and personalizing the chatbot style ]
 
 ```{r}
 #| label: flowchart-selection-bot
@@ -1398,11 +1435,16 @@ digraph chatbot_flow {
 ")
 ```
 
-![Chatbot flow diagram](intervention_screenshot.png)
+![Chatbot conversation screenshot](intervention_screenshot.png)
 
 #### Survey development
 
 We measured the effectiveness of our chatbot through administering a survey before and after the experiment intervention. The questionnaire was composed of basic demographic questions, a question to ascertain which of our six topics the participant was most unwilling to discuss, and then our willingness survey questions. The key measures in the survey were open-mindedness, polarization of topic-specific beliefs, and willingness to converse. We drew on existing measures for open-mindedness and polarization of topic-specific opinions. Applicable measures for willingness to converse did not exist, so we created and then pretested our own based on existing research about the concerns or experiences that contribute to unwillingness to converse. This led us to find concepts such as Social Identity Theory (SIT), Emotional Dysregulation (ED), and Communication Avoidance (CA). Through these measures, we were able to observe whether the intervention changed open-mindedness, polarization of topic-specific beliefs, overall willingness to converse, and specific concerns that contributed to users' unwillingness to converse.
+
+## open-mindedness so linked to willingness to converse
+[Dolbier, K. L., Dieffenbach, S., & Lieberman, M. D. (2025). Open-Mindedness: An Integrative Review of Interventions. Current Opinion in Behavioral Sciences, 58, 101438. (This is a forthcoming or very recent review, indicating its up-to-date relevance).
+
+Why it's a fit: This review explicitly focuses on open-mindedness and interventions to increase it. It discusses how interventions often target cognitive pathways (e.g., reducing biased thinking, promoting expansive mindsets) and affective pathways (emotion regulation to maintain composure when beliefs are challenged). These mechanisms are inherently activated when engaging with opposing views on controversial topics, as it requires confronting biases and managing emotional responses. It directly links open-mindedness to "willingness to nondefensively entertain alternative ideas" and "willingness to engage with dissenting opinions."]
 
 ### Procedure
 
@@ -1731,13 +1773,32 @@ By conducting this research, we aimed to assess whether conversational LLMs can 
 
 ### Limitations
 
-\[self-reported\]
+#### self-reported
+
+#### situational vs. dispositional willingness
+
+#### chatbot limitations 
+
+https://journals.sagepub.com/doi/epub/10.1177/1532673X241263079
+
+1. couldn't apply all human to human findings. for example, having people find similarities as people before talking about the issue @balietti2021
+
+2. psychological safety / group-level intervention
+
+reference our "Annotated Bibliography for Pilot A" Google Sheets doc for references about vulnerability, safety, and trust 
 
 The literature clearly indicates that while individual skills like emotional regulation, communication competence, and conflict management are vital for engaging in difficult conversations, their effective application is deeply intertwined with the social environment. Thus, by not directly intervening on the systemic level, which includes aspects such as creating a psychologically safe environment, challenging negative norms, and promoting inclusivity, we are missing pieces of the puzzle that significantly influence individual willingness, especially “psychological safety.”
 
 Psychological safety is the belief that one can speak openly and truthfully about problems without fear of reprisal; it is built upon three core pillars: care, consistency, and normalizing mistakes. Psychological safety is suggested to largely relate to group culture and norms in a conversation. Through developing greater abilities to navigate difficult conversations, users of our intervention may influence future group climates, which, in turn, could contribute to each member’s sense of psychological safety. This idea goes hand in hand with the finding that widespread individual avoidance can contribute to the formation of a silent, unsupportive opinion climate. However, the literature suggests that psychological safety is largely curated through systemic changes, especially for creating an environment where people from marginalized communities can experience the same sense of psychological safety as conventionally celebrated voices. Future research could explore applications of chatbots for systemic interventions.
 
+reference @paluck2019 about racism and ethnicity 
+
 Our primary goal, though, is to focus on the direct effects of individual interventions. By focusing solely on the individual level, perhaps users will grow in their abilities to navigate these difficult conversations even in spaces with poor group cultures or norms.
+
+
+#### other measures  
+
+[there were other key measures that the literature indicted were significant but that we didn't measure because we could only have so many measures and survey questions. reference @knochelmann2025 for intellectual humility ]
 
 ## Acknowledgements
 
