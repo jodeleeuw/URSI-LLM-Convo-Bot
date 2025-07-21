@@ -14,6 +14,7 @@ editor: visual
 #| include: false 
 
 library(osfr) 
+library(dplyr)
 library(ez) 
 library(tidyverse) 
 library(gt)
@@ -27,6 +28,7 @@ library(pheatmap) # for factor analysis heat map
 library(corrplot) # for correlation matrix 
 library(broom) # for correlation tests
 library(purrr) # for correlation tests 
+library(likert) # for likert plots 
 # library(GGally)
 # library(car)
 # library(MASS)
@@ -41,14 +43,14 @@ library(purrr) # for correlation tests
 ## add which round of the pilot it was by reading in demographics files so we know completion dates
 
 #read in prolific demographics files 
-pretest_demo_df <- read_csv("[insert actual csv]prolific_export_66a7f5efd46ad7a2b78cc200.csv") %>%
+pretest_demo_df <- read_csv("google_sheets_fake_demo.csv") %>%
   mutate(Age = as.numeric(Age))
 
 #merge files (if multiple)
-full_prolific_demographics_df <- bind_rows(pretest_demo_df) 
+merged_prolific_demographics_df <- bind_rows(pretest_demo_df) 
 
 #clean df
-full_prolific_demographics_df <- full_prolific_demographics_df %>%
+cleaned_prolific_demographics_df <- merged_prolific_demographics_df %>%
 # make name the same as in data csvs so merging is easier
 rename("prolific_subject_id" = "Participant id") %>%
 # filter out people who didn't finish
@@ -56,10 +58,10 @@ filter(Status != "RETURNED") %>%
 #rename "Started at" to make grepl function easier to use later on
 rename("start" = "Started at") %>%
 # make time more readable but keep the seconds version for analysis stuff later
-mutate(`Time taken (minutes)` = as.numeric(`Time taken`) / 60) %>%
+mutate(`time_taken_overall_minutes` = as.numeric(`Time taken`) / 60) %>%
 # name the round of the pilot that the person was in 
   mutate(pilot_iteration = case_when(
-    grepl("2025-07-15", start) ~ "Willingness Survey Pretest",
+    grepl(c("2025-07-10|2025-07-08"), start) ~ "Willingness Survey Pretest",
     TRUE ~ NA_character_
   )) 
 ```
@@ -75,8 +77,10 @@ files <- osf_retrieve_node("x32pv") %>%
 
 # filter for the correct date
 files_filtered <- files %>%
-  mutate(date_created = as_date(created_utc)) %>%
-  filter(date_created == as_date("2025-07-15"))
+  mutate( date_created = map_chr(meta, ~ as.character(.x$attributes$date_created)),
+    date_created = as_date(date_created)
+  ) %>%
+  filter(date_created %in% as_date(c("2025-07-10", "2025-07-08")))
 
 # download files for the correct date 
 osf_download(files_filtered, path = "data", conflicts = "skip")
@@ -91,6 +95,17 @@ osf_csv_filenames <- list.files(path = "data/")
 raw_dfs_tibbles <- map(osf_csv_filenames, ~read_csv(file.path("data/", .)))
 rawwwwwww_df <- bind_rows(raw_dfs_tibbles)
 
+
+# REMOVE IN REAL DATA ANALYSIS 
+# adding subject id's into df 
+rawwwwwww_df <- rawwwwwww_df %>%
+mutate(
+  prolific_subject_id = if_else(row_number() > 4, 1234, prolific_subject_id),
+  prolific_subject_id = if_else(row_number() < 4, 5678, prolific_subject_id)
+  )
+
+
+
 ```
 
 ```{r}
@@ -99,16 +114,12 @@ rawwwwwww_df <- bind_rows(raw_dfs_tibbles)
 
 raw_df <- rawwwwwww_df %>%
   # inner join with the demographics df from pilot 2 so we can eliminate pilot 1 subjects
-  inner_join(full_prolific_demographics_df, by = "prolific_subject_id") %>%
-  # remove unnecessary syntax from rowAsString and topicChoiceAsString for readability later
-  mutate(rowAsString = gsub('\\{"row":"', '', rowAsString)) %>%
-  mutate(rowAsString = gsub('"}', '', rowAsString)) %>%
+  inner_join(cleaned_prolific_demographics_df, by = "prolific_subject_id") %>%
+  # remove unnecessary syntax from topicChoiceAsString for readability later
   mutate(topicChoiceAsString = gsub('\\{"row":"', '', topicChoiceAsString)) %>%
   mutate(topicChoiceAsString = gsub('"}', '', topicChoiceAsString)) %>%
   # fill condition column and row and topic strings
   group_by(prolific_subject_id) %>%
-  fill(condition, .direction = "downup") %>%
-  fill(rowAsString, .direction = "downup") %>%
   fill(topicChoiceAsString, .direction = "downup") %>%
   ungroup() 
 
@@ -120,7 +131,7 @@ total_num_subjects_in_data <- nrow(raw_df %>%
 ```
 
 ```{r}
-#| label: clean the survey df
+#| label: Clean the survey df
 #| include: false
 
 surveys_cleaning_df <- raw_df %>%
@@ -129,6 +140,11 @@ surveys_cleaning_df <- raw_df %>%
   # Remove control interventions (these are coded as surveys)
   filter(phase != "control-intervention") %>%
   # Remove the matrix question titles because they mess with separating questions from answers
+  # openmindedness and offending reason
+  mutate(across(everything(), ~ gsub(',"openmindedness":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"openmindedness":', '', .))) %>%
+  mutate(across(everything(), ~ gsub(',"offending-reason":null,', '', .))) %>%
+  mutate(across(everything(), ~ gsub('"offending-reason":', '', .))) %>%
   # republican/democrat (pre-convo)
   mutate(across(everything(), ~ gsub(',"rating-republicans":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub(',"rating-democrats":null,', '', .))) %>%
@@ -151,36 +167,6 @@ surveys_cleaning_df <- raw_df %>%
   mutate(across(everything(), ~ gsub('"rating-democrats-post":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-republicans-post":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-democrats-post":', '', .))) %>%
-  #topic-specific polarization (pre-convo)
-  mutate(across(everything(), ~ gsub('"euthanasia-polarization":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"gender-polarization":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"healthcare-polarization":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"bombing-polarization":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"vaccines-polarization":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"criminal-polarization":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"same-sex-polarization":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"euthanasia-polarization":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"gender-polarization":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"healthcare-polarization":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"bombing-polarization":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"vaccines-polarization":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"criminal-polarization":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"same-sex-polarization":', '', .))) %>%
-  #topic-specific polarization (post-convo)
-  mutate(across(everything(), ~ gsub('"euthanasia-polarization-post":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"gender-polarization-post":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"healthcare-polarization-post":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"bombing-polarization-post":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"vaccines-polarization-post":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"criminal-polarization-post":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"same-sex-polarization-post":null,', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"euthanasia-polarization-post":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"gender-polarization-post":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"healthcare-polarization-post":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"bombing-polarization-post":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"vaccines-polarization-post":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"criminal-polarization-post":', '', .))) %>%
-  mutate(across(everything(), ~ gsub('"same-sex-polarization-post":', '', .))) %>%
   # the name of the question in 2.1 run of the experiment
   mutate(across(everything(), ~ gsub('topicChoice":', '', .))) %>%
   # the name of the question in future runs of the experiment
@@ -206,13 +192,30 @@ surveys_df <- surveys_cleaning_df %>%
   filter(!grepl("Gender should be disregarded when selecting candidates for career advancement opportunities", question)) %>%
   # Bin the religious affiliations because they were free response 
    mutate(answer = case_when(
-    question == "religious-affiliation" & str_detect(str_to_lower(answer), "christian") ~ "Christian/Catholic",
-    question == "religious-affiliation" & str_detect(str_to_lower(answer), "catholic") ~ "Christian/Catholic",
+     question == "religious-affiliation" & str_detect(str_to_lower(answer), "christian|catholic|christianity") ~ "Christian/Catholic",
     question == "religious-affiliation" & str_detect(str_to_lower(answer), "atheis|none|") ~ "Atheist/None",
     question == "religious-affiliation" & str_detect(str_to_lower(answer), "Nothing in Particular") ~ "Atheist/None",
     TRUE ~ answer
   )) 
 
+surveys_df <- surveys_df %>%
+  mutate(prolific_subject_id = as.numeric(prolific_subject_id))
+
+```
+
+```{r}
+#| label: Reverse code necessary items 
+#| include: false 
+
+# reverse code open-mindedness items 
+
+surveys_df <- surveys_df %>%
+   mutate(answer = ifelse(
+         grepl("@R@", question)  | 
+         grepl("openmindedness...believe it is a waste of time to pay attention to certain political ideas about", question), # CAN REMOVE IN REAL DATA ANALYSIS. i forgot to put an @R@ next to that one in the experiment code. fixed it now 
+     7 - as.numeric(answer),
+     answer
+   )) 
 ```
 
 ```{r}
@@ -223,19 +226,17 @@ attention_check <- surveys_df %>%
   filter(question == "attention-check-slider-post-placeholder" | question == "attention-check-slider-pre-placeholder") %>%
   group_by(prolific_subject_id) %>%
   mutate(flag = case_when(
-    sum(answer == "0.00") == 0 ~ "double fail", #double fail means we should reject their data
-    sum(answer == "0.00") == 1 ~ "single fail", #single fail is not means for rejecting data
-    sum(answer == "0.00") == 2 ~ "pass", #good subject :3
+    sum(answer == "0.00") == 0 ~ "fail (single)", #double fail means we should reject their data
+    sum(answer == "0.00") == 1 ~ "pass", #good subject :3
     TRUE ~ NA_character_
   )) %>%
   ungroup() %>%
-  select(flag, question, answer, prolific_subject_id, "Time taken (minutes)", condition) 
+  select(flag, question, answer, prolific_subject_id, time_taken_overall_minutes) 
 
 # extract value for text 
 total_failed_attention_checks <- attention_check %>%
   # excluding people for both fails
-  filter(flag == 'double fail' | flag == 'single fail') %>%
-  # add distinct because there are two attention check questions so a failed subject gets flagged twice
+  filter(flag == 'fail (single)') %>%
   summarize(total_failed_attention_checks = n_distinct(prolific_subject_id)) %>%
   pull(total_failed_attention_checks)
 
@@ -244,7 +245,6 @@ failed_attention_checks_subject_ids <- attention_check %>%
   filter(flag == 'double fail') %>%
   distinct(prolific_subject_id) %>%
   pull(prolific_subject_id)
-
 ```
 
 ```{r}
@@ -287,92 +287,30 @@ Through Prolific, we gathered data from `r total_num_subjects_in_data` subjects.
 Upon agreeing to participate in this experiment, participants were brought to the experiment webpage, http://54.234.217.37/jdeleeuw/ursi2024/experiment/experiment.html, where they were asked to complete our questionnaire. The questionnaire was composed of basic demographic questions, a question to ascertain which of our six topics the participant was most unwilling to discuss, and then our willingness survey questions. After completing the questionnaire, participants were sent back to Prolific.
 
 ```{r}
-#| label: Reverse code for quantitative analysis
-#| include: false
-
-reverse_coded_scores_df <- surveys_df %>%
-   # In the experiment code, we put '@R@' in all statements that are supposed to be reverse coded. So we can grab all of those statements here and reverse them. The only statements that don't have @R@ are the pre-convo survey polarization statements because those were converted into strings for the chatbot to use
-   mutate(answer = ifelse(
-         grepl("@R@", question) | 
-         grepl("It is not right for family members to request euthanasia on behalf of incapacitated patients", question) | 
-         grepl("Euthanasia should be banned for patients with non-terminal conditions", question) |
-         grepl("Euthanasia should be banned for all patients", question) |
-         grepl("Euthanasia should not be performed at home", question) |
-         grepl("The competitive market should drive healthcare prices", question) |
-        grepl("Policies that take gender into account often do more harm than good in achieving gender equality", question) | 
-          grepl("Gender should be disregarded when selecting candidates for career advancement opportunities to ensure that selections are based on merit", question) | 
-          grepl("Policies aimed at reducing inequality for women often create unfair advantages for women over men", question) |
-         grepl("The bombings were justified to bring a swift end to the war", question) |
-         grepl("Preventing people without vaccinations from entering public spaces and transportation would do more harm than good", question)  |
-         grepl("Businesses and institutions should be barred from discriminating based on vaccination status", question) |
-         grepl("It is not right to provide the same federal rights and support for same-sex couples as opposite-sex couples", question),
-     7 - as.numeric(answer),
-     answer
-   )) 
-
-sliders_df <- reverse_coded_scores_df %>%
-filter(grepl("slider", question))
-
-#change to be based around 0
-reverse_coded_mean_zero_scores_df <- reverse_coded_scores_df %>%
-filter(!grepl("slider", question)) %>%
-  mutate(answer = recode(as.numeric(answer),
-                         `7` = 3,
-                         `6` = 2,
-                         `5` = 1,
-                         `4` = 0,
-                         `3` = -1,
-                         `2` = -2,
-                         `1` = -3,
-                         .default = as.numeric(answer)
-  ))
-```
-
-```{r}
-#| label: Time taken on surveys
+#| label: Find time taken specifically on the surveys (by subject and overall)
 #| echo: false 
 
-#finding time taken on pre survey
-survey_time_df <- raw_df %>%
-  filter(grepl('survey', phase)) %>%
+#finding each subject's time taken on the survey specifically
+surveys_df <- surveys_df %>%
   group_by(prolific_subject_id) %>%
-  mutate(time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
-  select(prolific_subject_id, condition, time_minutes)
+  mutate(
+    time_minutes_survey_only = sum(
+      unique(as.numeric(rt)) / 60000),
+      na.rm = TRUE
+    )
 
-#removing duplicate rows
-survey_time_df <- unique(survey_time_df)
-
-
-###  another df where i did the same thing but differently? check with one is right when i actually have data 
-time_figure_df <- time_plot_df %>%
-  group_by(Condition) %>%
-  select(-condition_general) %>%
+#finding overall mean, min, max of how long participants took 
+time_stats <- surveys_df %>%
+  ungroup() %>%
   summarise(
-    Mean = round(mean(time_minutes, na.rm = TRUE), 1),
-    Min = round(min(time_minutes, na.rm = TRUE), 1),
-    Max = round(max(time_minutes, na.rm = TRUE), 1)
-  ) %>%
-  rename(
-    'Survey time (mean, min–max in minutes)' = Mean
-  )
+    Mean = round(mean(time_minutes_survey_only, na.rm = TRUE), 1),
+    Min = round(min(time_minutes_survey_only, na.rm = TRUE), 1),
+    Max = round(max(time_minutes_survey_only, na.rm = TRUE), 1)
+  ) 
 
-time_stats <- time_figure_df
-mean_survey_time <- time_stats$`Survey time (mean, min–max in minutes)`
+mean_survey_time <- time_stats$Mean
 min_survey_time <- time_stats$Min
 max_survey_time <- time_stats$Max
-
-```
-
-```{r}
-#| label: Word counts in free response question
-#| echo: false
-
-free_response_word_counts <- free_response %>%
-  filter(!is.na(word_count))
-
-avg_free_response_word_count <- round(mean(free_response_word_counts$word_count, na.rm = TRUE), 1)
-
-range_free_response_word_count <- round(range(free_response_word_counts$word_count, na.rm = TRUE), 1)
 ```
 
 ```{r}
@@ -385,31 +323,38 @@ range_free_response_word_count <- round(range(free_response_word_counts$word_cou
 #create a demographics table from the demographics questions in our survey. turn the demographics questions from question column into their own columns with answer as the entries within the column
 survey_demographics_df <- surveys_df %>%
 filter(question == 'ethnicity' | question == 'political-affiliation' | question == 'gender-identification' | question == 'education-level' | question == 'religious-affiliation' | question == 'political-ideology') %>%
-select(question, answer, prolific_subject_id, condition) %>%
+select(question, answer, prolific_subject_id) %>%
 pivot_wider(names_from = question, values_from = answer)
 
 #merge our two demographics tables
 demo_table_df <- survey_demographics_df %>%
-  left_join(full_prolific_demographics_df, by = "prolific_subject_id", suffix = c("_prolific", ""))
+  left_join(cleaned_prolific_demographics_df, by = "prolific_subject_id", suffix = c("_prolific", ""))
 
 #make a region column because showing each state is excessive
-demo_table_df$Region <- ifelse(demo_table_df$`Current u.s state of residence` %in% c("California (CA)", "Colorado (CO)", "Utah (UT)", "Utah(UT)", "Idaho (ID)", "Alaska (AK)", "Hawaii (HI)", "Washington (WA)", "Oregon (OR)", "Nevada (NV)", "New Mexico (NM)", "Montana (MT)", "Arizona (AZ)", "Wyoming (WY)"), "West",
-                     ifelse(demo_table_df$`Current u.s state of residence` %in% c("Texas (TX)", "Florida (FL)", "Georgia (GA)", "North Carolina (NC)", "Tennessee (TN)", "South Carolina (SC)", "Alabama (AL)", "Mississippi (MS)", "Louisiana (LA)", "Delaware (DE)", "Maryland (MD)", "Virginia (VA)", "Washington, D.C. (DC)", "West Virginia (WV)", "Kentucky (KY)", "Arkansas (AR)", "Oklahoma (OK)"), "South",
-                            ifelse(demo_table_df$`Current u.s state of residence` %in% c("New York (NY)", "New Jersey (NJ)", "Massachusetts (MA)", "Pennsylvania (PA)", "Connecticut (CT)", "Rhode Island (RI)", "Vermont (VT)", "New Hampshire (NH)", "Maine (ME)"), "Northeast",
-                                   ifelse(demo_table_df$`Current u.s state of residence` %in% c("Michigan (MI)", "Illinois (IL)", "Ohio (OH)", "Indiana (IN)", "Wisconsin (WI)", "Minnesota (MN)", "Iowa (IA)", "Missouri (MO)", "Kansas (KS)", "Nebraska (NE)", "South Dakota (SD)", "North Dakota (ND)"), "Midwest", NA))))
+demo_table_df$Region <- case_when(
+  demo_table_df$`Current u.s state of residence` %in% c("California (CA)", "Colorado (CO)", "Utah (UT)", "Utah(UT)", "Idaho (ID)", "Alaska (AK)", "Hawaii (HI)", "Washington (WA)", "Oregon (OR)", "Nevada (NV)", "New Mexico (NM)", "Montana (MT)", "Arizona (AZ)", "Wyoming (WY)") ~ "West",
+  demo_table_df$`Current u.s state of residence` %in% c("Texas (TX)", "Florida (FL)", "Georgia (GA)", "North Carolina (NC)", "Tennessee (TN)", "South Carolina (SC)", "Alabama (AL)", "Mississippi (MS)", "Louisiana (LA)", "Delaware (DE)", "Maryland (MD)", "Virginia (VA)", "Washington, D.C. (DC)", "West Virginia (WV)", "Kentucky (KY)", "Arkansas (AR)", "Oklahoma (OK)") ~ "South",
+   demo_table_df$`Current u.s state of residence` %in% c("New York (NY)", "New Jersey (NJ)", "Massachusetts (MA)", "Pennsylvania (PA)", "Connecticut (CT)", "Rhode Island (RI)", "Vermont (VT)", "New Hampshire (NH)", "Maine (ME)") ~ "Northeast",
+  demo_table_df$`Current u.s state of residence` %in% c("Michigan (MI)", "Illinois (IL)", "Ohio (OH)", "Indiana (IN)", "Wisconsin (WI)", "Minnesota (MN)", "Iowa (IA)", "Missouri (MO)", "Kansas (KS)", "Nebraska (NE)", "South Dakota (SD)", "North Dakota (ND)") ~ "Midwest",
+ TRUE ~ NA_character_
+)
 
+#ensure that these are factors
+demo_table_df$`education-level` <- factor(demo_table_df$`education-level`)
+demo_table_df$`political-affiliation` <- factor(demo_table_df$`political-affiliation`)
+demo_table_df$`political-ideology` <- factor(demo_table_df$`political-ideology`)
 
 # define the levels in categorical variables so that they are organized in the table 
-demo_table_df$'political-affiliation' <- fct_relevel(
-  demo_table_df$'political-affiliation',
+demo_table_df$`political-affiliation` <- fct_relevel(
+  demo_table_df$`political-affiliation`,
   "Republican",
   "Democrat",
   "Independent",
 )
 
 
-demo_table_df$'education-level' <- fct_relevel(
-  demo_table_df$'education-level',
+demo_table_df$`education-level` <- fct_relevel(
+  demo_table_df$`education-level`,
   "High school diploma or GED",
    "Some college; no degree",
   "Associate degree",
@@ -418,8 +363,8 @@ demo_table_df$'education-level' <- fct_relevel(
 )
 
 
-demo_table_df$'political-ideology' <- fct_relevel(
-  demo_table_df$'political-ideology',
+demo_table_df$`political-ideology` <- fct_relevel(
+  demo_table_df$`political-ideology`,
 "Very conservative",
 "Conservative",
 "Somewhat conservative",
@@ -435,11 +380,11 @@ demo_table_df <- demo_table_df %>%
 demographics_table <- tbl_summary(demo_table_df,
  by = NULL,
   label = list(
-    `Time taken (minutes)` = "Time taken (minutes)",
+    `time_taken_overall_minutes` = "Time taken (minutes)",
     `Region` = "Current U.S. region of residence",
     Age = "Age (years)",
     Sex = "Sex",
-    `Ethnicity simplified` = "Ethnicity simplified",
+    `Ethnicity simplified` = "Ethnicity",
     `political-affiliation` = "Political affiliation",
     `education-level` = "Education level",
     `religious-affiliation` = "Religious affiliation",
@@ -451,7 +396,7 @@ demographics_table <- tbl_summary(demo_table_df,
   #  all_categorical() ~ "{n} ({p}%)"
 #),
   type = list(
-    `Time taken (minutes)` = "continuous",
+    `time_taken_overall_minutes` = "continuous",
     `Region` = "categorical",
     `Age` = "continuous",
     `gender-identification` = "categorical",
@@ -472,7 +417,7 @@ demographics_table <- tbl_summary(demo_table_df,
   sort = NULL,
   percent = NULL,
  include = c(
-'Time taken (minutes)', 
+'time_taken_overall_minutes', 
 'Region', 
 'Age', 
 'Sex', 
@@ -534,36 +479,28 @@ In our full-scale experiment, we intend to administer this questionnaire both be
 On average, participants completed the questionnaire in `r mean_survey_minutes` minutes (`r min_survey_minutes`, `r max_survey_minutes`).
 
 ```{r}
-#| label: tbl-time-df
-#| echo: false
-#| tbl-cap: Table showing time spent on survey.
-
-kable(time_figure_df)
-```
-
-```{r}
 #| label: fig-topic-ratings
 #| echo: false
 #| fig-cap: In the pre-intervention survey, each subject used a 7-pt scale to rate how comfortable they would be discussing each of the following topics. One of the subject's most strongly rated topics were randomly selected as the topic that the subject would focus on for the remainder of the experiment. The scale went from strongly uncomfortable (1), to moderately uncomfortable, a little uncomfortable, neutral (4), a little comfortable, moderately comfortable, and strongly comfortable (7).
 
 # create figure/table showing distribution of ratings on topics
 topic_ratings_df <- surveys_df %>%
-    filter(grepl("topic-", question)) %>%
+    filter(grepl("mandating vaccines in the U.S.|human euthanasia in the U.S.|the criminal justice system in the U.S.|same-sex marriage in the U.S.|the role of the U.S. government in healthcare|gender equality in the U.S.", question)) %>%
   mutate(answer = as.numeric(answer)) %>%
-  select(prolific_subject_id, question, answer, topicChoiceAsString, condition)
+  select(prolific_subject_id, question, answer, topicChoiceAsString)
   
-topic_labels <- c(
-  "topic-mandating vaccines in the U.S." = 
+topic_labels <- c( 
+  "mandating vaccines in the U.S." = 
     "Mandating vaccines",
-  "topic-human euthanasia in the U.S." = 
+  "human euthanasia in the U.S." = 
     "Human euthanasia",
-  "topic-the criminal justice system in the U.S." = 
+  "the criminal justice system in the U.S." = 
     "Criminal justice system",
-  "topic-same-sex marriage in the U.S." = 
+  "same-sex marriage in the U.S." = 
     "Same-sex marriage",
-  "topic-the role of the U.S. government in healthcare" = 
+  "the role of the U.S. government in healthcare" = 
     "Government in healthcare",
-  "topic-gender equality in the U.S." = 
+  "gender equality in the U.S." = 
     "Gender equality"
 )
 
@@ -584,100 +521,195 @@ print(topic_ratings_plot)
 ```
 
 ```{r}
-#| label: fig-polarization-hist
+#| label: fig-offending-reason-likert-bar-plot
 #| echo: false
-#| fig-cap: Histogram of mean ratings of opinions on topic-specific statements. Subjects rated their opinions on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
+#| fig-cap: Likert bar plot displaying subjects' ratings of how much certain concerns contribute to their unwillingness to converse. The nineteen potential concerns were derived from existing literature and pretested in a pilot experiment. On a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree, subjects rated each potential concerns effect on their willingness to converse.
 
-polarization_hist <- ggplot(polarization_df, aes(mean_score, color = condition)) +
-  geom_hist() +  
-  labs(y = "Mean rating", title = "Mean ratings of olarization of topic-specific beliefs.", color = "Group")
+# only works though if all "1" to "7" ratings are in the df
 
-print(polarization_hist)
+wide_for_likert_df <- surveys_df %>%
+  filter(grepl("offending-reason", question)) %>%
+  select(question, answer, prolific_subject_id) %>%
+  pivot_wider(names_from = question, values_from = answer) %>%
+  ungroup() %>%
+  rename("Might experience negative feelings about self" = "offending-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)", "Might be offended" = "offending-reason-I might take offense to what someone says",
+  "Opinion is unpopular amongst group" = "offending-reason-I would feel like my opinion is unpopular amongst the group.",
+  "Doesn't participate in these conversations often" = "offending-reason-I don’t often participate in conversations like these",
+  "Might struggle to explain views or seem uninformed" = "offending-reason-I might struggle to explain my views to the others and/or come across as uninformed",
+  "Others might be unproductive or disrespectful" = "offending-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+  "Views wouldn't change" = "offending-reason-My views wouldn’t change",
+  "Doesn't want to listen to others" = "offending-reason-I would not want to listen to the others discuss their views",
+  "Might be criticized" = "offending-reason-Someone could criticize or show disapproval of my views",
+  "Experience negative feelings about the world" = "offending-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
+  "Conversation might be awkward or tense" = "offending-reason-The conversation could become awkward or tense",
+  "Might feel embarrassed" = "offending-reason-I could feel humiliated or embarrassed in the conversation",
+  "Might offend someone" = "offending-reason-Someone might take offense to what I say",
+  "Might struggle to remain productive and respectful" = "offending-reason-I might struggle to remain productive and respectful",
+  "Others won't make effort to listen" = "offending-reason-The others might not make a full effort to hear and understand me",
+  "Identity might be challenged" = "offending-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
+  "Might feel invalidated" = "offending-reason-I might feel disempowered, unheard, or invalidated",
+  "Might incur social reprecussions" = "offending-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",  
+  "Opinion is unpopular in general" = "offending-reason-My opinion is unpopular in general."
+) %>%
+  select(-prolific_subject_id) %>%
+  mutate(across(everything(), ~ factor(.x, levels = 1:7,
+     labels = c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree",
+                "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree"),
+     ordered = TRUE)))
+
+### REMOVE DURING ACTUAL DATA ANALYSIS. I'M MANUALLY ADDING ALL LIKERT VALUES FOR EACH OFFENDING REASON SO THAT LIKERT PLOT WORKS
+### create a vector of the all 1-7 values
+all_likert_values <- c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree", "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree")
+### get the column names from  existing df
+offending_reasons_names <- colnames(wide_for_likert_df)
+### create 7 new rows
+new_likert_rows <- lapply(all_likert_values, function(response) {
+  as.list(setNames(rep(response, length(offending_reasons_names)), offending_reasons_names))
+}) %>%
+  bind_rows()
+### add the new rows to the existing dataframe
+wide_for_likert_df <- bind_rows(wide_for_likert_df, new_likert_rows)
+
+
+
+# standardize all columns to use the same factor object
+wide_for_likert_df <- wide_for_likert_df %>%
+  mutate(across(everything(), ~ factor(.x, levels = all_likert_values, ordered = TRUE)))
+
+offending_reason_likert <- likert(as.data.frame(wide_for_likert_df))
+
+# for the future when comparing pre and post, might want to use this example line: df1_likert <- likert(items=df1[,3:4], grouping=df1[,2]) 
+
+plot(offending_reason_likert, legend.position="right")
 
 ```
 
 ```{r}
-#| label: fig-offending-reason-hist
+#| label: fig-sliders-density
 #| echo: false
-#| fig-cap: Histogram with mean ratings of reasons subjects might be unwilling to converse about their topic. Subjects rated how true the reasons were to them on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
+#| fig-cap: Density plot displaying subjects' self-reported willingness to converse about their topic with somebody who disagrees with them and/or will challenge their views. Subjects used a scale from 0 to 100, where a rating of 0 meant subject was absolutely unwilling and a rating of 100 meant subject was absolutely willing. Subjects were asked this question in two ways; this density plot shows the mean of the two ratings. 
 
-offending_reason_hist <- ggplot(offending_reason_df, aes(mean_score, color = condition)) +
-  geom_hist() + 
-  labs(y = "Mean rating", title = "Change in how much different concerns affect willingness to converse.", color = "Group")
+sliders_df <- surveys_df %>%
+  filter(question == "slider1-placeholder" | question == "slider2-placeholder") %>%
+  group_by(prolific_subject_id) %>%
+  summarize(mean_willingness = round(mean(as.numeric(answer), na.rm = TRUE), 1))
+  
+sliders_density <- ggplot(sliders_df, aes(x = mean_willingness)) + #, color = condition.x)) +
+  geom_density() +  
+  labs(x = "Mean Willingness Rating", y = "Density of Rating", title = "Average Willingness to Converse about Selected Topic")  #, color = "Group") +
+ # scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+ #                    labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
 
-print(offending_reason_hist)
+print(sliders_density)
 
 ```
 
-```{r}
-#| label: fig-sliders-hist
-#| echo: false
-#| fig-cap: Histogram with mean ratings of willingness to converse. Subjects rated their willingness on a slider from 0 to 100, where a rating of 0 meant subject was absolutely unwilling and a rating of 100 meant subject was absolutely willing.
-
-
-sliders_hist <- ggplot(merged_sliders_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in willingness to converse about selected topic with others.", color = "Group") +
-  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
-                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
-
-print(sliders_hist)
-
-```
 
 ```{r}
-#| label: fig-openmindedness-hist
+#| label: fig-openmindedness-density
 #| echo: false
 #| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of subjects' open-mindedness when discussing their topic. Subjects rated their open-mindedness on a scale from 0 to 7, where a rating of 0 meant subject was not open-minded and a rating of 7 meant subject was open-minded.
 
-openmindedness_hist <- ggplot(merged_openmindedness_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in open-mindedness ratings before and after conversations.", color = "Group") +
-  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
-                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+openmindedness_df <- surveys_df %>%
+  filter(grepl("openmindedness", question)) 
 
-print(sliders_hist)
+openmindedness_df_mean <- openmindedness_df %>%
+  group_by(prolific_subject_id) %>%
+  summarize(mean_openmindedness = mean(as.numeric(answer))) %>%
+  ungroup()
 
+openmindedness_density <- ggplot(openmindedness_df_mean, aes(x = mean_openmindedness)) + #, color = condition.x)) +
+  geom_density() +  
+  labs(x = "Mean Open-mindedness Rating", y = "Density of Rating", title = "Average Open-mindedness about Selected Topic")  #, color = "Group") +
+ # scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+ #                    labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(openmindedness_density)
 
 ```
+
+```{r}
+#| label: fig-openmindedness-likert-bar-plot
+#| echo: false
+#| fig-cap: Likert bar plot displaying subjects' ratings of five questions about their open-mindedness. The five questions were derived from @elnakouricite and modified for application to this experiment. On a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree, subjects rated how true the five statements were for them. Three of the statements were negatively worded in the survey but have been worded positively and reverse-coded in this plot for clarity.
+
+# only works though if all "1" to "7" ratings are in the df
+
+wide_for_likert_openmindedness_df <- openmindedness_df %>%
+  select(question, answer, prolific_subject_id) %>%
+  pivot_wider(names_from = question, values_from = answer) %>%
+  ungroup() %>%
+  rename("Has patience for opposing arguments" = "openmindedness...have little patience for arguments that I disagree with @R@", 
+"Does not avoid opposing messages" = "openmindedness...avoid messages that I disagree with @R@", 
+"Believes it is important to pay attention to all politics ideas" = "openmindedness...believe it is a waste of time to pay attention to certain political ideas about $topic",
+"Is open to other political viewpoints" = "openmindedness...am open to considering other political viewpoints about $topic",
+"Considers as many different opinions as possible" = "openmindedness...consider as many different opinions as possible about $topic") %>%
+  select(-prolific_subject_id) %>%
+  mutate(across(everything(), ~ factor(.x, levels = 1:7,
+     labels = c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree",
+                "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree"),
+     ordered = TRUE)))
+
+### REMOVE DURING ACTUAL DATA ANALYSIS. I'M MANUALLY ADDING ALL LIKERT VALUES FOR EACH OFFENDING REASON SO THAT LIKERT PLOT WORKS
+### create a vector of the all 1-7 values. defining again here in case stuff gets moved around 
+all_likert_values <- c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree", "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree")
+### get the column names from  existing df
+openmindedness_column_names <- colnames(wide_for_likert_openmindedness_df)
+### create 7 new rows
+new_openmindedness_likert_rows <- lapply(all_likert_values, function(response) {
+  as.list(setNames(rep(response, length(openmindedness_column_names)), openmindedness_column_names))
+}) %>%
+  bind_rows()
+### add the new rows to the existing dataframe
+wide_for_likert_openmindedness_df <- bind_rows(wide_for_likert_openmindedness_df, new_openmindedness_likert_rows)
+
+
+
+# standardize all columns to use the same factor object
+wide_for_likert_openmindedness_df <- wide_for_likert_openmindedness_df %>%
+  mutate(across(everything(), ~ factor(.x, levels = all_likert_values, ordered = TRUE)))
+
+openmindedness_likert <- likert(as.data.frame(wide_for_likert_openmindedness_df))
+
+# for the future when comparing pre and post, might want to use this example line: df1_likert <- likert(items=df1[,3:4], grouping=df1[,2]) 
+
+plot(openmindedness_likert, legend.position="right")
+```
+
 
 ### Free response
 
 We conducted two primary analyses. First, we analyzed free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data. This analysis was performed manually. We found that \[list results\].
 
 ```{r}
-#| label: tbl-bot-free-response-examples
+#| label: tbl-bot-free-response-examples-table
 #| echo: false
-#| tbl-cap: Table showing examples of subjects' responses to free response question.
+#| tbl-cap: Table showing examples of subjects' responses to free response question, which asked subjects if there were any concerns beyond the nineteen items in our survey that contributed to the subject's unwillingness.
 
-free_response_figure <- free_response %>%
-  # turn each question into its own column so one subject can be one row
-  pivot_wider(names_from = question, values_from = answer) %>%
-  # for each subject, smash all the rows together into one
-  group_by(prolific_subject_id) %>%
-  reframe(across(everything(), ~ paste(unique(na.omit(.)), collapse = "; "))) %>%
-  # unnecessary columns for visual display
-  select(-c(prolific_subject_id, pilot_iteration.x, word_count)) %>%
+free_response <- surveys_df %>%
+  filter(question == "willingness-free-response") %>%
+  select(answer, topicChoiceAsString) %>%
   rename(
-    Condition = condition,
+    #Condition = condition,
     'Topic Choice' = 'topicChoiceAsString',
-    'Other reasons for unwillingness?' = 'willingness-free-response'
+    'Other reasons for unwillingness?' = 'answer'
     )
 
-kable(free_response_figure, "html") %>%
-  kable_styling() %>%
-  column_spec(2, width = "5em") %>%
-  column_spec(c(3,4,5,5), width = "40em")
+kable(free_response, "html") 
+# %>%
+#   kable_styling() %>%
+#   column_spec(2, width = "5em") %>%
+#   column_spec(c(3,4,5,5), width = "40em")
 ```
 
 ```{r}
-#| label: tbl-bot-free-response-df
+#| label: tbl-bot-free-response-tally-plot
 #| echo: false
 #| tbl-cap: Table showing subjects' responses to free response question.
 
 # CHANGE THIS CODE AS NEEDED BASED ON HOW THE DF IS STRUCTURED 
+
+### NEED TO CREATE A DF WITH ADDITIONAL REASONS FOUND IN THE FREE RESPONSE BEFORE I CAN DO THIS
 
 free_response_bar_plot <- ggplot(INSERT_DF_NAME_HERE, aes(x = count, y = reorder(statement, count))) +
   geom_col(fill = "cornflowerblue") +
@@ -694,7 +726,7 @@ print(free_response_bar_plot)
 
 ### Factor analysis
 
-Secondly, we conducted a factor analysis on the 19 given items to determine which concerns, if any, are correlated with each other. We found that \[list results\].
+Secondly, we conducted a factor analysis on the 19 items to explore potential latent factors reflecting correlated concerns. We found that \[list results\].
 
 ```{r}
 #| label: KMO, Bartlett's test, parallel analysis on 19-item matrix
@@ -703,21 +735,28 @@ Secondly, we conducted a factor analysis on the 19 given items to determine whic
 # create short labels for each question
 question_key_for_fa <- surveys_df %>%
   distinct(question) %>%
+  filter(grepl("offending-reason", question)) %>%
   arrange(question) %>%  # ensure consistent order
   mutate(short_label = paste0("Q0", row_number()))
 
 # join short labels back to the main data
 surveys_df_labeled_questions <- surveys_df %>%
-  left_join(question_key_for_fa, by = "question")
+  left_join(question_key_for_fa, by = "question") %>%
+  filter(grepl("offending-reason", question))
 
-concerns <- survey_df %>% select(starts_with("Q0"))
+concerns_labeled_wide <- surveys_df_labeled_questions %>%
+  select(prolific_subject_id, short_label, answer) %>%
+  pivot_wider(names_from = short_label, values_from = answer) %>%
+  mutate(across(starts_with("Q0"), ~ as.numeric(as.character(.)))) %>%
+  ungroup() %>%
+  select(-prolific_subject_id)
 
 # KMO and Bartlett’s test
-KMO(concerns)
-cortest.bartlett(cor(concerns), n = nrow(concerns))
+KMO(concerns_labeled_wide)
+cortest.bartlett(cor(concerns_labeled_wide), n = nrow(concerns_labeled_wide))
 
 # Parallel analysis
-fa.parallel(concerns, fa = "fa")
+fa.parallel(concerns_labeled_wide, fa = "fa")
 
 ```
 
@@ -725,27 +764,14 @@ fa.parallel(concerns, fa = "fa")
 #| label: Factor analysis on 19 items 
 #| echo: false
 
-
-# select relevant columns and pivot to wide format using short labels
-factor_analysis_wide_df <- surveys_df_labeled_questions %>%
-  select(prolific_subject_id, short_label, answer) %>%
-  pivot_wider(
-    names_from = short_label,
-    values_from = answer
-  )
-
-# remove any rows with missing values (there shouldn't be any though)
-factor_analysis_wide_complete_df <- factor_analysis_wide_df %>%
-  drop_na()
-
 # determine number of factors with parallel analysis
-fa.parallel(factor_analysis_wide_complete_df[-1], 
+fa.parallel(concerns_labeled_wide, 
             fa = "fa", 
             n.iter = 100)
 
 # run factor analysis with the chosen number of factors
 fa_result <- fa(
-  factor_analysis_wide_complete_df[-1], 
+  concerns_labeled_wide, 
   nfactors = [INSERT_NUMBER_OF_FACTORS], 
   rotate = "oblimin", 
   fm = "ml"
@@ -760,7 +786,7 @@ print(fa_result, cutoff = 0.3)  # show loadings above .3 NOT SURE IF THIS IS A G
 #| echo: false
 #| tbl-cap: Correlation matrix of reasons for unwillingness
 
-cor_matrix <- cor(concerns, use = "pairwise.complete.obs")
+cor_matrix <- cor(concerns_labeled_wide, use = "pairwise.complete.obs")
 corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
 
 ```
@@ -769,7 +795,7 @@ corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
 #| label: Check internal consistency 
 #| echo: false
 
-psych::alpha(concerns)
+psych::alpha(concerns_labeled_wide)
 
 ```
 
@@ -825,16 +851,16 @@ print(fa_heat_map)
 
 ### Additional analyses
 
-Additionally, we looked for any correlations between polarization and willingness concerns.
+Additionally, we looked for any correlations between open-mindedness and willingness concerns.
 
 ```{r}
-#| label: Correlations polarization vs. willingness concerns 
+#| label: Correlations open-mindedness vs. willingness concerns 
 #| echo: false
-#| tbl-cap: Correlation matrix of polarization vs. willingness concerns 
+#| tbl-cap: Correlation matrix of open-mindedness vs. willingness concerns 
 
-# look at correlation between polarization score and each willingness concern
-cor_results <- concerns %>%
-  map_dfr(~ tidy(cor.test(.x, survey_df$polarization_score)), .id = "item")
+# look at correlation between open-mindedness score and each willingness concern
+cor_results <- concerns_labeled_wide %>%
+  map_dfr(~ tidy(cor.test(.x, survey_df$open-mindedness_score)), .id = "item")
 
 # view results
 cor_results %>%
@@ -849,7 +875,7 @@ cor_results %>%
 
 survey_df$slider_avg <- rowMeans(survey_df %>% select(slider_1, slider_2), na.rm = TRUE)
 
-apply(concerns, 2, function(x) cor(x, survey_df$slider_avg, use = "pairwise.complete.obs"))
+apply(concerns_labeled_wide, 2, function(x) cor(x, survey_df$slider_avg, use = "pairwise.complete.obs"))
 
 ```
 
@@ -859,7 +885,7 @@ Next, we looked for correlations between willingness concerns and overall willin
 #| label: Look at concerns as predictors of overall willingness 
 #| echo: false 
 
-model <- lm(willingness_avg ~ ., data = cbind(survey_df["slider_avg"], concerns))
+model <- lm(willingness_avg ~ ., data = cbind(survey_df["slider_avg"], concerns_labeled_wide))
 summary(model)
 
 # Multicollinearity check
@@ -875,31 +901,31 @@ Then, we assessed whether any willingness concerns are significant predictors of
 #| echo: false 
 
 # Scale data
-concerns_scaled <- scale(concerns)
+concerns_labeled_wide_scaled <- scale(concerns_labeled_wide)
 
 # Determine optimal number of clusters
 library(factoextra)
-fviz_nbclust(concerns_scaled, kmeans, method = "wss")
+fviz_nbclust(concerns_labeled_wide_scaled, kmeans, method = "wss")
 
 # K-means with k = 3 (example)
 set.seed(123)
-kmeans_result <- kmeans(concerns_scaled, centers = 3)
+kmeans_result <- kmeans(concerns_labeled_wide_scaled, centers = 3)
 survey_df$cluster <- kmeans_result$cluster
 
 # Visualize clusters with PCA
 library(ggfortify)
-autoplot(prcomp(concerns_scaled), data = survey_df, colour = 'cluster')
+autoplot(prcomp(concerns_labeled_wide_scaled), data = survey_df, colour = 'cluster')
 ```
 
 We also conducted cluster analysis to determine whether participants generally fell into certain categories of concerns.
 
 ```{r}
 # If you have a 'topic' variable
-manova_result <- manova(as.matrix(concerns) ~ survey_df$topic)
+manova_result <- manova(as.matrix(concerns_labeled_wide) ~ survey_df$topic)
 summary(manova_result)
 
 # Follow-up ANOVAs
-aov_results <- lapply(concerns, function(item) aov(item ~ survey_df$topic))
+aov_results <- lapply(concerns_labeled_wide, function(item) aov(item ~ survey_df$topic))
 lapply(aov_results, summary)
 
 ```
