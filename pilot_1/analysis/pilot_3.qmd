@@ -9,7 +9,7 @@ editor: visual
 
 ## Abstract
 
-In an era of rising polarization, Americans face increasing challenges when engaging in respectful conversations across ideological divides (Klein, 2020). While human-to-human conversations have been shown to increase empathy and reduce polarization (e.g., Broockman & Kalla, 2016, Combs et al., 2023, and Elnakouri et al., 2024), they are often difficult to initiate and sustain, particularly in socially or politically charged environments. As existing research has found that large language models (LLMs) can impact user beliefs (e.g., Chalaguine et al., 2019 & Costello et al., 2024), this study investigates whether LLMs can serve as accessible tools to support and encourage more open-minded human-to-human conversations. Drawing on prior research into conversational styles that promote civility and perspective-taking, we developed a specialized chatbot using ChatGPT and tested it in this experiment. American participants discussed one of seven controversial topics with the chatbot and completed surveys before and after the conversation to assess changes in willingness to engage, open-mindedness, and belief extremity. Results suggest that certain chatbot styles may positively influence users’ attitudes in ways that support productive future dialogue. This research positions LLMs as scalable, private, and low-risk tools that can help prepare individuals for more thoughtful engagement with those they disagree with. Applications could revolutionize educational settings and online platforms, where dissenting views often face social penalties. Future research should administer the chatbot intervention and then assess changes in key measures by having subjects participate in a human-to-human conversation . 
+In an era of rising polarization, Americans face increasing challenges when engaging in respectful conversations across ideological divides (Klein, 2020). While human-to-human conversations have been shown to increase empathy and reduce polarization (e.g., Broockman & Kalla, 2016, Combs et al., 2023, and Elnakouri et al., 2024), they are often difficult to initiate and sustain, particularly in socially or politically charged environments. As existing research has found that large language models (LLMs) can impact user beliefs (e.g., Chalaguine et al., 2019 & Costello et al., 2024), this study investigates whether LLMs can serve as accessible tools to support and encourage more open-minded human-to-human conversations. Drawing on prior research into conversational styles that promote civility and perspective-taking, we developed a specialized chatbot using ChatGPT and tested it in this experiment. American participants discussed one of seven controversial topics with the chatbot and completed surveys before and after the conversation to assess changes in willingness to engage, open-mindedness, and belief extremity. Results suggest that certain chatbot styles may positively influence users’ attitudes in ways that support productive future dialogue. This research positions LLMs as scalable, private, and low-risk tools that can help prepare individuals for more thoughtful engagement with those they disagree with. Applications could revolutionize educational settings and online platforms, where dissenting views often face social penalties. Future research should administer the chatbot intervention and then assess changes in key measures by having participants participate in a human-to-human conversation . 
 
 ```{r}
 #| label: Data Fetching. Load R packages
@@ -24,6 +24,23 @@ library(kableExtra)
 library(stringr)
 library(ggridges)
 library(DiagrammeR) # for flowchart 
+library(afex) # for mixed model anova
+library(emmeans) # for mixed model anova
+
+# from pretest code
+library(lubridate)  # for date handling
+library(psych) # for factor analysis 
+library(pheatmap) # for factor analysis heat map 
+library(corrplot) # for correlation matrix 
+library(broom) # for correlation tests
+library(purrr) # for correlation tests 
+library(likert) # for likert plots 
+library(factoextra)
+library(ggfortify)
+library(car) # for mlr
+
+
+# old and don't think i need anymore?
 # library(knitr)
 # library(corrplot)
 # library(GGally)
@@ -56,7 +73,7 @@ filter(Status != "RETURNED") %>%
 rename("start" = "Started at") %>%
 # make time more readable but keep the seconds version for analysis stuff later
 mutate(`Time taken (minutes)` = as.numeric(`Time taken`) / 60) %>%
-# manually remove one subject who didn't receive a condition because i messed up our experiment code and one subject who didn't give us their data
+# manually remove one participant who didn't receive a condition because i messed up our experiment code and one participant who didn't give us their data
   filter(prolific_subject_id != "65fc207aef1f5877493fe5e8") %>% 
   filter(prolific_subject_id != "6602ce6267191d285a324221") %>% 
 # name the round of the pilot that the person was in 
@@ -93,9 +110,9 @@ rawwwwwww_df <- bind_rows(raw_dfs_tibbles)
 #| include: false 
 
 raw_df <- rawwwwwww_df %>%
-  # inner join with the demographics df from pilot 2 so we can eliminate pilot 1 subjects
+  # inner join with the demographics df from pilot 2 so we can eliminate pilot 1 participants
   inner_join(full_prolific_demographics_df, by = "prolific_subject_id") %>%
-  # manually remove one subject who didn't receive a condition because i messed up our experiment code and one subject who didn't give us their data
+  # manually remove one participant who didn't receive a condition because i messed up our experiment code and one participant who didn't give us their data
   filter(prolific_subject_id != "65fc207aef1f5877493fe5e8") %>% 
   filter(prolific_subject_id != "6602ce6267191d285a324221") %>%
   # add condition column
@@ -120,10 +137,10 @@ raw_df <- rawwwwwww_df %>%
   fill(topicChoiceAsString, .direction = "downup") %>%
   ungroup() 
 
-# number of subjects in data 
-total_num_subjects_in_data <- nrow(raw_df %>%
+# number of participants in data 
+total_num_participants_in_data <- nrow(raw_df %>%
   group_by(prolific_subject_id) %>%
-  summarize(total_num_subjects_in_data = n()))
+  summarize(total_num_participants_in_data = n()))
 
 ```
 
@@ -137,7 +154,7 @@ surveys_cleaning_df <- raw_df %>%
   # Remove control interventions (these are coded as surveys)
   filter(phase != "control-intervention") %>%
   # Remove the matrix question titles because they mess with separating questions from answers
-  # republican/democrat (pre-convo)
+  # republican/democrat (pre-intervention)
   mutate(across(everything(), ~ gsub(',"rating-republicans":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub(',"rating-democrats":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"rating-republicans":null,', '', .))) %>%
@@ -150,7 +167,7 @@ surveys_cleaning_df <- raw_df %>%
   mutate(across(everything(), ~ gsub('"rating-democrats":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-republicans":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-democrats":', '', .))) %>%
-  # republican/democrat (post-convo)
+  # republican/democrat (post-intervention)
   mutate(across(everything(), ~ gsub('"rating-republicans-post":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"rating-democrats-post":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-republicans-post":null,', '', .))) %>%
@@ -159,7 +176,7 @@ surveys_cleaning_df <- raw_df %>%
   mutate(across(everything(), ~ gsub('"rating-democrats-post":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-republicans-post":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-democrats-post":', '', .))) %>%
-  #topic-specific polarization (pre-convo)
+  #topic-specific polarization (pre-intervention)
   mutate(across(everything(), ~ gsub('"euthanasia-polarization":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"gender-polarization":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"healthcare-polarization":null,', '', .))) %>%
@@ -174,7 +191,7 @@ surveys_cleaning_df <- raw_df %>%
   mutate(across(everything(), ~ gsub('"vaccines-polarization":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"criminal-polarization":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"same-sex-polarization":', '', .))) %>%
-  #topic-specific polarization (post-convo)
+  #topic-specific polarization (post-intervention)
   mutate(across(everything(), ~ gsub('"euthanasia-polarization-post":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"gender-polarization-post":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"healthcare-polarization-post":null,', '', .))) %>%
@@ -261,7 +278,7 @@ failed_copypaste_check <- copypaste_flagging %>%
   pull(failed_copypaste_check)
 
 # get their ids so we can remove them from data analysis
-failed_copypaste_check_subject_ids <- copypaste_flagging %>%
+failed_copypaste_check_participant_ids <- copypaste_flagging %>%
   filter(flag == 'copy-pasted') %>%
   distinct(prolific_subject_id) %>%
   pull(prolific_subject_id)
@@ -313,7 +330,7 @@ failed_character_count_check <- character_count_flagging %>%
 pull(failed_character_count_check)
 
 # get their ids so we can remove them from data analysis
-failed_character_count_subject_ids <- character_count_flagging %>%
+failed_character_count_participant_ids <- character_count_flagging %>%
   filter(flag == 'fishy') %>%
   distinct(prolific_subject_id) %>%
   pull(prolific_subject_id)
@@ -329,24 +346,24 @@ attention_check <- surveys_df %>%
   mutate(flag = case_when(
     sum(answer == "0.00") == 0 ~ "double fail", #double fail means we should reject their data
     sum(answer == "0.00") == 1 ~ "single fail", #single fail is not means for rejecting data
-    sum(answer == "0.00") == 2 ~ "pass", #good subject :3
+    sum(answer == "0.00") == 2 ~ "pass", #good participant :3
     TRUE ~ NA_character_
   )) %>%
   ungroup() %>%
   select(flag, question, answer, prolific_subject_id, "Time taken (minutes)", condition) %>%
-  # REMOVE THIS FOR FULL EXPERIMENT, manually making one subject pass because i had an error in the experiment code that made the subject not receive one of the attention checks (nothing else was affected in their data)
+  # REMOVE THIS FOR FULL EXPERIMENT, manually making one participant pass because i had an error in the experiment code that made the participant not receive one of the attention checks (nothing else was affected in their data)
   mutate(flag = if_else(prolific_subject_id == "66ac39dd781146c974c07009", "pass", flag))
 
 # extract value for text 
 total_failed_attention_checks <- attention_check %>%
   # excluding people for both fails
   filter(flag == 'double fail' | flag == 'single fail') %>%
-  # add distinct because there are two attention check questions so a failed subject gets flagged twice
+  # add distinct because there are two attention check questions so a failed participant gets flagged twice
   summarize(total_failed_attention_checks = n_distinct(prolific_subject_id)) %>%
   pull(total_failed_attention_checks)
 
 # get count of how many ppl double failed
-failed_attention_checks_subject_ids <- attention_check %>%
+failed_attention_checks_participant_ids <- attention_check %>%
   filter(flag == 'double fail') %>%
   distinct(prolific_subject_id) %>%
   pull(prolific_subject_id)
@@ -359,18 +376,18 @@ failed_attention_checks_subject_ids <- attention_check %>%
 
 # remove bad subs
 raw_df <- raw_df %>%
-  filter(!(prolific_subject_id %in% failed_copypaste_check_subject_ids)) %>%
-  filter(!(prolific_subject_id %in% failed_character_count_subject_ids)) %>%
+  filter(!(prolific_subject_id %in% failed_copypaste_check_participant_ids)) %>%
+  filter(!(prolific_subject_id %in% failed_character_count_participant_ids)) %>%
   filter(!(prolific_subject_id %in% total_failed_attention_checks))
     
 surveys_df <- surveys_df %>%
-  filter(!prolific_subject_id %in% failed_copypaste_check_subject_ids)  %>%
-  filter(!prolific_subject_id %in% failed_character_count_subject_ids)  %>%
-  filter(!prolific_subject_id %in% failed_attention_checks_subject_ids) 
+  filter(!prolific_subject_id %in% failed_copypaste_check_participant_ids)  %>%
+  filter(!prolific_subject_id %in% failed_character_count_participant_ids)  %>%
+  filter(!prolific_subject_id %in% failed_attention_checks_participant_ids) 
   
-total_num_clean_subjects_in_data <- nrow(raw_df %>%
+total_num_clean_participants_in_data <- nrow(raw_df %>%
   group_by(prolific_subject_id) %>%
-  summarize(total_num_clean_subjects_in_data = n()))
+  summarize(total_num_clean_participants_in_data = n()))
 
 ```
 
@@ -378,16 +395,152 @@ total_num_clean_subjects_in_data <- nrow(raw_df %>%
 
 Americans are increasingly unwilling to engage in conversations about emotionally charged or politically divisive topics—discussions that are essential for fostering empathy, intellectual humility, and democratic resilience (@finkel2020; @iyengar2019). While human-to-human conversations have been shown to increase open-mindedness and reduce polarization (e.g., @broockman2016; @combs2023; @elnakouri2024; @fernbach2013), these same conversations can also become unproductive and inaccessible, leaving participants even more reluctant to engage in future dialogue (cite). This growing reluctance presents a societal challenge: how can we foster greater willingness in Americans to engage with each other across ideological divides?
 
-Recent findings suggest that artificial intelligence (AI), particularly conversational large language models (LLMs), can promote open-mindedness and persuade users. Research has shown that AI can shift user beliefs, increase receptiveness to opposing views, and encourage intellectual humility (@altay2022; @chalaguine2019; @costello2024; @matz2024). While these characteristics are thought to be closely linked with willingness to converse (cite), research has not directly tested whether conversations with a conversational LLM can increase willingness to converse about divisive topics in the U.S..
+We propose that conversational large language models (LLMs) could serve as a low-stakes, scalable, and emotionally neutral entry point into difficult dialogues—--one that does not replace human-to-human conversations, but increases Americans' willingness to engage in productive, open-minded conversations with other Americans. To explore this, we developed the Mind-Opening Conversational Agent (MOCA), a response-election chatbot system designed specifically to increase users’ willingness to engage in discussions about polarizing issues. 
 
-We propose that conversational large language models (LLMs) could serve as a low-stakes, scalable, and emotionally neutral entry point into difficult dialogues—one that increases users' willingness to engage in productive, open-minded conversations. To explore this, we developed the Mind-Opening Conversational Agent (MOCA), a response-election chatbot system designed specifically to increase users’ willingness to engage in discussions about polarizing issues. 
+Recent findings suggest that artificial intelligence (AI), particularly conversational large language models (LLMs), can promote open-mindedness and persuade users in various contexts. Research has shown that AI can shift user beliefs, increase receptiveness to opposing views, and encourage intellectual humility (@altay2022; @chalaguine2019; @costello2024; @matz2024). While these characteristics are thought to be closely linked with willingness to converse (cite), research has not directly tested whether conversations with a conversational LLM can increase willingness to converse about divisive topics in the U.S.
 
-MOCA is comprised of four chatbots that generate potential responses and a fifth chatbot that selects and outputs the response that it deems most likely to increase willingness to converse (Figure 1). We based three of the four response-generating chatbots' approaches on findings in the human-to-human research (e.g., @broockman2016; @combs2023; @elnakouri2024; @fernbach2013), but left the fourth approach as minimal as possible to increase MOCA's autonomy. In this way, there are two avenues through which MOCA could influence users: through literature-backed, prompt-engineered approaches and through MOCA's own approach.
+We worked with six divisive topics in the U.S. during the development of MOCA and will have each user discuss one of these topics with MOCA: human euthanasia, the role of the government in healthcare, same-sex marriage, mandating vaccines, the criminal justice system, and gender equality. To evaluate MOCA’s effectiveness, we will administer pre- and post-intervention surveys assessing open-mindedness, polarization, and willingness to converse. If MOCA is effective, we expect to observe increased open-mindedness and willingness to converse, alongside reduced polarization, when comparing pre- and post-intervention survey responses. By adapting techniques shown to be effective in human-human conversations to a modern AI framework, we aim to evaluate whether LLMs can serve as scalable tools for encouraging open dialogue on contentious issues.
+
+## Methods
+
+### Participants
+
+We pre-registered a target sample size of `r total_num_participants_in_data` participants to achieve sufficient statistical power. We restricted our study to Prolific users who fluently speak English, currently reside in the United States, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participate in studies with harmful content. This study was approved by the Vassar College Institutional Review Board. After applying exclusion criteria, `r total_num_clean_participants_in_data` participants remain. We excluded `r total_failed_attention_checks` participants for failing one or more of the attention checks in the surveys and `r failed_copypaste_check + failed_character_count_check` participants for likely plagiarizing their conversation messages. participants were [demographics] (\@ref(fig:tbl-basic-demographics-table)).
 
 ```{r}
-#| label: flowchart-selection-bot
+#| label: tbl-basic-demographics-table
 #| echo: false
-#| tbl-cap: Graphic of selection bot process.
+#| tbl-cap: Table of basic demographics.
+
+#we already read in demographics earlier 
+
+#create a demographics table from the demographics questions in our survey. turn the demographics questions from question column into their own columns with answer as the entries within the column
+survey_demographics_df <- surveys_df %>%
+filter(question == 'ethnicity' | question == 'political-affiliation' | question == 'gender-identification' | question == 'education-level' | question == 'religious-affiliation' | question == 'political-ideology') %>%
+select(question, answer, prolific_subject_id, condition) %>%
+pivot_wider(names_from = question, values_from = answer)
+
+#merge our two demographics tables
+demo_table_df <- survey_demographics_df %>%
+  left_join(full_prolific_demographics_df, by = "prolific_subject_id", suffix = c("_prolific", ""))
+
+#make a region column because showing each state is excessive
+demo_table_df$Region <- ifelse(demo_table_df$`Current u.s state of residence` %in% c("California (CA)", "Colorado (CO)", "Utah (UT)", "Utah(UT)", "Idaho (ID)", "Alaska (AK)", "Hawaii (HI)", "Washington (WA)", "Oregon (OR)", "Nevada (NV)", "New Mexico (NM)", "Montana (MT)", "Arizona (AZ)", "Wyoming (WY)"), "West",
+                     ifelse(demo_table_df$`Current u.s state of residence` %in% c("Texas (TX)", "Florida (FL)", "Georgia (GA)", "North Carolina (NC)", "Tennessee (TN)", "South Carolina (SC)", "Alabama (AL)", "Mississippi (MS)", "Louisiana (LA)", "Delaware (DE)", "Maryland (MD)", "Virginia (VA)", "Washington, D.C. (DC)", "West Virginia (WV)", "Kentucky (KY)", "Arkansas (AR)", "Oklahoma (OK)"), "South",
+                            ifelse(demo_table_df$`Current u.s state of residence` %in% c("New York (NY)", "New Jersey (NJ)", "Massachusetts (MA)", "Pennsylvania (PA)", "Connecticut (CT)", "Rhode Island (RI)", "Vermont (VT)", "New Hampshire (NH)", "Maine (ME)"), "Northeast",
+                                   ifelse(demo_table_df$`Current u.s state of residence` %in% c("Michigan (MI)", "Illinois (IL)", "Ohio (OH)", "Indiana (IN)", "Wisconsin (WI)", "Minnesota (MN)", "Iowa (IA)", "Missouri (MO)", "Kansas (KS)", "Nebraska (NE)", "South Dakota (SD)", "North Dakota (ND)"), "Midwest", NA))))
+
+
+# define the levels in categorical variables so that they are organized in the table 
+demo_table_df$'political-affiliation' <- fct_relevel(
+  demo_table_df$'political-affiliation',
+  "Republican",
+  "Democrat",
+  "Independent",
+)
+
+
+demo_table_df$'education-level' <- fct_relevel(
+  demo_table_df$'education-level',
+  "High school diploma or GED",
+   "Some college; no degree",
+  "Associate degree",
+  "Bachelor's degree",
+   "Master's degree",
+)
+
+
+demo_table_df$'political-ideology' <- fct_relevel(
+  demo_table_df$'political-ideology',
+"Very conservative",
+"Conservative",
+"Somewhat conservative",
+"Moderate",
+"Somewhat liberal",
+"Liberal",
+"Very liberal"
+)
+
+demo_table_df <- demo_table_df %>%
+  mutate(across(where(is.factor), ~ droplevels(.)))
+
+demographics_table <- tbl_summary(demo_table_df,
+ by = NULL,
+  label = list(
+    `Time taken (minutes)` = "Time taken (minutes)",
+    `Region` = "Current U.S. region of residence",
+    Age = "Age (years)",
+    Sex = "Sex",
+    `Ethnicity simplified` = "Ethnicity simplified",
+    `political-affiliation` = "Political affiliation",
+    `education-level` = "Education level",
+    `religious-affiliation` = "Religious affiliation",
+    `political-ideology` = "Political ideology"
+  ),
+  statistic = NULL,
+#list(
+  #  all_continuous() ~ "{mean} ({sd})",
+  #  all_categorical() ~ "{n} ({p}%)"
+#),
+  type = list(
+    `Time taken (minutes)` = "continuous",
+    `Region` = "categorical",
+    `Age` = "continuous",
+    `gender-identification` = "categorical",
+   `Sex` = "categorical",
+    `Ethnicity simplified` = "categorical",
+    `political-affiliation` = "categorical",
+    `education-level` = "categorical",
+    `religious-affiliation` = "categorical",
+    `political-ideology` = "categorical"
+  ),
+  digits = list(
+    all_continuous() ~ 2,
+    all_categorical() ~ 0
+  ),
+  value = NULL,
+  missing = NULL,
+  missing_text = NULL,
+  sort = NULL,
+  percent = NULL,
+ include = c(
+'Time taken (minutes)', 
+'Region', 
+'Age', 
+'Sex', 
+'Ethnicity simplified', 
+'political-affiliation', 
+'education-level', 
+'religious-affiliation', 
+'political-ideology'
+))
+ # %>%  modify_header(label = "**whatever label i want**")
+
+# Print the table
+as_gt(demographics_table)
+
+```
+
+```{r}
+#| label: WIP - Grab number of participants who chatted beyond required length with MOCA
+#| include: false 
+
+n_participants_kept_messaging_chatbot
+
+```
+
+### Materials
+
+We used the gpt-4.1 model of ChatGPT through an OpenAI API key to run MOCA. See [link to appendix in osf] for MOCA's five prompts that were used in this study. See [link to other appendix in osf] for documentation of the conceptual development and iterative execution of MOCA, including literature supporting the approaches that we designed and our prompt-engineering methods.
+
+We used custom software written with the jsPsych framework (@jspsychcite) to create the experiment and its components, which participants viewed and responded to via their personal laptops or desktops. The javascript code for the experiment and RStudio code for data analysis can both be found at (https://github.com/jodeleeuw/URSI-LLM-Convo-Bot/tree/main/pilot_1). 
+
+Pre-registrations and all data for this study, previous pilots, and the survey pretest are available on the Open Science Framework at https://osf.io/x32pv. The experiment Web page can be found at http://54.234.217.37/jdeleeuw/ursi2024/experiment/experiment.html.
+
+```{r}
+#| label: flowchart-response-election
+#| echo: false
+#| tbl-cap: Graphic of the Mind-Opening Conversational Agent's (MOCA) response-selection process. Experimental group participants converse with MOCA about a divisive topic in the U.S.
 
 grViz("
 digraph chatbot_flow {
@@ -416,21 +569,85 @@ digraph chatbot_flow {
 ")
 ```
 
-We worked with six divisive topics in the U.S. during the development of our chatbot approaches and will have users select one of these for their conversation: human euthanasia, the role of the government in healthcare, same-sex marriage, mandating vaccines, the criminal justice system, and gender equality. To evaluate MOCA’s effectiveness, we will administer pre- and post-intervention surveys assessing open-mindedness, polarization, and willingness to converse. If MOCA is effective, we expect to observe increased open-mindedness and willingness to converse, alongside reduced polarization, when comparing pre- and post-intervention survey responses. By adapting techniques shown to be effective in human-human conversations to a modern AI framework, we aim to evaluate whether LLMs can serve as scalable tools for encouraging open dialogue on contentious issues.
+### Procedure
+
+Participants experienced a three-part online experiment: survey, intervention, survey. Upon agreeing to participate in this experiment, participants were brought to the experiment Web page, where they were shown a welcome message (\@ref(fig:fig-pre-intervention-screenshots)). They clicked any key to proceed to an instructions message, which informed users that they were going to fill out a survey and converse with a chatbot (experimental group) or perform a free reflection (control group). Next, all participants filled out a survey which assessed the user's demographics, the topic that the user would discuss with the chatbot, how polarized the user's beliefs about the topic and the other political party are, how open-minded the user is about the topic, how willing the user is converse about the topic with others, and what concerns contribute to the user's unwillingness to converse. The open-mindedness and change in polarization questions that participants engaged with were based in questionnaires from the existing literature than we modified so that they would apply well to our experiment (@elnakouricite, [cite]). Applicable measures for willingness to converse did not yet exist, so participants engaged with questions that we created based on existing theory and validated in a pretest experiment. 
+
+```{r}
+#| label:  fig-pre-intervention-screenshots
+#| echo: false
+#| fig-cap: Screenshots of pre-intervention portion of the experiment.
+#| out.width: 33% 
+#| fig.show: 'hold'
+#| fig.align: 'center'
+
+knitr::include_graphics(c("welcome.png", 
+                          "start_of_survey.png",
+                          "topic_selection.png",
+                          "openmindedness.png",
+                          "offending_reasons.png"))
+```
+
+Then, experimental group participants were informed that they had completed the survey and, prior to conversing with MOCA, were briefed with a short message that provided more information about the conversation. This message asked users to be truthful, explained that there were no right or wrong answers, informed users that they would be prompted to proceed to the next part of the experiment after exchanging ten messages with the chatbot, and informed users that copy-pasted messages would be detected and result in their participation being rejected on Prolific. Then, the participants proceeded to converse with MOCA (\@ref(fig:fig-experimental-intervention-screenshot)). 
+
+Each participant was prompted to start conversing by a pre-written message from MOCA: "Hey there! I'm here to chat about [topic that user was most unwilling to discuss with others per their pre-intervention survey], a disputed topic. I'm not here to judge your beliefs; I'm just here to help you explore your views. To get the conversation started, could you explain your view on whether [opinionated topic-specific statement with which user most strongly disagreed in their pre-intervention survey]?" (\@ref(fig:fig-experimental-intervention-screenshot)). After the participant responded to this message, then MOCA's response-election system went into effect. 
+
+MOCA was comprised of four chatbots that generated potential responses and a fifth chatbot that selected and output the response that it deemed most likely to increase willingness to converse (\@ref(fig:flowchart-response-election)). We based three of the four response-generating chatbots' approaches on findings in the human-to-human research (e.g., @broockman2016; @combs2023; @elnakouri2024; @fernbach2013) so that MOCA had the opportunity to influence users through literature-backed prompts. These approaches were: providing a potential counterargument, explaining an alternative viewpoint that others might have, and asking the participant a question about their views. We left the fourth approach as minimal as possible to increase MOCA's autonomy; in case our manipulation of AI was actually a barrier rather than an advantage in the endeavor to have AI increase willingness to converse, increasing the autonomy in this response-generating chatbot should have given MOCA an opportunity to influence users despite our manipulation of AI in the other response-generating chatbots. 
+
+Thus, every time a participant sent a message to MOCA, the participant received a message back that either asked a question about their views, provided a counterargument, explained an alternative viewpoint, or engaged with the user in some other way that MOCA autonomously chose. The participant would next respond to this message and then receive another message that MOCA generated through the same response-election approach. After participants had exchanged ten sets of messages with MOCA, they were notified to click "Continue" to proceed with the experiment. We did not explicitly tell participants that they could or could not continue chatting with MOCA, but the messaging feature remained enabled even when the "Continue" button appeared, meaning participants had the ability to continue messaging beyond ten messages if they desired to do so. `r n_participants_kept_messaging_chatbot/total_num_participants_in_data` percent of participants continued chatting with MOCA beyond the ten messages. 
+
+```{r}
+#| label: fig-experimental-intervention-screenshot
+#| echo: false
+#| fig-cap: Screenshot of chatbot intervention interface during a conversation.
+#| out.width: 33% 
+#| fig.show: 'hold'
+#| fig.align: 'center'
+
+knitr::include_graphics(c("pre_convo_message.png",
+                        "first_convo_message.png",
+                        "intervention_screenshot.png"))
+
+```
+
+When participants in the control group completed the pre-intervention questionnaire, they were then informed that it was time to complete the free reflection. The reflection asked participants to freely reflect for 10 minutes on a statement (\@ref(fig:fig-control-reflection-screenshot)). If a participant stopped typing for more than 20 seconds, the timer paused and they received a notification that the timer would pause during longer periods of inactivity. Like in the chatbot intervention, the statement that a participant was given was drawn from the polarization section of the participant's pre-intervention questionnaire. In this section, the participant was shown multiple opinionated statements about their topic and was asked to rate how much they agreed or disagreed with each statement on a seven point scale. The statement that the participant most strongly disagreed with was the statement that they were asked to freely reflect upon. 
+
+```{r}
+#| label:  fig-control-reflection-screenshot
+#| echo: false
+#| fig-cap: Screenshot of control reflection.
+#| out.width: 100%
+
+knitr::include_graphics("control_screenshot.png")
+
+```
+
+After completing their interventions, all participants were shown a message which said that they had completed their intervention and had one survey left to complete before returning to Prolific (\@ref(fig:fig-post-survey-screenshot)). Participants then proceeded to this survey, which included all of the elements from the pre-intervention survey except for the demographics section. Experimental group participants also completed a set of questions which directly asked about their feelings about the bot and its effectiveness. 
+
+Finally, all participants were thanked for their participation, briefly informed about the purpose of the experiment, and redirected to Prolific. 
+
+```{r}
+#| label:  fig-post-survey-screenshot
+#| echo: false
+#| fig-cap: Screenshot of post-intervention questionnaire phases.
+#| out.width: 33% 
+#| fig.show: 'hold'
+#| fig.align: 'center'
+
+knitr::include_graphics(c("post_convo_message.png",
+                        "democrats.png",
+                        "last_questions.png",
+                        "goodbye.png"))
+```
 
 
-## Methods
-
-### Participants
-
-We pre-registered a target sample size of `r total_num_subjects_in_data` participants to achieve sufficient statistical power. We restricted our study to Prolific users who fluently speak English, currently reside in the United States, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. This study was approved by the Vassar College Institutional Review Board. After applying exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain. We excluded `r total_failed_attention_checks` subjects for failing one or more of the attention checks in the surveys and `r failed_copypaste_check + failed_character_count_check` subjects for likely plagiarizing their conversation messages.
 
 ```{r}
 #| label: Reverse code for quantitative analysis
 #| include: false
 
 reverse_coded_scores_df <- surveys_df %>%
-   # In the experiment code, we put '@R@' in all statements that are supposed to be reverse coded. So we can grab all of those statements here and reverse them. The only statements that don't have @R@ are the pre-convo survey polarization statements because those were converted into strings for the chatbot to use
+   # In the experiment code, we put '@R@' in all statements that are supposed to be reverse coded. So we can grab all of those statements here and reverse them. The only statements that don't have @R@ are the pre-intervention survey polarization statements because those were converted into strings for the chatbot to use
    mutate(answer = ifelse(
          grepl("@R@", question) | 
          grepl("It is not right for family members to request euthanasia on behalf of incapacitated patients", question) | 
@@ -521,7 +738,7 @@ pre_polarization_df <- reverse_coded_scores_df %>%
          grepl("Discrimination against same-sex couples in housing and public accommodations should be banned", question) |
           grepl("polarization-general", question)
            ) %>%
-  filter(grepl("pre-convo", phase)) %>%
+  filter(grepl("pre-intervention", phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -581,7 +798,7 @@ post_polarization_df <- reverse_coded_scores_df %>%
          grepl("Discrimination against same-sex couples in housing and public accommodations should be banned", question)|
           grepl("polarization-general", question)
            ) %>%
-  filter(grepl('post-convo', phase)) %>%
+  filter(grepl('post-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -599,7 +816,7 @@ post_polarization_df <- reverse_coded_scores_df %>%
 pre_polarization_general_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("polarization-general", question))%>%
-  filter(grepl('pre-convo', phase)) %>%
+  filter(grepl('pre-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -613,7 +830,7 @@ pre_polarization_general_df <- reverse_coded_scores_df %>%
 post_polarization_general_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("polarization-general", question)) %>%
-  filter(grepl("post-convo", phase)) %>%
+  filter(grepl("post-intervention", phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -678,7 +895,7 @@ pre_specific_polarization_df <- reverse_coded_scores_df %>%
          grepl("It is not right to provide the same federal rights and support for same-sex couples as opposite-sex couples", question) |
          grepl("Discrimination against same-sex couples in housing and public accommodations should be banned", question)
            ) %>%
-  filter(grepl('pre-convo', phase)) %>%
+  filter(grepl('pre-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -738,7 +955,7 @@ post_specific_polarization_df <- reverse_coded_scores_df %>%
          grepl("It is not right to provide the same federal rights and support for same-sex couples as opposite-sex couples", question) |
          grepl("Discrimination against same-sex couples in housing and public accommodations should be banned", question)
            ) %>%
-  filter(grepl('post-convo', phase)) %>%
+  filter(grepl('post-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -756,7 +973,7 @@ post_specific_polarization_df <- reverse_coded_scores_df %>%
 pre_offending_reason_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("offending-reason", question)) %>%
-  filter(grepl('pre-convo', phase)) %>%
+  filter(grepl('pre-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -769,7 +986,7 @@ pre_offending_reason_df <- reverse_coded_scores_df %>%
 post_offending_reason_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("reason-of-avoidance-post", question) | grepl("offending-reason", question)) %>%
-  filter(grepl('post-convo', phase)) %>%
+  filter(grepl('post-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -788,7 +1005,7 @@ post_offending_reason_df <- reverse_coded_scores_df %>%
 pre_openmindedness_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("openmindedness", question)) %>%
-  filter(grepl('pre-convo', phase)) %>%
+  filter(grepl('pre-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -802,7 +1019,7 @@ pre_openmindedness_df <- reverse_coded_scores_df %>%
 post_openmindedness_df <- reverse_coded_scores_df %>%
    group_by(prolific_subject_id) %>%
   filter(grepl("openmindedness", question)) %>%
-  filter(grepl('post-convo', phase)) %>%
+  filter(grepl('post-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -820,7 +1037,7 @@ post_openmindedness_df <- reverse_coded_scores_df %>%
 
 pre_sliders_df <- sliders_df %>%
    group_by(prolific_subject_id) %>%
-  filter(grepl('pre-convo', phase)) %>%
+  filter(grepl('pre-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -828,11 +1045,12 @@ pre_sliders_df <- sliders_df %>%
     pre_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
     max_score = max(as.numeric(answer), na.rm = TRUE)
-  )
+  ) %>%
+  ungroup()
 
 post_sliders_df <- sliders_df %>%
    group_by(prolific_subject_id) %>%
-  filter(grepl('post-convo', phase)) %>%
+  filter(grepl('post-intervention', phase)) %>%
   group_by(prolific_subject_id) %>%
   summarize(
     condition = first(condition),
@@ -840,7 +1058,22 @@ post_sliders_df <- sliders_df %>%
     post_mean_score = mean(as.numeric(answer), na.rm = TRUE),
     min_score = min(as.numeric(answer), na.rm = TRUE),
     max_score = max(as.numeric(answer), na.rm = TRUE)
-  )
+  ) %>%
+  ungroup()
+
+```
+
+```{r}
+#| label: Extracting mean willingness values 
+#| include: false
+
+average_pre_moca_mean_willingness <- round(mean(pre_sliders_df %>% filter(condition = experimental) %>% pull(pre_mean_score), na.rm = TRUE), 1)
+
+average_pre_control_mean_willingness <- round(mean(pre_sliders_df %>% filter(condition = control) %>% pull(pre_mean_score), na.rm = TRUE), 1)
+
+average_post_moca_mean_willingness  <- round(mean(post_sliders_df %>% filter(condition = experimental) %>% pull(post_mean_score), na.rm = TRUE), 1)
+
+average_post_control_mean_willingness <- round(mean(post_sliders_df %>% filter(condition = control) %>% pull(post_mean_score), na.rm = TRUE), 1)
 
 ```
 
@@ -875,61 +1108,10 @@ post_politics_df <- reverse_coded_scores_df %>%
 ```
 
 ```{r}
-#| label: T-tests with all topics lumped together 
-#| echo: false
-
-t_test_politics <- t.test(pre_politics_df$pre_mean_score[pre_politics_df$condition != 'control free reflection'], post_politics_df$post_mean_score[post_politics_df$condition != 'control free reflection'], paired = TRUE)
-
-t_test_polarization <- t.test(pre_polarization_df$pre_mean_score[pre_polarization_df$condition != 'control free reflection'], post_polarization_df$post_mean_score[post_polarization_df$condition != 'control free reflection'], paired = TRUE)
-
-t_test_sliders <- t.test(pre_sliders_df$pre_mean_score[pre_sliders_df$condition != 'control free reflection'], post_sliders_df$post_mean_score[post_sliders_df$condition != 'control free reflection'], paired = TRUE)
-
-t_test_offending_reason <- t.test(pre_offending_reason_df$pre_mean_score[pre_offending_reason_df$condition != 'control free reflection'], post_offending_reason_df$post_mean_score[post_offending_reason_df$condition != 'control free reflection'], paired = TRUE)
-
-t_test_openmindedness <- t.test(pre_openmindedness_df$pre_mean_score[pre_openmindedness_df$condition != 'control free reflection'], post_openmindedness_df$post_mean_score[post_openmindedness_df$condition != 'control free reflection'], paired = TRUE)
-```
-
-```{r}
-#| label: Extract t-test values
-#| echo: false 
-
-# politics 
-politics_t_value <- round(t_test_politics$statistic, 3)
-politics_ci <- round(t_test_politics$conf.int, 3)
-politics_p_val <- round(t_test_politics$p.value, 3)
-politics_significance_status <- ifelse(politics_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
-
-# polarization
-polarization_t_value <- round(t_test_polarization$statistic, 3)
-polarization_ci <- round(t_test_polarization$conf.int, 3)
-polarization_p_val <- round(t_test_polarization$p.value, 3)
-polarization_significance_status <- ifelse(polarization_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
-
-# sliders
-sliders_t_value <- round(t_test_sliders$statistic, 3)
-sliders_ci <- round(t_test_sliders$conf.int, 3)
-sliders_p_val <- round(t_test_sliders$p.value, 3)
-sliders_significance_status <- ifelse(sliders_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
-
-# openmindedness
-openmindedness_t_value <- round(t_test_openmindedness$statistic, 3)
-openmindedness_ci <- round(t_test_openmindedness$conf.int, 3)
-openmindedness_p_val <- round(t_test_openmindedness$p.value, 3)
-openmindedness_significance_status <- ifelse(openmindedness_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
-
-# offending_reason
-offending_reason_t_value <- round(t_test_offending_reason$statistic, 3)
-offending_reason_ci <- round(t_test_offending_reason$conf.int, 3)
-offending_reason_p_val <- round(t_test_offending_reason$p.value, 3)
-offending_reason_significance_status <- ifelse(offending_reason_p_val < 0.05, "a statistically significant difference", "no statistically significant difference")
-
-```
-
-```{r}
 #| label: Conversation raw transcript df
 #| echo: false
 
-## make raw conversations df with subject_id and condition. remove keypresslog 
+## make raw conversations df with participant_id and condition. remove keypresslog 
 conversations_rawwww_df <- raw_df %>%
   filter(trial_type == "chat") %>%
   select(prolific_subject_id, logs, condition) 
@@ -1106,7 +1288,7 @@ reflections_df <- raw_df %>%
   mutate(across(everything(), ~ gsub('\\{"Q0":"', '', .))) %>%
   mutate(across(everything(), ~ gsub('"\\}', '', .))) %>%
   select(prolific_subject_id, response, rt, rowAsString) %>%
-  rename('Statement the subject reflected on' = rowAsString) %>%
+  rename('Statement the participant reflected on' = rowAsString) %>%
   mutate(`Time spent on reflection (minutes)` = as.numeric(`rt`) / 60000) %>%
   rename('Time spent on reflection (ms)' = rt)
 
@@ -1162,11 +1344,11 @@ write.csv(bot_feedback_for_csv, "bot_feedback.csv", row.names = FALSE)
 chatbot_time_df <- raw_df %>%
   group_by(prolific_subject_id) %>%  
   filter(condition != 'control free reflection') %>%
-#add up each subject's rts to find total time (not including chatbot convo bc we only logged chat time in the transcripts) spent doing experiment
+#add up each participant's rts to find total time (not including chatbot convo bc we only logged chat time in the transcripts) spent doing experiment
   mutate(summed_rt = sum(as.numeric(rt), na.rm = TRUE)) %>%
 #easier while figuring out the different time metrics to convert into minutes
   mutate(summed_rt_minutes = summed_rt / 60000) %>%
-#elapsed time is measured since the subject started the experiment. so, elapsed time at the last phase of the experiment (goodbye) is the total time spent on the experiment 
+#elapsed time is measured since the participant started the experiment. so, elapsed time at the last phase of the experiment (goodbye) is the total time spent on the experiment 
   filter(phase == 'goodbye') %>%
   mutate(time_elapsed_minutes = as.numeric(time_elapsed) / 60000) %>%
   # select what we want because there are a lot of columns 
@@ -1186,22 +1368,31 @@ reflections_time_df <- reflections_df %>%
 
 #Find time taken on first survey and time taken on second survey. Also subtract for the different. Also, look at whether there's a difference for control people versus chatbot people
 
-#finding time taken on pre survey
-pre_intervention_survey_time_df <- raw_df %>%
-  filter(grepl('survey', phase), grepl('pre', phase)) %>%
-  group_by(prolific_subject_id) %>%
-  mutate(pre_time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
-  select(prolific_subject_id, condition, pre_time_minutes)
+# ADD CONDITION BACK IN TO SELECT WHEN ACTUALLY RUNNING THIS 
 
-#removing duplicate rows
-pre_intervention_survey_time_df <- unique(pre_intervention_survey_time_df)
+#finding time taken on pre survey
+pre_intervention_full_survey_time_df <- raw_df %>%
+  filter(grepl('pre-intervention-survey', phase)) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(pre_intervention_full_survey_time = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
+  select(prolific_subject_id, condition, pre_intervention_full_survey_time) 
+
+pre_intervention_full_survey_time_df <- unique(pre_intervention_full_survey_time_df)
+
+pre_intervention_no_demo_survey_time_df <- raw_df %>%
+  filter(grepl('survey', phase), grepl('pre', phase)) %>%
+  filter(phase != "pre-intervention-survey-initial") %>%
+  group_by(prolific_subject_id) %>%
+  mutate(pre_intervention_no_demo_survey_time = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
+  select(prolific_subject_id, condition, pre_intervention_no_demo_survey_time)
 
 #finding time taken on post survey
+# note - this does not include the "last questions" part of the survey
 post_intervention_survey_time_df <- raw_df %>%
-  filter(grepl('survey', phase), grepl('post', phase)) %>%
+  filter(grepl('post-intervention-survey', phase)) %>%
   group_by(prolific_subject_id) %>%
-  mutate(post_time_minutes = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
-  select(prolific_subject_id, post_time_minutes)
+  mutate(post_intervention_survey_time = sum(as.numeric(rt) / 60000, na.rm = TRUE)) %>%
+  select(prolific_subject_id, condition, post_intervention_survey_time)
 
 #removing duplicates
 post_intervention_survey_time_df <- unique(post_intervention_survey_time_df)
@@ -1209,9 +1400,22 @@ post_intervention_survey_time_df <- unique(post_intervention_survey_time_df)
 #merge dfs to view differences 
 survey_time_df <- pre_intervention_survey_time_df %>%
   full_join(post_intervention_survey_time_df, by = "prolific_subject_id") %>%
-  mutate(difference_pre_post_time_minutes = pre_time_minutes - post_time_minutes) %>%
+  full_join(pre_intervention_no_demo_survey_time_df, by = "prolific_subject_id") %>%
+  mutate(difference_pre_post_time_minutes_no_demo = pre_intervention_no_demo_survey_time - post_intervention_survey_time_df) %>%
   ungroup()
 
+# extract the values for inline text later 
+mean_pre_intervention_survey_time <-  round(mean(survey_time_df$pre_intervention_no_demo_survey_time, na.rm = TRUE), 1)
+
+mean_post_control_survey_time <- round(
+  mean(survey_time_df %>% filter(condition == "control") %>% pull(post_intervention_survey_time), na.rm = TRUE),
+  1
+)
+
+mean_post_moca_survey_time <- round(
+  mean(survey_time_df %>% filter(condition == "experimental") %>% pull(post_intervention_survey_time), na.rm = TRUE),
+  1
+)
 ```
 
 ```{r}
@@ -1265,201 +1469,147 @@ range_reflection_word_count <- round(range(reflections_word_counts$reflection_wo
 ```
 
 ```{r}
-#| label: Extracting values for results section 
+#| label:  Extracting percents of subjects who rated various degrees of unwillingness to discuss the 6 topics
 #| echo: false 
 
-
-```
-
-```{r}
-#| label: tbl-basic-demographics-table
-#| echo: false
-#| tbl-cap: Table of basic demographics.
-
-#we already read in demographics earlier 
-
-#create a demographics table from the demographics questions in our survey. turn the demographics questions from question column into their own columns with answer as the entries within the column
-survey_demographics_df <- surveys_df %>%
-filter(question == 'ethnicity' | question == 'political-affiliation' | question == 'gender-identification' | question == 'education-level' | question == 'religious-affiliation' | question == 'political-ideology') %>%
-select(question, answer, prolific_subject_id, condition) %>%
-pivot_wider(names_from = question, values_from = answer)
-
-#merge our two demographics tables
-demo_table_df <- survey_demographics_df %>%
-  left_join(full_prolific_demographics_df, by = "prolific_subject_id", suffix = c("_prolific", ""))
-
-#make a region column because showing each state is excessive
-demo_table_df$Region <- ifelse(demo_table_df$`Current u.s state of residence` %in% c("California (CA)", "Colorado (CO)", "Utah (UT)", "Utah(UT)", "Idaho (ID)", "Alaska (AK)", "Hawaii (HI)", "Washington (WA)", "Oregon (OR)", "Nevada (NV)", "New Mexico (NM)", "Montana (MT)", "Arizona (AZ)", "Wyoming (WY)"), "West",
-                     ifelse(demo_table_df$`Current u.s state of residence` %in% c("Texas (TX)", "Florida (FL)", "Georgia (GA)", "North Carolina (NC)", "Tennessee (TN)", "South Carolina (SC)", "Alabama (AL)", "Mississippi (MS)", "Louisiana (LA)", "Delaware (DE)", "Maryland (MD)", "Virginia (VA)", "Washington, D.C. (DC)", "West Virginia (WV)", "Kentucky (KY)", "Arkansas (AR)", "Oklahoma (OK)"), "South",
-                            ifelse(demo_table_df$`Current u.s state of residence` %in% c("New York (NY)", "New Jersey (NJ)", "Massachusetts (MA)", "Pennsylvania (PA)", "Connecticut (CT)", "Rhode Island (RI)", "Vermont (VT)", "New Hampshire (NH)", "Maine (ME)"), "Northeast",
-                                   ifelse(demo_table_df$`Current u.s state of residence` %in% c("Michigan (MI)", "Illinois (IL)", "Ohio (OH)", "Indiana (IN)", "Wisconsin (WI)", "Minnesota (MN)", "Iowa (IA)", "Missouri (MO)", "Kansas (KS)", "Nebraska (NE)", "South Dakota (SD)", "North Dakota (ND)"), "Midwest", NA))))
-
-
-# define the levels in categorical variables so that they are organized in the table 
-demo_table_df$'political-affiliation' <- fct_relevel(
-  demo_table_df$'political-affiliation',
-  "Republican",
-  "Democrat",
-  "Independent",
+topics_list <- c(
+  "mandating vaccines in the U.S.",
+  "human euthanasia in the U.S.",
+  "the criminal justice system in the U.S.",
+  "same-sex marriage in the U.S.",
+  "the role of the U.S. government in healthcare",
+  "gender equality in the U.S.",
+  "the atomic bombings of Hiroshima and Nagasaki"
 )
-
-
-demo_table_df$'education-level' <- fct_relevel(
-  demo_table_df$'education-level',
-  "High school diploma or GED",
-   "Some college; no degree",
-  "Associate degree",
-  "Bachelor's degree",
-   "Master's degree",
-)
-
-
-demo_table_df$'political-ideology' <- fct_relevel(
-  demo_table_df$'political-ideology',
-"Very conservative",
-"Conservative",
-"Somewhat conservative",
-"Moderate",
-"Somewhat liberal",
-"Liberal",
-"Very liberal"
-)
-
-demo_table_df <- demo_table_df %>%
-  mutate(across(where(is.factor), ~ droplevels(.)))
-
-demographics_table <- tbl_summary(demo_table_df,
- by = NULL,
-  label = list(
-    `Time taken (minutes)` = "Time taken (minutes)",
-    `Region` = "Current U.S. region of residence",
-    Age = "Age (years)",
-    Sex = "Sex",
-    `Ethnicity simplified` = "Ethnicity simplified",
-    `political-affiliation` = "Political affiliation",
-    `education-level` = "Education level",
-    `religious-affiliation` = "Religious affiliation",
-    `political-ideology` = "Political ideology"
-  ),
-  statistic = NULL,
-#list(
-  #  all_continuous() ~ "{mean} ({sd})",
-  #  all_categorical() ~ "{n} ({p}%)"
-#),
-  type = list(
-    `Time taken (minutes)` = "continuous",
-    `Region` = "categorical",
-    `Age` = "continuous",
-    `gender-identification` = "categorical",
-   `Sex` = "categorical",
-    `Ethnicity simplified` = "categorical",
-    `political-affiliation` = "categorical",
-    `education-level` = "categorical",
-    `religious-affiliation` = "categorical",
-    `political-ideology` = "categorical"
-  ),
-  digits = list(
-    all_continuous() ~ 2,
-    all_categorical() ~ 0
-  ),
-  value = NULL,
-  missing = NULL,
-  missing_text = NULL,
-  sort = NULL,
-  percent = NULL,
- include = c(
-'Time taken (minutes)', 
-'Region', 
-'Age', 
-'Sex', 
-'Ethnicity simplified', 
-'political-affiliation', 
-'education-level', 
-'religious-affiliation', 
-'political-ideology'
-))
- # %>%  modify_header(label = "**whatever label i want**")
-
-# Print the table
-as_gt(demographics_table)
-
-```
-
-### Materials
-
-We used custom software written with the jsPsych framework (@jspsychcite), which participants viewed and responded to via their personal laptops or desktops. The javascript code for the experiment and data analysis can be found at (https://github.com/jodeleeuw/URSI-LLM-Convo-Bot/tree/main/pilot_1). Pre-registration and all data for this study and previous pilots are available at https://osf.io/x32pv.
-
-#### Intervention development
-
-There are findings from human-to-human research on approaches, techniques, and situational factors that can make people more willing to have conversations on controversial topics and be more productive/open-minded. 
-
-Some cognitive scientists have found that inviting people to explain, rather than freely reflect on, a contentious political issue may help reduce intergroup toxicity in these discussions (@fernbach2013. @fernbach2013 explained that the attempt to explain the issue often leads people to become confronted with their lack of understanding, which in turn might lead them to become more moderate as well as less hostility towards political outgroup members. However, subsequent scholarship either found no evidence for the effect (Crawford & Ruscio, 2021) or found it to be constrained to specific topics (Sloman & Vives, 2022) or personalities (Voelkel, Brandt, & Colombo, 2018). That is, inviting people to explain specific policy positions did not consistently lead to less extreme policy positions, nor did it influence how they felt about political partisans. Another possibility is that explanations might still hold some promise, changing the process of how people think rather than the content of what people believe. Specifically, inviting people to explain themselves could encourage information search via consulting others’ viewpoints and integration of multiple perspectives, opening the door for wiser, more open-minded political thinking (Baron, 2019; Grossmann et al., 2021; Grossmann & Kross, 2014; Kross & Ayduk, 2017; Stanovich & West, 1997; see Grossmann et al., 2021, Porter et al., 2022, for reviews). 
-
-Research has also found that inviting people to explain a problem to somebody who is unfamiliar with the topic can increase open-mindedness (@elnakouri2024).
-
-Though the findings were abundant and there were thus a myriad of approaches which we could have taken, we extracted three general approaches: providing counterarguments, asking questions about the user's views, and explaining why others might have alternative perspectives. \[cite the research for each one\].
-
-The chatbot that we created for this experiment uses a response election approach: four chatbots, each with a different chat completion prompt, generate a unique response to a user message. Then, a final chatbot selects and outputs one of the responses. Three of the four approaches were those gathered in the human-to-human research. The fourth approach gave the bot as much agency as possible in its choice of response through the most minimal prompting that still produced a conversational response (see Appendix: Prompts). We developed these prompts through methods suggested by leading guides on prompt engineering (cite) and iterative refinement until we reached a satisfactory result. In this way, we hoped to give the chatbot two opportunities to affect users: either through our manipulation of its capabilities or through its own manipulation.
-
-[discuss @matz2024 and personalizing the chatbot style ]
-
-```{r}
-#| label: flowchart-selection-bot
-#| echo: false
-#| tbl-cap: Graphic of selection bot process.
-
-grViz("
-digraph chatbot_flow {
   
-  graph [layout = dot, rankdir = LR]
+topic_ratings_df <- surveys_df %>%
+  filter(question %in% topics_list) 
+  
+# get IDs of participants who answered at least one question with answer == 1 aka strongly unwilling
+answered_strongly_ids <- topic_ratings_df %>%
+  filter(answer == 1) %>%
+  distinct(prolific_subject_id)
 
-  node [shape = note, style = filled, fillcolor = lightblue]
+# count them
+n_had_a_strongly_unwilling_topic <- nrow(answered_strongly_ids)
 
-  user_input [label = 'User\\nmessage\\ninput']
-  counter_response [label = 'Bot generates\\ncounter-argument\\nresponse', shape = box]
-  question_response [label = 'Bot generates\\nquestion\\nresponse', shape = box]
-  viewpoint_response [label = 'Bot generates\\nviewpoint\\nresponse', shape = box]
-  bot_decision [label = 'Bot chooses\\nbest\\nresponse', shape = circle, width=1.2]
-  final_output [label = 'Bot\\nmessage\\noutput']
+# get IDs of participants who did NOT answer any 1s 
+no_strongly_ids <- topic_ratings_df %>%
+  filter(!prolific_subject_id %in% answered_strongly_ids$prolific_subject_id)
 
-  user_input -> counter_response
-  user_input -> question_response
-  user_input -> viewpoint_response
+# from those, get participants who answered at least one question with answer == 2 aka moderately unwilling
+answered_moderately_but_not_strongly <- no_strongly_ids %>%
+  filter(answer == 2) %>%
+  distinct(prolific_subject_id)
 
-  counter_response -> bot_decision
-  question_response -> bot_decision
-  viewpoint_response -> bot_decision
+# count them
+n_had_a_moderately_unwilling_topic <- nrow(answered_moderately_but_not_strongly)
 
-  bot_decision -> final_output
-}
-")
+# get IDs of participants who did NOT answer any 1s or 2s
+no_strongly_or_moderately_ids <- topic_ratings_df %>%
+  filter(!prolific_subject_id %in% answered_strongly_ids$prolific_subject_id) %>%
+  filter(!prolific_subject_id %in% answered_moderately_but_not_strongly$prolific_subject_id) 
+
+# from those, get participants who answered at least one question with answer == 3 aka a little unwilling
+answered_a_little_but_not_strongly_or_moderately <- no_strongly_or_moderately_ids %>%
+  filter(answer == 3) %>%
+  distinct(prolific_subject_id)
+
+# Count them
+n_had_a_little_unwilling_topic <- nrow(answered_a_little_but_not_strongly_or_moderately)
+
 ```
 
-![Chatbot conversation screenshot](intervention_screenshot.png)
+## Results VERY ROUGH DRAFT  - FOR LOGIC FLOW 
 
-#### Survey development
+We conducted our analyses in the R environment (R version 4.2.1; R Core Team, 2022), using several packages from the tidyverse (@tidyversecite), as well as osfr (@osfrcite), ez (@ezcite), gt (@gtcite), gtsummary (@gtsummarycite), kableExtra (@kableExtracite), stringr (@stringrcite), and ggridges (@ggridgescite) packages. We performed the pre-registered analysis for the experiment.
 
-We measured the effectiveness of our chatbot through administering a survey before and after the experiment intervention. The questionnaire was composed of basic demographic questions, a question to ascertain which of our six topics the participant was most unwilling to discuss, and then our willingness survey questions. The key measures in the survey were open-mindedness, polarization of topic-specific beliefs, and willingness to converse. We drew on existing measures for open-mindedness and polarization of topic-specific opinions. Applicable measures for willingness to converse did not exist, so we created and then pretested our own based on existing research about the concerns or experiences that contribute to unwillingness to converse. This led us to find concepts such as Social Identity Theory (SIT), Emotional Dysregulation (ED), and Communication Avoidance (CA). Through these measures, we were able to observe whether the intervention changed open-mindedness, polarization of topic-specific beliefs, overall willingness to converse, and specific concerns that contributed to users' unwillingness to converse.
+In the pre-intervention survey, each participant used a 7-pt scale to rate how comfortable they would be discussing each of the following topics. One of the participant's most strongly rated topics were randomly selected as the topic that the participant would focus on for the remainder of the experiment. The scale went from strongly unwilling (1), to moderately unwilling, a little unwilling, neutral (4), a little comfortable, moderately comfortable, and strongly comfortable (7). The topic that a participant was most unwilling discussing was the topic that the participant then discussed with MOCA or was asked to freely reflect upon. \@ref(fig:fig-topic-ratings) displays the distribution of ratings for each topic. 
 
-## open-mindedness so linked to willingness to converse
-[Dolbier, K. L., Dieffenbach, S., & Lieberman, M. D. (2025). Open-Mindedness: An Integrative Review of Interventions. Current Opinion in Behavioral Sciences, 58, 101438. (This is a forthcoming or very recent review, indicating its up-to-date relevance).
+### Basics / Is the data good
+As our primary goal was to increase willingness and, intuitively, the Americans whom we would most like to affect are those who are very unwilling, we endeavored to provide topics that were contentious enough for participants to be moderately to strongly unwilling to discuss, but not so contentious as to cause genuine/harmful distress in participants. However, we anticipated that a small percentage of participants would happen to be neutral or even relatively willing to discuss all topics. Indeed, this was the case for `r 100-(100*((n_had_a_strongly_unwilling_topic+n_had_a_moderately_unwilling_topic+(n_had_a_little_unwilling_topic+n_had_a_moderately_unwilling_topic))/total_num_participants_in_data))` percent of participants. We did not exclude any of these participants' data, though, as all humans can still improve in their willingness to converse about contentious topics and because a relatively willing participant may still exhibit room for improvement in their open-mindedness and/or polarization As for the other participants, `r 100*(n_had_a_strongly_unwilling_topic/total_num_participants_in_data)` percent were strongly unwilling to discuss at least one of the topics; and `r 100*n_had_a_moderately_unwilling_topic/total_num_participants_in_data` percent were, at most, moderately unwilling to discuss at least one of the topics, and `r 100*n_had_a_little_unwilling_topic/total_num_participants_in_data` percent were, at most, a little unwilling to discuss at least one of the topics.
 
-Why it's a fit: This review explicitly focuses on open-mindedness and interventions to increase it. It discusses how interventions often target cognitive pathways (e.g., reducing biased thinking, promoting expansive mindsets) and affective pathways (emotion regulation to maintain composure when beliefs are challenged). These mechanisms are inherently activated when engaging with opposing views on controversial topics, as it requires confronting biases and managing emotional responses. It directly links open-mindedness to "willingness to nondefensively entertain alternative ideas" and "willingness to engage with dissenting opinions."]
+```{r}
+#| label: fig-topic-ratings
+#| echo: false
+#| fig-cap: In the pre-intervention survey, each participant used a 7-pt scale to rate how comfortable they would be discussing each of the following topics. One of the participant's most strongly rated topics were randomly selected as the topic that the participant would focus on for the remainder of the experiment. The scale went from strongly unwilling (1), to moderately unwilling, a little unwilling, neutral (4), a little comfortable, moderately comfortable, and strongly comfortable (7).
 
-### Procedure
+# create figure/table showing distribution of ratings on topics
+topic_ratings_df <- surveys_df %>%
+  filter(question %in% topics_list) %>%
+  mutate(answer = as.numeric(answer)) %>%
+  select(prolific_subject_id, question, answer, topicChoiceAsString, condition)
+  
+topics_labels <- c(
+  "mandating vaccines in the U.S." = 
+    "Mandating vaccines",
+  "human euthanasia in the U.S." = 
+    "Human euthanasia",
+  "the criminal justice system in the U.S." = 
+    "Criminal justice system",
+  "same-sex marriage in the U.S." = 
+    "Same-sex marriage",
+  "the role of the U.S. government in healthcare" = 
+    "Government in healthcare",
+  "gender equality in the U.S." = 
+    "Gender equality",
+  "the atomic bombings of Hiroshima and Nagasaki" = 
+    "Atomic bombings"
+)
 
-Upon agreeing to participate in this experiment, participants were brought to the experiment webpage, http://54.234.217.37/jdeleeuw/ursi2024/experiment/experiment.html, where they were shown a welcome message and were told that they were going to fill out a questionnaire and then converse with a chatbot (experimental group) or perform a free reflection (control group). After completing the questionnaire, participants were sent back to Prolific.
+topic_ratings_plot <- ggplot(topic_ratings_df, aes(x = answer, y = question, fill = question)) +
+  geom_density_ridges() +
+  # give the qualitative meanings of 1-7
+  scale_x_continuous(breaks = seq(1, 7, by = 1)) +
+   scale_y_discrete(labels = topics_labels) +
+  # make it look nicer
+  theme_ridges() +      
+  # remove the legend
+  theme(legend.position = "none") +
+  labs(title = "Ridgeline Plot of Ratings by Topic",
+       x = "Rating",
+       y = "Contentious Topic")
 
-## Results
+print(topic_ratings_plot)
+```
 
-We conducted our analyses in the R environment (R version 4.2.1; R Core Team, 2022), using several packages from the tidyverse (@tidyversecite), as well as the osfr (@osfrcite), ez (@ezcite), gt (@gtcite), gtsummary (@gtsummarycite), kableExtra (@kableExtracite), stringr (@stringrcite), and ggridges (@ggridgescite) packages. We performed the pre-registered analysis for the experiment.
+```{r}
+#| label: Extracting values for statement polarization 
+#| include: false 
 
-On average, subjects spent `r average_chatbot_time` minutes with the chatbot (range `r range_chatbot_time`) and each message was `r avg_conversation_word_count` words long (range `r range_conversation_word_count`). Subjects averaged `r average_reflection_time` minutes on the control free reflection (range `r range_reflection_time`) with a reflection length of `r avg_reflection_word_count` words (range `r range_reflection_word_count`). Experimental group subjects averaged `r avg_bot_feedback_word_count` words in response to each post-intervention survey question that asked for feedback on the bot (range `r range_bot_feedback_word_count`).
+statement_ratings_df <- surveys_df %>%
+  filter(question == topicChoiceAsString)
+  
+n_subs_neutral_all_statements <- nrow(statement_ratings_df %>%
+  group_by(prolific_subject_id) %>%
+  filter(answer == 4) %>%
+  summarize(n_subs_neutral_all_statements = n()))
+
+n_a_little_agreed_or_disagreed_with_a_statement <- nrow(statement_ratings_df %>%
+  group_by(prolific_subject_id) %>%
+  filter(answer == 3 | answer == 5) %>%
+  summarize(n_a_little_agreed_or_disagreed_with_a_statement = n()))
+
+n_moderately_agreed_or_disagreed_with_a_statement <- nrow(statement_ratings_df %>%
+  group_by(prolific_subject_id) %>%
+  filter(answer == 2 | answer == 6) %>%
+  summarize(n_moderately_agreed_or_disagreed_with_a_statement = n()))
+
+n_strongly_agreed_or_disagreed_with_a_statement <- nrow(statement_ratings_df %>%
+  group_by(prolific_subject_id) %>%
+  filter(answer == 1 | answer == 7) %>%
+  summarize(n_strongly_agreed_or_disagreed_with_a_statement = n()))
+
+```
+
+Similarly to our assessment of unwillingness to discuss topics, we intended for participants to discuss with MOCA or freely reflect upon an opinion about which they held more polarizing attitudes. However, we anticipated that some subjects would happen to feel neutral about all of the statements. Indeed, this was the case for `r n_subs_neutral_all_statements` or `r 100-(100*((n_strongly_agreed_or_disagreed_with_a_statement+n_moderately_agreed_or_disagreed_with_a_statement+n_a_little_agreed_or_disagreed_with_a_statement)/total_num_participants_in_data))` (should be same number) percent of participants. We did not exclude any of these participants' data, though, because our goal is not to make all participants feel neutral about the opinionated statements and because a participant who has relatively neutral opinions may still exhibit room for improvement in their willingness to converse and/or open-mindedness scores. As for the other participants, `r 100*(n_strongly_agreed_or_disagreed_with_a_statement/total_num_participants_in_data)` percent felt strongly about at least one of the statements; `r 100*n_moderately_agreed_or_disagreed_with_a_statement/total_num_participants_in_data` percent felt, at most, moderately about at least one of the statements; and `r 100*n_a_little_agreed_or_disagreed_with_a_statement/total_num_participants_in_data)` percent felt, at most, a little about at least one of the statements.
+
+We expected participants to complete the post-intervention survey faster because participants were already somewhat familiar with the questions and because the post-intervention survey did not include the demographics questions. We also anticipated but hoped to be wrong that some participants would speed through the survey to an extent that obstructs the value of their data. We attempted to combat this with our attention check questions, but there was not much more than we could do about it. We pre-registered that we would look at average completion time exploratorily to look at how much faster participants completed the post-intervention survey, but we have no way of determining how fast is too fast; we cannot conclude that a participant's data is poor based on the difference in their post-intervention survey time and pre-intervention survey time. Nonetheless, we thought it might still be interesting simple to observe. Participants, on average, spent `r mean_pre_intervention_survey_time` minutes taking the pre-intervention survey. Control group participants spent an average of`r mean_post_control_survey_time` minutes taking the post-intervention survey. Experimental group participants spent an average of `r mean_post_moca_survey_time` minutes taking the post-intervention survey, not including the bot feedback questions \@ref(fig:tbl-example-reflections).
 
 ```{r}
 #| label: fig-time-plot
 #| echo: false
-#| fig-cap: Scatterplot with line of equality showing time spent on pre- and post-intervention surveys with color indicating whether subject was in control group or experimental group.
+#| fig-cap: Scatterplot with line of equality showing time spent on pre- and post-intervention surveys with color indicating whether participant was in control group or experimental group.
 
 time_plot_df <- survey_time_df %>%
   full_join(reflections_time_df, by = "prolific_subject_id") %>%
@@ -1485,8 +1635,9 @@ print(time_plot)
 
 ```{r}
 #| label: tbl-time-df
-#| echo: false
+#| include: false
 #| tbl-cap: Table showing time spent on pre-intervention survey, post-intervention survey, difference in pre- and post-intervention survey times, and time spent on intervention. 
+#| note: i don't think this is useful for the report anymore but i already made it a while back and it's useful for me to look at internally so that's why i'm keeping it here 
 
 time_figure_df <- time_plot_df %>%
   group_by(Condition) %>%
@@ -1503,174 +1654,9 @@ time_figure_df <- time_plot_df %>%
 kable(time_figure_df)
 ```
 
-### Scatterplots of subjects' pre- and post-intervention ratings on surveys
+Similarly to survey effort, we were interested in assessing the time and word counts of participants' conversations with MOCA and their free reflections. While time and word count may not directly reflect a participant's effort, it can be a helpful metric for providing an overview. On average, participants spent `r average_chatbot_time` minutes with MOCA (range `r range_chatbot_time`; \@ref(fig:fig-time-plot); \@ref(fig:tbl-time-df)) and each message was `r avg_conversation_word_count` words long (range `r range_conversation_word_count`). \@ref(fig:tbl-example-transcripts) displays some example transcripts of conversations that participants had with MOCA. participants averaged `r average_reflection_time` minutes on the control free reflection (range `r range_reflection_time`) with a reflection length of `r avg_reflection_word_count` words (range `r range_reflection_word_count`). \@ref(fig:tbl-example-reflections) displays some example free reflections from participants. Towards a more proper assessment of participants' intervention data, we manually reviewed all[x percent] of conversation and free reflection transcripts. [state result of that manual review. maybe in the form of quantitative data? like x percent of conversation transcripts and x percent of free reflection transcripts were deemed sufficiently effortful per x criteria?].
 
-The politics t-test revealed a t-value of `r politics_t_value` with a p-value of `r politics_p_val`, indicating `r politics_significance_status` between the change in experimental group subjects' views of the opposing political party and control group subjects' change in views (95% CI: `r politics_ci`).
-
-```{r}
-#| label: fig-political-party-graph
-#| echo: false
-#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of opinions on the opposite party. Subjects rated their opinions on a scale from 0 to 7, where a rating of 0 was strongly negative and a rating of 7 was strongly positive.
-
-merged_politics_df <- merge(pre_politics_df, post_politics_df, by = "prolific_subject_id")
-
-politics_scatterplot <- ggplot(merged_politics_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in opinions of the opposite party", color = "Group") +
-  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
-                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
-
-print(politics_scatterplot)
-
-```
-
-The polarization t-test revealed a t-value of `r polarization_t_value` with a p-value of `r polarization_p_val`, indicating `r polarization_significance_status` between the change in experimental group subjects' topic-specific opinions and control group subjects' change in opinions (95% CI: `r polarization_ci`).
-
-```{r}
-#| label: fig-polarization-graph
-#| echo: false
-#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of opinions on topic-specific statements. Subjects rated their opinions on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
-
-merged_polarization_df <- merge(pre_polarization_df, post_polarization_df, by = "prolific_subject_id")
-
-polarization_scatterplot <- ggplot(merged_polarization_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in polarization of topic-specific beliefs.", color = "Group") +
-  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
-                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
-
-print(polarization_scatterplot)
-
-```
-
-The offending reason t-test revealed a t-value of `r offending_reason_t_value` with a p-value of `r offending_reason_p_val`, indicating `r offending_reason_significance_status` between the change in experimental group subjects' severity of reasons that hold them back from conversing and control group subjects' change in severity (95% CI: `r offending_reason_ci`).
-
-```{r}
-#| label: fig-offending-reason-graph
-#| echo: false
-#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of reasons subjects might be unwilling to converse about their topic. Subjects rated how true the reasons were to them on a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree.
-
-merged_offending_reason_df <- merge(pre_offending_reason_df, post_offending_reason_df, by = "prolific_subject_id")
-
-offending_reason_scatterplot <- ggplot(merged_offending_reason_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in how much different concerns affect willingness to converse.", color = "Group") +
-  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
-                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
-
-print(offending_reason_scatterplot)
-
-```
-
-The sliders t-test revealed a t-value of `r sliders_t_value` with a p-value of `r sliders_p_val`, indicating `r sliders_significance_status` between the change in experimental group subjects' willingness to converse about their topic and control group subjects' change in willingness (95% CI: `r sliders_ci`).
-
-```{r}
-#| label: fig-sliders-graph
-#| echo: false
-#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of willingness to converse. Subjects rated their willingness on a slider from 0 to 100, where a rating of 0 meant subject was absolutely unwilling and a rating of 100 meant subject was absolutely willing.
-
-
-merged_sliders_df <- merge(pre_sliders_df, post_sliders_df, by = "prolific_subject_id")
-
-sliders_scatterplot <- ggplot(merged_sliders_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in willingness to converse about selected topic with others.", color = "Group") +
-  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
-                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
-
-print(sliders_scatterplot)
-
-```
-
-The open-mindedness t-test revealed a t-value of `r openmindedness_t_value` with a p-value of `r openmindedness_p_val`, indicating `r openmindedness_significance_status` between the change in experimental group subjects' open-mindedness on their topic and control group subjects' change in open-mindedness (95% CI: `r openmindedness_ci`).
-
-```{r}
-#| label: fig-openmindedness-graph
-#| echo: false
-#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of subjects' open-mindedness when discussing their topic. Subjects rated their open-mindedness on a scale from 0 to 7, where a rating of 0 meant subject was not open-minded and a rating of 7 meant subject was open-minded.
-
-merged_openmindedness_df <- merge(pre_openmindedness_df, post_openmindedness_df, by = "prolific_subject_id")
-
-openmindedness_scatterplot <- ggplot(merged_openmindedness_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
-  geom_point() +  # Add points
-  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
-  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in open-mindedness ratings before and after conversations.", color = "Group") +
-  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
-                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
-
-print(sliders_scatterplot)
-
-
-```
-
-### Example table of changes in average willingness to converse (slider questions)
-
-```{r}
-#| label: tbl-willingness-df
-#| echo: false
-#| tbl-cap: Table showing changes in willingness according to sliders. This is the same information as the willingness scatterplot.
-
-example_table_of_changes <- surveys_df
-
-example_table_of_changes <- example_table_of_changes %>%
-  filter(grepl("slider", question)) %>%
-  group_by(prolific_subject_id, phase) %>%
-  summarize(condition = first(condition), 
-            question = mean(as.numeric(answer), na.rm = TRUE), .groups = "drop") %>%
-  #asked chat to give me code to separate into two columns
-  mutate(
-    'Post-conversation' = lead(question),   # Shift the 'questions' column up by one row
-    row_number = row_number()       # Add a row number for filtering later
-  ) %>%
-  filter(row_number %% 2 == 1) %>%  # Keep only odd rows, where the new column now has even-row values
-  select(question, 'Post-conversation', condition)        %>%
-  rename("Pre-conversation"  = "question") %>%
-  mutate_if(is.numeric, ~ round(., 1)) %>%
-  arrange(desc(condition)) 
-
-kable(example_table_of_changes)
-
-  # mutate(across(everything(), ~ gsub('rating-republicans-post-', '', .))) %>%
-  #   mutate(across(everything(), ~ gsub('rating-democrats-post-', '', .))) %>%
-  # mutate(across(everything(), ~ gsub('pre-rating-republicans-', '', .))) %>%
-  #   mutate(across(everything(), ~ gsub('pre-rating-democrats-', '', .))) 
-
-# 
-# part1_processing_example_table_of_changes <-processing_example_table_of_changes[1:6, ]
-# part2_processing_example_table_of_changes <-processing_example_table_of_changes[7:12, ]
-# 
-# example_table_of_changes <- part1_processing_example_table_of_changes %>%
-#   left_join(part2_processing_example_table_of_changes, by = "Subject's opinions on the opposite party", suffix = c("", "_new")) %>%
-#     rename("Pre-Convo Ratings" = answer, "Post-Convo Ratings" =  answer_new) %>%
-#   select("Subject's opinions on the opposite party", "Pre-Convo Ratings", "Post-Convo Ratings")
-# 
-# 
-# print(example_table_of_changes)
-
-```
-
-### Three free reflections
-
-```{r}
-#| label: tbl-example-reflections
-#| echo: false
-#| tbl-cap: Example free reflections. Subjects received the statement that they rated most strongly in the pre-intervention survey. We prompted subjects to reflect for 10 minutes, and the timer paused if their keyboard inactivtiy exceeded 20 seconds. 
-
-# make a simplified df to display reflections
-
-example_reflections_df <- reflections_df %>%
-  ungroup() %>%
-  # only have three reflections right now, but will want to filter for just a few later on when we have more 
-  # filter(prolific_subject_id == ) %>%
-  select('Statement the subject reflected on', response, 'Time spent on reflection (minutes)')
-
-kable(example_reflections_df)
-
-```
+note that if we actually do create an exclusion criteria, we can move most of this section to the participants section in methods
 
 ```{r}
 #| label: tbl-example-transcripts
@@ -1692,17 +1678,34 @@ kable(example_conversation_transcripts, "html") %>%
 
 ```
 
-### Free response feedback from chatbot group subjects
+```{r}
+#| label: tbl-example-reflections
+#| echo: false
+#| tbl-cap: Example free reflections. participants received the statement that they rated most strongly in the pre-intervention survey. We prompted participants to reflect for 10 minutes, and the timer paused if their keyboard inactivtiy exceeded 20 seconds. 
+
+# make a simplified df to display reflections
+
+example_reflections_df <- reflections_df %>%
+  ungroup() %>%
+  # only have three reflections right now, but will want to filter for just a few later on when we have more 
+  # filter(prolific_subject_id == ) %>%
+  select('Statement the participant reflected on', response, 'Time spent on reflection (minutes)')
+
+kable(example_reflections_df)
+
+```
+
+Also in regards to effortful completion of the experiment, we were interested in assessing whether participants gave thoughtful feedback about the bot. While word count does not directly reflect a participant's effort, it is worth noting that participants averaged `r avg_bot_feedback_word_count` words in response to each post-intervention survey question that asked for feedback on the bot (range `r range_bot_feedback_word_count`). \@ref(fig:tbl-bot-feedback-df) provides some example responses to our questions. Manual review of the feedback found overall themes of [positive/negative feedback, specific concerns, etc.]. Specifically, [X percent of participants felt A about the bot, Y percent felt B, etc.].
 
 ```{r}
 #| label: tbl-bot-feedback-df
 #| echo: false
-#| tbl-cap: Table showing subjects' responses to free response feedback questions. 
+#| tbl-cap: Table showing participants' responses to free response feedback questions. 
 
 bot_feedback_figure <- bot_feedback %>%
-  # turn each question into its own column so one subject can be one row
+  # turn each question into its own column so one participant can be one row
   pivot_wider(names_from = question, values_from = answer) %>%
-  # for each subject, smash all the rows together into one
+  # for each participant, smash all the rows together into one
   group_by(prolific_subject_id) %>%
   reframe(across(everything(), ~ paste(unique(na.omit(.)), collapse = "; "))) %>%
   # unnecessary columns for visual display
@@ -1712,7 +1715,7 @@ bot_feedback_figure <- bot_feedback %>%
     'Topic Choice' = 'topicChoiceAsString',
     'Did willingness increase?' = 'free-response',
     'Was conversation productive? Any parts affect willingness?' = 'convo-effect-on-willingness',
-    'Any moments in convo open subject to new perspective?' = 'new-perspective',
+    'Any moments in convo open participant to new perspective?' = 'new-perspective',
     "What still contributes to willingness or unwillingness to converse?" = 'still-contributes',
     'Feedback on the bot?' = 'feelings-about-bot'
     )
@@ -1723,50 +1726,738 @@ kable(bot_feedback_figure, "html") %>%
   column_spec(c(3,4,5,5), width = "40em")
 ```
 
-```{r}
-#| label: fig-topic-ratings
-#| echo: false
-#| fig-cap: In the pre-intervention survey, each subject used a 7-pt scale to rate how comfortable they would be discussing each of the following topics. One of the subject's most strongly rated topics were randomly selected as the topic that the subject would focus on for the remainder of the experiment. The scale went from strongly uncomfortable (1), to moderately uncomfortable, a little uncomfortable, neutral (4), a little comfortable, moderately comfortable, and strongly comfortable (7).
+### Confirmatory analyses
 
-# create figure/table showing distribution of ratings on topics
-topic_ratings_df <- surveys_df %>%
-    filter(grepl("topic-", question)) %>%
-  mutate(answer = as.numeric(answer)) %>%
-  select(prolific_subject_id, question, answer, topicChoiceAsString, condition)
-  
-topic_labels <- c(
-  "topic-mandating vaccines in the U.S." = 
-    "Mandating vaccines",
-  "topic-human euthanasia in the U.S." = 
-    "Human euthanasia",
-  "topic-the criminal justice system in the U.S." = 
-    "Criminal justice system",
-  "topic-same-sex marriage in the U.S." = 
-    "Same-sex marriage",
-  "topic-the role of the U.S. government in healthcare" = 
-    "Government in healthcare",
-  "topic-gender equality in the U.S." = 
-    "Gender equality",
-  "topic-the atomic bombings of Hiroshima and Nagasaki" = 
-    "Atomic bombings"
+```{r}
+#| label: Willingness Mixed-Model ANOVA, EMMs, and pairwise comparisons
+#| include: false
+
+# run mixed ANOVA for mean willingness to converse
+willingness_anova_result <- aov_ez(
+  id = "prolific_subject_id",               # participant identifier
+  dv = "mean_willingness",         # dependent variable
+  data = surveys_df,          # CHECK 
+  within = "time", # CHECK W DF                 # within-participant factor aka pre- or post-intervention
+  between = "condition"  # CHECK W DF              # between-participant factor aka experimental vs control 
 )
 
-topic_ratings_plot <- ggplot(topic_ratings_df, aes(x = answer, y = question, fill = question)) +
-  geom_density_ridges() +
-  # give the qualitative meanings of 1-7
-  scale_x_continuous(breaks = seq(1, 7, by = 1)) +
-   scale_y_discrete(labels = topic_labels) +
-  # make it look nicer
-  theme_ridges() +      
-  # remove the legend
-  theme(legend.position = "none") +
-  labs(title = "Ridgeline Plot of Ratings by Topic",
-       x = "Rating",
-       y = "Contentious Topic")
+# estimated marginal means
+willingness_emm <- emmeans(willingness_anova_result, ~ group * time)
+summary(willingness_emm)
 
-print(topic_ratings_plot)
+# pairwise comparisons 
+pairs(emmeans(willingness_anova_result, ~ time | group))
+
 ```
 
+```{r}
+#| label:  Extracting MMANOVA values for willingness
+#| include: false
+
+# From ANOVA
+willingness_interaction_f <- willingness_anova_table["group:time", "F"]
+willingness_interaction_p <- willingness_anova_table["group:time", "Pr(>F)"]
+willingness_interaction_eta2 <- willingness_anova_table["group:time", "ges"]
+
+# From EMMs
+willingness_emms <- emmeans(willingness_anova_result, ~ group * time)
+willingness_emms_df <- as.data.frame(willingness_emms)
+
+willingness_emmean_exp_pre <- willingness_emms_df %>% filter(group == "Experimental", time == "pre") %>% pull(emmean)
+willingness_emmean_exp_post <- willingness_emms_df %>% filter(group == "Experimental", time == "post") %>% pull(emmean)
+willingness_emmean_ctrl_pre <- willingness_emms_df %>% filter(group == "Control", time == "pre") %>% pull(emmean)
+willingness_emmean_ctrl_post <- willingness_emms_df %>% filter(group == "Control", time == "post") %>% pull(emmean)
+
+# From pairwise comparisons (pre vs post within group)
+willingness_pairwise <- pairs(emmeans(willingness_anova_result, ~ time | group), side = "<") # one-tailed test
+
+# For experimental group
+willingness_exp_row <- as.data.frame(willingness_pairwise) %>% filter(group == "Experimental")
+willingness_t_exp_pre_post <- willingness_exp_row$t.ratio
+willingness_p_exp_pre_post <- willingness_exp_row$p.value
+
+# For control group
+willingness_ctrl_row <- as.data.frame(willingness_pairwise) %>% filter(group == "Control")
+willingness_t_ctrl_pre_post <- willingness_ctrl_row$t.ratio
+willingness_p_ctrl_pre_post <- willingness_ctrl_row$p.value
+```
+
+We primarily sought to measure the effectiveness of MOCA through comparing pre- and post-intervention survey data, specifically for willingness to converse, open-mindedness, and change in polarization of opinions about the opposite political party and topic-specific statements. We specifically wanted to assess whether MOCA was any more effective than the control intervention. We hypothesized that participants who conversed with MOCA would exhibit a significantly greater improvement in willingness to converse and in open-mindedness, as well as a significantly greater decrease in polarization, compared to the changes in participants who freely reflected.
+
+Towards this end, we conducted 2 (group: control vs. experimental) × 2 (time: pre-intervention vs. post-intervention) mixed-design ANOVAs for each of the three key measures. For each measure, we ensured that the experimental group and control group data were normally distributed and met the assumption of homoscedasticity, meaning the two groups have approximately the same error variance. We did this through transforming the data to correct any violations of these assumptions / no transformations were necessary as the data naturally met these assumptions. We also ensured that the assumption of homogeneity of the variance-covariance matrices was met by ensuring that the pattern of inter-correlations among the pre- and post-intervention data was consistent across the experimental and control groups. We did this by using the Box’s M statistic. Box’s M returned a p value that was more than or equal to .001, meaning the variance-covariance assumption was met. Although violations of this assumption can be corrected for with data transformations, we did not need to do so.
+
+```{r}
+#| label: notes for my own understanding
+#| include: false
+
+# 
+# note for myself:
+# 
+# F statistics indicates the variance between groups compared to the variance within groups. A large F suggests a meaningful difference in how the groups changed over time.
+# 
+# p value is p value 
+# 
+# The generalized eta squared (η²<sub>G</sub>), a measure of effect size. It tells you how much of the variance in willingness is explained by the group × time interaction.
+# 
+# degrees freedom are used in conjunction with the F-statistic and p-value to determine statistical significance. 
+# 
+# emmean_exp_pre is the average (model-estimated) willingness score for the experimental group before the intervention.
+# 
+# emmean_exp_post	is the average willingness score for the experimental group after the intervention.
+# 
+# emmean_ctrl_pre	is the average willingness score for the control group before the intervention.
+# 
+# emmean_ctrl_post is the average willingness score for the control group after the intervention.
+#  
+```
+
+For willingness to converse, prior to completing the intervention, the experimental group participants rated their average willingness at `r average_pre_moca_mean_willingness` and the control group participants rated their average willingness at `r average_pre_control_mean_willingness` (\@ref(fig:fig-sliders-graph) and \@ref(fig:fig-sliders-boxplot)). After completing the intervention, participants who chatted with MOCA averaged a willingness rating of `r average_post_moca_mean_willingness`, while participants who performed the free reflection averaged `r average_post_control_mean_willingness`, meaning the experimental group showed an increase of `r average_post_moca_mean_willingness - average_pre_moca_mean_willingness` and the control group showed a decrease of `r average_post_control_mean_willingness - average_pre_control_mean_willingness`. [However, in]In our mixed-model ANOVA, this general trend was [not] supported:  we found [no]a significant group × time interaction (*F*(1, df) = `r round(willingness_interaction_f, 2)`, *p* = `r format.pval(willingness_interaction_p, digits = 3)`, η²₍G₎ = `r round(willingness_interaction_eta2, 3)`), indicating that the change in willingness to converse [did not differ]differed between experimental and control groups.
+
+In addition to these results, we looked at estimated marginal means (EMMs) to assess whether willingness increased significantly in the individual groups and we looked at pairwise comparisons to assess whether the effects were directional. The EMMs indicated that willingness increased[remained relatively stable] from pre- to post-intervention in the experimental group (`r round(emmean_exp_pre, 2)` to `r round(emmean_exp_post, 2)`) and[but] increased [remained relatively stable] in the control group (`r round(emmean_ctrl_pre, 2)` to `r round(emmean_ctrl_post, 2)`). The pairwise comparisons confirmed[did not confirm] this directional effect: the increase in willingness from pre- to post-intervention was [not] statistically significant in the experimental group, *t*(df) = `r round(t_exp_pre_post, 2)`, *p* (one-tailed) = `r format.pval(p_exp_pre_post, digits = 3)`, [and]but [not] in the control group, *t*(df) = `r round(t_ctrl_pre_post, 2)`, *p* = `r format.pval(p_ctrl_pre_post, digits = 3)`.
+
+These results [do not] support the hypothesis that engaging with MOCA led to a greater increase in willingness to converse about divisive topics.
+
+
+```{r}
+#| label: fig-sliders-graph
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of willingness to converse. participants rated their willingness on a slider from 0 to 100, where a rating of 0 meant participant was absolutely unwilling and a rating of 100 meant participant was absolutely willing.
+
+merged_sliders_df <- merge(pre_sliders_df, post_sliders_df, by = "prolific_subject_id")
+
+sliders_scatterplot <- ggplot(merged_sliders_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in willingness to converse about selected topic with others.", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(sliders_scatterplot)
+
+```
+
+```{r}
+#| label: fig-sliders-boxplot
+#| echo: false
+#| fig-cap: Boxplot plot displaying participants' self-reported willingness to converse about their topic with somebody who disagrees with them and/or will challenge their views. participants used a scale from 0 to 100, where a rating of 0 meant participant was absolutely unwilling and a rating of 100 meant participant was absolutely willing. participants were asked this question in two ways; this density plot shows the mean of the two ratings. 
+
+sliders_boxplot <- ggplot(sliders_df, aes(x = mean_willingness)) + #, color = condition.x)) +
+  geom_boxplot() #+  
+  #geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Mean Willingness Rating", y = "hi", title = "Willingness to converse about selected topic with others") #, color = "Group") +
+ # scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+ #                    labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(sliders_boxplot)
+
+```
+
+```{r}
+#| label:  Openmindedness Mixed-Model ANOVA, EMMs, and pairwise comparisons
+#| include: false
+
+# run mixed ANOVA for mean willingness to converse
+openmindedness_anova_result <- aov_ez(
+  id = "prolific_subject_id",               # participant identifier
+  dv = "mean_openmindedness",         # dependent variable
+  data = surveys_df,          # CHECK 
+  within = "time", # CHECK W DF                 # within-participant factor aka pre- or post-intervention
+  between = "condition"  # CHECK W DF              # between-participant factor aka experimental vs control 
+)
+
+# estimated marginal means
+openmindedness_emm <- emmeans(openmindedness_anova_result, ~ group * time)
+summary(openmindedness_emm)
+
+# pairwise comparisons 
+pairs(emmeans(openmindedness_anova_result, ~ time | group))
+
+```
+
+```{r}
+#| label:  Extracting MMANOVA values for openmindedness
+#| include: false
+
+# extract results as a df
+openmindedness_anova_table <- as.data.frame(openmindedness_anova_result$openmindedness_anova_table)
+
+# get values for the interaction term (group × time)
+openmindedness_interaction_f <- openmindedness_anova_table["group:time", "F"]
+openmindedness_interaction_p <- openmindedness_anova_table["group:time", "Pr(>F)"]
+openmindedness_interaction_eta2 <- openmindedness_anova_table["group:time", "ges"]  # generalized eta squared
+
+
+# From EMMs
+openmindedness_emms <- emmeans(openmindedness_anova_result, ~ group * time)
+openmindedness_emms_df <- as.data.frame(openmindedness_emms)
+
+openmindedness_emmean_exp_pre <- openmindedness_emms_df %>% filter(group == "Experimental", time == "pre") %>% pull(emmean)
+openmindedness_emmean_exp_post <- openmindedness_emms_df %>% filter(group == "Experimental", time == "post") %>% pull(emmean)
+openmindedness_emmean_ctrl_pre <- openmindedness_emms_df %>% filter(group == "Control", time == "pre") %>% pull(emmean)
+openmindedness_emmean_ctrl_post <- openmindedness_emms_df %>% filter(group == "Control", time == "post") %>% pull(emmean)
+
+# From pairwise comparisons (pre vs post within group)
+openmindedness_pairwise <- pairs(emmeans(openmindedness_anova_result, ~ time | group), side = "<") # one-tailed test
+
+# For experimental group
+openmindedness_exp_row <- as.data.frame(openmindedness_pairwise) %>% filter(group == "Experimental")
+openmindedness_t_exp_pre_post <- openmindedness_exp_row$t.ratio
+openmindedness_p_exp_pre_post <- openmindedness_exp_row$p.value
+
+# For control group
+openmindedness_ctrl_row <- as.data.frame(openmindedness_pairwise) %>% filter(group == "Control")
+openmindedness_t_ctrl_pre_post <- openmindedness_ctrl_row$t.ratio
+openmindedness_p_ctrl_pre_post <- openmindedness_ctrl_row$p.value
+
+```
+
+
+For mindedness, prior to completing the intervention, participants' average ratings of their attitudes towards conversations about their contentious topics were [adjective] open-minded (\@ref(fig:fig-polarization-graph)). For example, the average response to the statement "[statement]" was [likert option that matches average rating]. After completing the intervention, participants who chatted with MOCA exhibited [adjective] open-mindedness in their views while participants who performed the free reflection exhibited [adjective] open-mindedness, meaning both the experimental group and control group showed an increase[or decrease or no change or the groups were different] in open-mindedness. [However, in] This general trend was [not] supported by the mixed model ANOVA that we ran for open-mindedness, in which we found [no]a significant group × time interaction (*F*(1, df) = `r round(openmindedness_interaction_f, 2)`, *p* = `r format.pval(openmindedness_interaction_p, digits = 3)`, η²₍G₎ = `r round(openmindedness_interaction_eta2, 3)`), indicating that the change in open-mindedness to converse [did not differ]differed between experimental and control groups.
+
+The open-mindedness EMMs indicated that open-mindedness increased[remained relatively stable] from pre- to post-intervention in the experimental group (`r round(emmean_exp_pre, 2)` to `r round(emmean_exp_post, 2)`) and[but] increased [remained relatively stable] in the control group (`r round(emmean_ctrl_pre, 2)` to `r round(emmean_ctrl_post, 2)`). The pairwise comparisons confirmed[did not confirm] this directional effect: the increase in open-mindedness from pre- to post-intervention was [not] statistically significant in the experimental group, *t*(df) = `r round(t_exp_pre_post, 2)`, *p* (one-tailed) = `r format.pval(p_exp_pre_post, digits = 3)`, [and]but [not] in the control group, *t*(df) = `r round(t_ctrl_pre_post, 2)`, *p* = `r format.pval(p_ctrl_pre_post, digits = 3)`.
+
+These results [do not] support the hypothesis that engaging with MOCA led to a greater increase in open-mindedness to converse about divisive topics.
+
+
+ (\@ref(fig:fig-openmindedness-graph)).
+
+```{r}
+#| label: fig-openmindedness-graph
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of participants' open-mindedness when discussing their topic. participants rated their open-mindedness on a scale from 0 to 7, where a rating of 0 meant participant was not open-minded and a rating of 7 meant participant was open-minded.
+
+merged_openmindedness_df <- merge(pre_openmindedness_df, post_openmindedness_df, by = "prolific_subject_id")
+
+openmindedness_scatterplot <- ggplot(merged_openmindedness_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in open-mindedness ratings before and after conversations.", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(sliders_scatterplot)
+
+
+```
+
+```{r}
+#| label:  Polarization Mixed-Model ANOVA, EMMs, and pairwise comparisons
+#| include: false
+
+# run mixed ANOVA for mean polarization to converse
+polarization_anova_result <- aov_ez(
+  id = "prolific_subject_id",               # participant identifier
+  dv = "mean_polarization",         # dependent variable
+  data = surveys_df,          # CHECK 
+  within = "time", # CHECK W DF                 # within-participant factor aka pre- or post-intervention
+  between = "condition"  # CHECK W DF              # between-participant factor aka experimental vs control 
+)
+
+# estimated marginal means
+polarization_emm <- emmeans(polarization_anova_result, ~ group * time)
+summary(polarization_emm)
+
+# pairwise comparisons 
+pairs(emmeans(polarization_anova_result, ~ time | group))
+
+```
+
+```{r}
+#| label:  Extracting MMANOVA values for polarization 
+#| include: false
+
+# extract results as a df
+polarization_anova_table <- as.data.frame(polarization_anova_result$polarization_anova_table)
+
+# get values for the interaction term (group × time)
+polarization_interaction_f <- polarization_anova_table["group:time", "F"]
+polarization_interaction_p <- polarization_anova_table["group:time", "Pr(>F)"]
+polarization_interaction_eta2 <- polarization_anova_table["group:time", "ges"]  # generalized eta squared
+
+
+# From EMMs
+polarization_emms <- emmeans(polarization_anova_result, ~ group * time)
+polarization_emms_df <- as.data.frame(polarization_emms)
+
+polarization_emmean_exp_pre <- polarization_emms_df %>% filter(group == "Experimental", time == "pre") %>% pull(emmean)
+polarization_emmean_exp_post <- polarization_emms_df %>% filter(group == "Experimental", time == "post") %>% pull(emmean)
+polarization_emmean_ctrl_pre <- polarization_emms_df %>% filter(group == "Control", time == "pre") %>% pull(emmean)
+polarization_emmean_ctrl_post <- polarization_emms_df %>% filter(group == "Control", time == "post") %>% pull(emmean)
+
+# From pairwise comparisons (pre vs post within group)
+polarization_pairwise <- pairs(emmeans(polarization_anova_result, ~ time | group), side = "<") # one-tailed test
+
+# For experimental group
+polarization_exp_row <- as.data.frame(polarization_pairwise) %>% filter(group == "Experimental")
+polarization_t_exp_pre_post <- polarization_exp_row$t.ratio
+polarization_p_exp_pre_post <- polarization_exp_row$p.value
+
+# For control group
+polarization_ctrl_row <- as.data.frame(polarization_pairwise) %>% filter(group == "Control")
+polarization_t_ctrl_pre_post <- polarization_ctrl_row$t.ratio
+polarization_p_ctrl_pre_post <- polarization_ctrl_row$p.value
+```
+
+For polarization, prior to completing the intervention, participants' average ratings of their views on opinionated statements about their contentious topics were [adjective] polarized (\@ref(fig:fig-polarization-graph)). For example, on the topic of same-sex marriage, the average response to the statement "[statement]" was [likert option that matches average rating]. After completing the intervention, participants who chatted with MOCA exhibited [adjective] polarization in their views while participants who performed the free reflection exhibited [adjective] polarization. [However, in] This general trend was [not] supported by the mixed model ANOVA that we ran for polarization, in which we found [no]a significant group × time interaction (*F*(1, df) = `r round(polarization_interaction_f, 2)`, *p* = `r format.pval(polarization_interaction_p, digits = 3)`, η²₍G₎ = `r round(polarization_interaction_eta2, 3)`), indicating that the change in polarization to converse [did not differ]differed between experimental and control groups.
+
+The open-mindedness EMMs indicated that open-mindedness increased[remained relatively stable] from pre- to post-intervention in the experimental group (`r round(emmean_exp_pre, 2)` to `r round(emmean_exp_post, 2)`) and[but] increased [remained relatively stable] in the control group (`r round(emmean_ctrl_pre, 2)` to `r round(emmean_ctrl_post, 2)`). The pairwise comparisons confirmed[did not confirm] this directional effect: the increase in open-mindedness from pre- to post-intervention was [not] statistically significant in the experimental group, *t*(df) = `r round(t_exp_pre_post, 2)`, *p* (one-tailed) = `r format.pval(p_exp_pre_post, digits = 3)`, [and]but [not] in the control group, *t*(df) = `r round(t_ctrl_pre_post, 2)`, *p* = `r format.pval(p_ctrl_pre_post, digits = 3)`.
+
+These results [do not] support the hypothesis that engaging with MOCA led to a greater increase in open-mindedness to converse about divisive topics.
+
+```{r}
+#| label: fig-polarization-graph
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of opinions on topic-specific statements. participants rated their opinions on a scale from 0 to 7, where a rating of 0 meant participant strongly disagreed and a rating of 7 meant strongly agree.
+
+merged_polarization_df <- merge(pre_polarization_df, post_polarization_df, by = "prolific_subject_id")
+
+polarization_scatterplot <- ggplot(merged_polarization_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in polarization of topic-specific beliefs.", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(polarization_scatterplot)
+
+```
+
+```{r}
+#| label:  19 concerns linear mixed effects model 
+#| include: false 
+
+lmm_concerns <- lmer(
+  rating ~ group * time + (1 | prolific_subject_id) + (1 | concern),
+  data = concerns_long
+)
+
+lmm_concerns_summary <- summary(lmm_concerns)
+
+#explanation:
+# rating: the rating for how much a concern contributes to unwillingness
+# group * time: tests whether the change in concern ratings differs by group
+# (1 | participant_id): accounts for repeated measures within each participant
+# (1 | concern): accounts for variation in baseline severity across concerns
+
+```
+
+```{r}
+#| label:  Check that assumptions for linear mixed effects model are met 
+#| note: barely anything tested here
+#| include: false
+
+#checking residuals 
+
+# plot residuals vs. fitted
+plot(lmm_concerns)  # Residuals vs. Fitted values
+
+# Q-Q plot of residuals (normality check)
+qqnorm(resid(lmm_concerns))
+qqline(resid(lmm_concerns))
+
+# note
+# If you see:
+# A curved pattern → possible nonlinearity
+# Fan shape in residuals vs. fitted → possible heteroskedasticity
+# Non-straight Q-Q plot → non-normal residuals
+# Then a transformation or non-linear model might be warranted.
+```
+
+```{r}
+#| label:  19 concerns extracting values 
+#| include: false
+
+fixed_effects_df <- as.data.frame(lmm_concerns_summary$coefficients)
+
+# Intercept
+b_intercept <- fixed_effects_df["(Intercept)", "Estimate"]
+se_intercept <- fixed_effects_df["(Intercept)", "Std. Error"]
+t_intercept <- fixed_effects_df["(Intercept)", "t value"]
+
+# Main effect of group (e.g., experimental vs control)
+b_group <- fixed_effects_df["groupexperimental", "Estimate"]
+se_group <- fixed_effects_df["groupexperimental", "Std. Error"]
+t_group <- fixed_effects_df["groupexperimental", "t value"]
+
+# Main effect of time (e.g., post vs pre)
+b_time <- fixed_effects_df["timepost", "Estimate"]
+se_time <- fixed_effects_df["timepost", "Std. Error"]
+t_time <- fixed_effects_df["timepost", "t value"]
+
+# Interaction: group x time
+b_interaction <- fixed_effects_df["groupexperimental:timepost", "Estimate"]
+se_interaction <- fixed_effects_df["groupexperimental:timepost", "Std. Error"]
+t_interaction <- fixed_effects_df["groupexperimental:timepost", "t value"]
+
+```
+
+We also wanted to learn whether MOCA effectively mitigated how much various concerns contribute to Americans' unwillingness to converse. This would allow us to see whether MOCA is only effective in targeting certain concerns and, if so, could help future versions of this project either hone in on these assets or focus on improving MOCA's weak points. As shown in \@ref(fig:fig-offending-reason-likert-bar-plot), participants in both conditions exhibited [comment on overal trend]. Towards formally assessing this trend, we ran a linear mixed effects mixed model in which we treated the 19 concerns as a within-participants factor, meaning the model could capture the average trend across concerns without assuming that the average participant cares about all concerns equally. We ensured that the data met the assumptions of linearity, homoscedasticity, independence, and normality. For linearity, we ensured that the relationship between the response variable and the fixed effects (predictors) was linear by plotting residuals against fitted values and ensuring that there were not any non-linear patterns. For homoscedasticity, we ensured that the variance of the residuals was constant across all levels of the predictor variables by plotting the residuals against the fitted values and ensuring that the variance was constant. For independence, we ensured that the residuals were independent of each other and of the random effects by plotting the residuals against the covariates or other potential sources of correlation. For normality, we ensured that the residuals and random effects were normally distributed by using normal probability plots, histograms, or statistical tests like the Shapiro-Wilk test. 
+
+The model predicted concern-based willingness ratings. The results of this model revealed[did not reveal] a significant group x time interaction, suggesting that the reduction in concern severity over time was [not] greater in the experimental group compared to the control group (b = `r round(b_interaction, 2)`, SE = `r round(se_interaction, 2)`, *t* = `r round(t_interaction, 2)`).
+
+```{r}
+#| label: fig-offending-reason-likert-bar-plot
+#| echo: false
+#| fig-cap: Likert bar plot displaying participants' ratings of how much certain concerns contribute to their unwillingness to converse. The nineteen potential concerns were derived from existing literature and pretested in a pilot experiment. On a scale from 0 to 7, where a rating of 0 meant participant strongly disagreed and a rating of 7 meant strongly agree, participants rated each potential concerns effect on their willingness to converse.
+
+# only works though if all "1" to "7" ratings are in the df
+
+wide_for_likert_offending_reasons_df_with_sub_labels <- surveys_df %>%
+  filter(grepl("offending-reason", question)) %>%
+  select(question, answer, prolific_subject_id) %>%
+  mutate(answer = as.numeric(answer)) %>%
+  pivot_wider(names_from = question, values_from = answer) %>%
+  ungroup() %>%
+  rename("Might experience negative feelings about self" = "offending-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)", "Might be offended" = "offending-reason-I might take offense to what someone says",
+  "Opinion is unpopular amongst group" = "offending-reason-I would feel like my opinion is unpopular amongst the group.",
+  "Doesn't participate in these conversations often" = "offending-reason-I don’t often participate in conversations like these",
+  "Might struggle to explain views or seem uninformed" = "offending-reason-I might struggle to explain my views to the others and/or come across as uninformed",
+  "Others might be unproductive or disrespectful" = "offending-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+  "Views wouldn't change" = "offending-reason-My views wouldn’t change",
+  "Doesn't want to listen to others" = "offending-reason-I would not want to listen to the others discuss their views",
+  "Might be criticized" = "offending-reason-Someone could criticize or show disapproval of my views",
+  "Experience negative feelings about the world" = "offending-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
+  "Conversation might be awkward or tense" = "offending-reason-The conversation could become awkward or tense",
+  "Might feel embarrassed" = "offending-reason-I could feel humiliated or embarrassed in the conversation",
+  "Might offend someone" = "offending-reason-Someone might take offense to what I say",
+  "Might struggle to remain productive and respectful" = "offending-reason-I might struggle to remain productive and respectful",
+  "Others won't make effort to listen" = "offending-reason-The others might not make a full effort to hear and understand me",
+  "Identity might be challenged" = "offending-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
+  "Might feel invalidated" = "offending-reason-I might feel disempowered, unheard, or invalidated",
+  "Might incur social reprecussions" = "offending-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",  
+  "Opinion is unpopular in general" = "offending-reason-My opinion is unpopular in general."
+)
+
+wide_for_likert_offending_reasons_df <- wide_for_likert_offending_reasons_df_with_sub_labels %>%
+  select(-prolific_subject_id) %>%
+  mutate(across(everything(), ~ factor(.x, levels = 1:7,
+     labels = c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree",
+                "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree"),
+     ordered = TRUE)))
+
+
+### REMOVE DURING ACTUAL DATA ANALYSIS. I'M MANUALLY ADDING ALL LIKERT VALUES FOR EACH OFFENDING REASON SO THAT LIKERT PLOT WORKS
+### create a vector of the all 1-7 values
+all_likert_values <- c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree", "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree")
+### get the column names from  existing df
+offending_reasons_names <- colnames(wide_for_likert_offending_reasons_df)
+### create 7 new rows
+new_likert_rows <- lapply(all_likert_values, function(response) {
+  as.list(setNames(rep(response, length(offending_reasons_names)), offending_reasons_names))
+}) %>%
+  bind_rows()
+### add the new rows to the existing dataframe
+wide_for_likert_offending_reasons_df <- bind_rows(wide_for_likert_offending_reasons_df, new_likert_rows)
+
+
+
+# standardize all columns to use the same factor object
+wide_for_likert_offending_reasons_df <- wide_for_likert_offending_reasons_df %>%
+  mutate(across(everything(), ~ factor(.x, levels = all_likert_values, ordered = TRUE)))
+
+offending_reason_likert <- likert(as.data.frame(wide_for_likert_offending_reasons_df))
+
+# for the future when comparing pre and post, might want to use this example line: df1_likert <- likert(items=df1[,3:4], grouping=df1[,2]) 
+
+plot(offending_reason_likert, legend.position="right")
+
+```
+
+### Pilot-specific exploratory
+
+literally just were the conversations good
+
+### Exploratory analyses
+
+```{r}
+#| label:  factored concerns Mixed-Model ANOVA, EMMs, and pairwise comparisons
+#| include: false
+
+library(afex)
+library(emmeans)
+library(tidyverse)
+
+# List of DVs (factor scores)
+concerns_factor_dv_names <- c("mean_factor1_score", "mean_factor2_score", "mean_factor3_score", "mean_factor4_score")
+
+# Run aov_ez for each factor. essentially running 4 anovas here, which means reducing alpha value for statistical significance 
+factored_concerns_anova_results <- concerns_factor_dv_names %>%
+  set_names() %>%
+  map(~ aov_ez(
+    id = "prolific_subject_id",
+    dv = .x,
+    data = surveys_df,
+    within = "time",
+    between = "condition"
+  ))
+
+# get EMMs for each anova results
+factored_concern_emms <- factored_concerns_anova_results %>%
+  map(~ emmeans(.x, ~ condition * time))
+
+# get pre vs post comparisons within each group
+factored_concern_pairwise <- factored_concern_anova_results %>%
+  map(~ pairs(emmeans(.x, ~ time | condition), side = "<"))
+
+```
+
+```{r}
+#| label:  factored concerns - extracting values
+#| include: false
+
+# extract results 
+factored_concern_anova_stats <- factored_concerns_anova_results %>%
+  map_df(~ {
+    anova_tbl <- as.data.frame(.x$anova_table)
+    tibble(
+      F = anova_tbl["condition:time", "F"],
+      p = anova_tbl["condition:time", "Pr(>F)"],
+      eta2 = anova_tbl["condition:time", "ges"]
+    )
+  }, .id = "DV")
+
+# extract anova results
+# factor 1
+factor1_f <- factored_concern_anova_stats %>% filter(DV == "mean_factor1_score") %>% pull(F)
+factor1_p <- factored_concern_anova_stats %>% filter(DV == "mean_factor1_score") %>% pull(p)
+factor1_eta2 <- factored_concern_anova_stats %>% filter(DV == "mean_factor1_score") %>% pull(eta2)
+
+# factor 2
+factor2_f <- factored_concern_anova_stats %>% filter(DV == "mean_factor2_score") %>% pull(F)
+factor2_p <- factored_concern_anova_stats %>% filter(DV == "mean_factor2_score") %>% pull(p)
+factor2_eta2 <- factored_concern_anova_stats %>% filter(DV == "mean_factor2_score") %>% pull(eta2)
+
+# factor 3
+factor3_f <- factored_concern_anova_stats %>% filter(DV == "mean_factor3_score") %>% pull(F)
+factor3_p <- factored_concern_anova_stats %>% filter(DV == "mean_factor3_score") %>% pull(p)
+factor3_eta2 <- factored_concern_anova_stats %>% filter(DV == "mean_factor3_score") %>% pull(eta2)
+
+# factor 4
+factor4_f <- factored_concern_anova_stats %>% filter(DV == "mean_factor4_score") %>% pull(F)
+factor4_p <- factored_concern_anova_stats %>% filter(DV == "mean_factor4_score") %>% pull(p)
+factor4_eta2 <- factored_concern_anova_stats %>% filter(DV == "mean_factor4_score") %>% pull(eta2)
+
+#EMMS
+#factor 1
+# convert EMMs to a data frame for filtering
+emms_factor1_df <- as.data.frame(factored_concern_emms[["mean_factor1_score"]])
+
+# experimental group
+emmean_exp_pre_factor1 <- emms_factor1_df %>% 
+  filter(condition == "experimental", time == "pre") %>% 
+  pull(emmean)
+
+emmean_exp_post_factor1 <- emms_factor1_df %>% 
+  filter(condition == "experimental", time == "post") %>% 
+  pull(emmean)
+
+# control group
+emmean_ctrl_pre_factor1 <- emms_factor1_df %>% 
+  filter(condition == "control", time == "pre") %>% 
+  pull(emmean)
+
+emmean_ctrl_post_factor1 <- emms_factor1_df %>% 
+  filter(condition == "control", time == "post") %>% 
+  pull(emmean)
+
+#factor 2
+# convert EMMs to a data frame for filtering
+emms_factor2_df <- as.data.frame(factored_concern_emms[["mean_factor2_score"]])
+
+# experimental group
+emmean_exp_pre_factor2 <- emms_factor2_df %>% 
+  filter(condition == "experimental", time == "pre") %>% 
+  pull(emmean)
+
+emmean_exp_post_factor2 <- emms_factor2_df %>% 
+  filter(condition == "experimental", time == "post") %>% 
+  pull(emmean)
+
+# control group
+emmean_ctrl_pre_factor2 <- emms_factor2_df %>% 
+  filter(condition == "control", time == "pre") %>% 
+  pull(emmean)
+
+emmean_ctrl_post_factor2 <- emms_factor2_df %>% 
+  filter(condition == "control", time == "post") %>% 
+  pull(emmean)
+
+#factor 3
+# convert EMMs to a data frame for filtering
+emms_factor3_df <- as.data.frame(factored_concern_emms[["mean_factor3_score"]])
+
+# experimental group
+emmean_exp_pre_factor3 <- emms_factor3_df %>% 
+  filter(condition == "experimental", time == "pre") %>% 
+  pull(emmean)
+
+emmean_exp_post_factor3 <- emms_factor3_df %>% 
+  filter(condition == "experimental", time == "post") %>% 
+  pull(emmean)
+
+# control group
+emmean_ctrl_pre_factor3 <- emms_factor3_df %>% 
+  filter(condition == "control", time == "pre") %>% 
+  pull(emmean)
+
+emmean_ctrl_post_factor3 <- emms_factor3_df %>% 
+  filter(condition == "control", time == "post") %>% 
+  pull(emmean)
+
+#factor 4
+# convert EMMs to a data frame for filtering
+emms_factor4_df <- as.data.frame(factored_concern_emms[["mean_factor4_score"]])
+
+# experimental group
+emmean_exp_pre_factor4 <- emms_factor4_df %>% 
+  filter(condition == "experimental", time == "pre") %>% 
+  pull(emmean)
+
+emmean_exp_post_factor4 <- emms_factor4_df %>% 
+  filter(condition == "experimental", time == "post") %>% 
+  pull(emmean)
+
+# control group
+emmean_ctrl_pre_factor4 <- emms_factor4_df %>% 
+  filter(condition == "control", time == "pre") %>% 
+  pull(emmean)
+
+emmean_ctrl_post_factor4 <- emms_factor4_df %>% 
+  filter(condition == "control", time == "post") %>% 
+  pull(emmean)
+
+
+# pairwise comparisons object for factor 1
+factor1_pairwise <- summary(factored_concern_pairwise[["mean_factor1_score"]])
+
+# Experimental: pre vs post
+t_exp_pre_post_factor1 <- factor1_pairwise %>%
+  filter(condition == "experimental") %>%
+  pull(t.ratio)
+
+p_exp_pre_post_factor1 <- factor1_pairwise %>%
+  filter(condition == "experimental") %>%
+  pull(p.value)
+
+# Control: pre vs post
+t_ctrl_pre_post_factor1 <- factor1_pairwise %>%
+  filter(condition == "control") %>%
+  pull(t.ratio)
+
+p_ctrl_pre_post_factor1 <- factor1_pairwise %>%
+  filter(condition == "control") %>%
+  pull(p.value)
+
+
+
+# pairwise comparisons object for factor 2
+factor2_pairwise <- summary(factored_concern_pairwise[["mean_factor2_score"]])
+
+# Experimental: pre vs post
+t_exp_pre_post_factor2 <- factor2_pairwise %>%
+  filter(condition == "experimental") %>%
+  pull(t.ratio)
+
+p_exp_pre_post_factor2 <- factor2_pairwise %>%
+  filter(condition == "experimental") %>%
+  pull(p.value)
+
+# Control: pre vs post
+t_ctrl_pre_post_factor2 <- factor2_pairwise %>%
+  filter(condition == "control") %>%
+  pull(t.ratio)
+
+p_ctrl_pre_post_factor2 <- factor2_pairwise %>%
+  filter(condition == "control") %>%
+  pull(p.value)
+
+
+# pairwise comparisons object for factor 3
+factor3_pairwise <- summary(factored_concern_pairwise[["mean_factor3_score"]])
+
+# Experimental: pre vs post
+t_exp_pre_post_factor3 <- factor3_pairwise %>%
+  filter(condition == "experimental") %>%
+  pull(t.ratio)
+
+p_exp_pre_post_factor3 <- factor3_pairwise %>%
+  filter(condition == "experimental") %>%
+  pull(p.value)
+
+# Control: pre vs post
+t_ctrl_pre_post_factor3 <- factor3_pairwise %>%
+  filter(condition == "control") %>%
+  pull(t.ratio)
+
+p_ctrl_pre_post_factor3 <- factor3_pairwise %>%
+  filter(condition == "control") %>%
+  pull(p.value)
+
+
+# pairwise comparisons object for factor 4
+factor4_pairwise <- summary(factored_concern_pairwise[["mean_factor4_score"]])
+
+# Experimental: pre vs post
+t_exp_pre_post_factor4 <- factor4_pairwise %>%
+  filter(condition == "experimental") %>%
+  pull(t.ratio)
+
+p_exp_pre_post_factor4 <- factor4_pairwise %>%
+  filter(condition == "experimental") %>%
+  pull(p.value)
+
+# Control: pre vs post
+t_ctrl_pre_post_factor4 <- factor4_pairwise %>%
+  filter(condition == "control") %>%
+  pull(t.ratio)
+
+p_ctrl_pre_post_factor4 <- factor4_pairwise %>%
+  filter(condition == "control") %>%
+  pull(p.value)
+```
+
+We ran an additional analysis to assess MOCA's effectiveness at reducing concerns that contribute to unwillingness. This was a Mixed-Model ANOVA with Time (pre vs. post) as a within-participants factor and Condition (experimental vs. control) as a between-participants factor, separately for each of the four concern dimensions that were derived through factor analysis in our survey pretest experiment. We ran factor analysis on this data as well to ensure that the underlying dimensions were the same as in our pilot. We chose this model because it would respect how each participant is likely to not be equally concerned about each item. 
+
+note- the factor names here and in the code are made up for now 
+
+For the first concern factor (“Social Judgement”), there was [not] a significant interaction between time and condition, F(1, 74) =  `r factor1_f`, p = `r factor1_p`, η² = `r factor1_eta2`, indicating that the experimental group showed[did not show] a greater reduction in social judgement concerns than the control group. The EMMs indicated that concern decreased [remained relatively stable] from pre- to post-intervention in the experimental group (`r round(emmean_exp_pre_factor1, 2)` to `r round(emmean_exp_post_factor1, 2)`) and[but] increased [remained relatively stable] in the control group (`r round(emmean_ctrl_pre_factor1, 2)` to `r round(emmean_ctrl_post_factor1, 2)`). The pairwise comparisons confirmed[did not confirm] this directional effect: the increase in willingness from pre- to post-intervention was [not] statistically significant in the experimental group, *t*(df) = `r round(t_exp_pre_post_factor1, 2)`, *p* (one-tailed) = `r format.pval(p_exp_pre_post_factor1, digits = 3)`, [and]but [not] in the control group, *t*(df) = `r round(t_ctrl_pre_post_factor1, 2)`, *p* = `r format.pval(p_ctrl_pre_post_factor1, digits = 3)`.
+
+For the second concern factor (“[factor]”), there was [not] a significant interaction (F(1, 74) = `r factor2_f`, p = `r factor2_p`, η² = `r factor2_eta2`), also indicating that the experimental group showed[did not show] a greater reduction in social judgement concerns than the control group. The EMMs indicated that concern decreased [remained relatively stable] from pre- to post-intervention in the experimental group (`r round(emmean_exp_pre_factor2, 2)` to `r round(emmean_exp_post_factor2, 2)`) and[but] increased [remained relatively stable] in the control group (`r round(emmean_ctrl_pre_factor2, 2)` to `r round(emmean_ctrl_post_factor2, 2)`). The pairwise comparisons confirmed[did not confirm] this directional effect: the increase in willingness from pre- to post-intervention was [not] statistically significant in the experimental group, *t*(df) = `r round(t_exp_pre_post_factor2, 2)`, *p* (one-tailed) = `r format.pval(p_exp_pre_post_factor2, digits = 3)`, [and]but [not] in the control group, *t*(df) = `r round(t_ctrl_pre_post_factor2, 2)`, *p* = `r format.pval(p_ctrl_pre_post_factor2, digits = 3)`.
+
+For the third concern factor (“Moral Integrity”), there was a significant interaction (F(1, 74) = `r factor3_f`, p = `r factor3_p`, η² = `r factor3_eta2`), also indicating that the experimental group showed[did not show] a greater reduction in social judgement concerns than the control group. The EMMs indicated that concern decreased [remained relatively stable] from pre- to post-intervention in the experimental group (`r round(emmean_exp_pre_factor3, 2)` to `r round(emmean_exp_post_factor3, 2)`) and[but] increased [remained relatively stable] in the control group (`r round(emmean_ctrl_pre_factor3, 2)` to `r round(emmean_ctrl_post_factor3, 2)`). The pairwise comparisons confirmed[did not confirm] this directional effect: the increase in willingness from pre- to post-intervention was [not] statistically significant in the experimental group, *t*(df) = `r round(t_exp_pre_post_factor3, 2)`, *p* (one-tailed) = `r format.pval(p_exp_pre_post_factor3, digits = 3)`, [and]but [not] in the control group, *t*(df) = `r round(t_ctrl_pre_post_factor3, 2)`, *p* = `r format.pval(p_ctrl_pre_post_factor3, digits = 3)`.
+
+For the fourth concern factor (“Topic Complexity”), there was [not] a significant interaction (F(1, 74) = `r factor4_f`, p = `r factor4_p`, η² = `r factor4_eta2)`, also indicating that the experimental group showed[did not show] a greater reduction in social judgement concerns than the control group. The EMMs indicated that concern decreased [remained relatively stable] from pre- to post-intervention in the experimental group (`r round(emmean_exp_pre_factor4, 2)` to `r round(emmean_exp_post_factor4, 2)`) and[but] increased [remained relatively stable] in the control group (`r round(emmean_ctrl_pre_factor4, 2)` to `r round(emmean_ctrl_post_factor4, 2)`). The pairwise comparisons confirmed[did not confirm] this directional effect: the increase in willingness from pre- to post-intervention was [not] statistically significant in the experimental group, *t*(df) = `r round(t_exp_pre_post_factor4, 2)`, *p* (one-tailed) = `r format.pval(p_exp_pre_post_factor4, digits = 3)`, [and]but [not] in the control group, *t*(df) = `r round(t_ctrl_pre_post_factor4, 2)`, *p* = `r format.pval(p_ctrl_pre_post_factor4, digits = 3)`.
+
+```{r}
+#| label: WIP - exploratory political polarization MMANOVA
+#| include: false 
+```
+
+```{r}
+#| label: WIP - political polarization extracting values 
+#| include: false 
+
+```
+
+Prior to completing the intervention, participants, on average, exhibited [adjective] polarized views towards the political party/parties with which the participants did not identify ((\@ref(fig:fig-political-party-graph)). After completing the intervention, participants, on average, exhibited [adjective] polarized views towards the same party/parties. Polarization towards the opposing political party/parties was not a key focus of this experiment because we could only have so many key variables and the three key variables that we do have were more pressing according to the literature, our intuition, and our desire to not wholly conflate our experiment with political tension. However, in the interest of seeing whether MOCA affected polarization towards opposing parties, we exploratorily ran a mixed-model ANOVA on participants' mean ratings of their attitudes towards the opposing parties. 
+
+```{r}
+#| label: fig-political-party-graph
+#| echo: false
+#| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of opinions on the opposite party. participants rated their opinions on a scale from 0 to 7, where a rating of 0 was strongly negative and a rating of 7 was strongly positive.
+
+merged_politics_df <- merge(pre_politics_df, post_politics_df, by = "prolific_subject_id")
+
+politics_scatterplot <- ggplot(merged_politics_df, aes(x = pre_mean_score, y = post_mean_score, color = condition.x)) +
+  geom_point() +  # Add points
+  geom_abline(intercept = 0, slope = 1, color = "rosybrown1", linetype = "dashed") +  # Line of equality
+  labs(x = "Pre-intervention mean rating", y = "Post-intervention mean rating", title = "Change in opinions of the opposite party", color = "Group") +
+  scale_color_manual(values = c("control free reflection" = "darkseagreen", "selection bot" = "cornflowerblue", "combination bot" = "navyblue"), 
+                     labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
+
+print(politics_scatterplot)
+
+```
 ## Discussion
 
 By conducting this research, we aimed to assess whether conversational LLMs can help Americans become more willing to have productive conversations about divisive topics. We found that \[summary\]
@@ -1776,6 +2467,21 @@ By conducting this research, we aimed to assess whether conversational LLMs can 
 #### self-reported
 
 #### situational vs. dispositional willingness
+
+Situational vs. dispositional willingness problem:
+
+Situational vs. dispositional willingness — We either need to define the situation(s) or let targets fill it in for themselves. This is tricky if we’re only trying to get at dispositional willingness. How we define the situation(s) implies whether we’re targeting situational willingness or dispositional (and potentially also situational vs. dispositional open-mindedness?)
+ 
+For example:
+Ask something like “How controversial is your opinion?” to get at the finding that people are less willing when they think their opinion is a very unpopular one. 
+but I think this is really just a situational matter, too. What the person really cares about here is whether their opinion is unpopular amongst the people with whom they’re going to converse, and this matters to them more if they don’t feel safe enough with these people to divulge their thoughts.
+Sub-problem relating back to situational vs dispositional willingness: Do we ask things on an intentionally vague level or do we ensure that every question is situated? 
+Ask something like “How important are your feelings about gay relationships to your understanding of whether gay marriage should be legal in the U.S.?” to get at the finding that conversations often become more hostile when a person is emotionally involved in it
+
+Do we add follow up open-ended questions for the highest-rated reason(s) why a participant is unwilling? And/or one open-ended question at the end that asks if there are other reasons at play that we didn’t ask about? Could have chat parse these responses for data analysis
+
+A central limitation is that situational willingness plays an enormous role in the success of a given conversation. That’s because safety/vulnerability/trust with the conversational partner(s) is perhaps the most important thing. We could either choose to accept this limitation or we could try to target it by having our bot somehow ‘prepare’ users  for conversations that aren’t built on trust/safety. For example, we can look for research on helping the user develop the tools to not do the things that people do that make a conversation go bad when they’re in a conversation where there isn’t enough safety/trust. 
+
 
 #### chatbot limitations 
 
@@ -1810,7 +2516,40 @@ We thank Dr. Steve Flusberg, Ian Ho, Victor Zhang, and Niranjan Baskaran for the
 
 \[not sure if this is even necessary or do we only discuss the final product that we arrived at?\]
 
-## Appendix: Prompts
+
+draft of our process
+- we found human to human findings on what works 
+- we sorted that into three main strategies 
+- we then proceeded to design chatbots for each strategy and ran small, iterative pilots 
+- we found that having the bot consistently talk in one style wasn't flexible enough for realistic conversation. we developed the combination bot and selection bot with the intention of only moving forward with one or the other. we tested these and ultimately decided that the two bots seemed to put out very similar responses but that the selection bot made more sense theoretically (it's picking from responses, not the potential for what the responses could be) so we moved forward with the selection bot. 
+- we continued developing each bot in MOCA based on what we observed in the transcripts and in continued testing. we also explored other potential approaches in our own workshopping, but always came to the conclusion that our original three approaches were most consistent with the literature 
+- we knew we were ready to deploy the pilot when we reached a point at which MOCA performs the approaches while being adequately conversational and not going too far in any unwanted direction (e.g., being too supportive to the user or being too contrarian towards the user). at this point, MOCA has reached the vision that we had in mind, so any problems with how MOCA acts are much more likely to reflect a problem with our conceptual design rather than our prompt-engineering.
+
+
+
+Americans today are becoming increasingly unwilling to engage in constructive conversations about polarizing social and political topics---issues that require open, thoughtful dialogue to promote democratic functioning, critical thinking, and inclusive learning environments  (@finkel2020 & @iyengar2019). While existing research has found that human-to-human conversations can improve characteristics like empathy and polarization (e.g., @broockman2016, @combs2023, @elnakouri2024, @fernbach2013), research has also found that these conversations can become unproductive, leading to further decreased willingness to engage in future conversations (cite). With the advent of conversational large language models (LLMs), this unwillingness to converse across divides raises a pressing question: can new technologies increase Americans' willingness to engage in productive, open-minded discussions about divisive topics?
+
+Researchers have recently found that conversations with artificial intelligence (AI) can shift attitudes, increase receptiveness to opposing views, and promote open-mindedness---defined as the willingness to consider alternative perspectives, evaluate contradictory evidence, and remain flexible rather than dogmatic  (@altay2022, @andrews2008, @chalaguine2019, @costello2024, @matz2024, @stanovich1999rational). However, most prior work in this area has diverged from our focus in either key measures or use of technology. For example, some studies focused on other topics like conspiracy theories (e.g., @costello2024), used more rigid AI mechanisms like Good Old-Fashioned AI (GOFAI) (e.g., @costello2024), or did not assess willingness to converse (e.g., @chalaguine2019). Thus, while there is promising evidence that AI can support attitude change, we still don’t know whether modern large language models (LLMs)—which enable flexible, adaptive, and increasingly humanlike dialogue—can increase Americans’ willingness to engage in productive, open-minded conversations with other Americans about controversial topics. This is the central question of our study.
+
+To address this question, we will draw want to focus on divisive topics because Americans need to become more comfortable discussing them, use conversational LLMs because of their flexibility and adaptability, and measure willingness to converse. Additionally, we would like to focus our study on applying relevant findings from the human-to-human research to the conversational LLM space rather than taking directly from approaches that were used in existing AI persuasiveness research. We are choosing this approach because we want to take advantage of the flexible conversational abilities of LLMs that are unique from more rigidly programmed argumentation strategies and conversation structures that are found in older studies. 
+
+Existing research has found that human-to-human conversations, both in-person and anonymously online, can increase empathy and reduce polarization (e.g., @broockman2016, @combs2023, @elnakouri2024, @fernbach2013). Though there are myriad findings, we found that the two overarching components of the conversations that were thought to lead to positive effects were: explaining one's views and engaging with people of opposing opinions. For example, @elnakouri2024 found that explaining one's views led to greater open-mindedness. @combs2023 found that engaging in anonymous cross-party conversations about political topics led participants to exhibit substantial decreases in polarization, which were also correlated with the civility of dialogue between study participants. When we performed a deeper dive into why the act of engaging with people of opposing opinions is helpful, we found theories such as that participants gain more knowledge about the other side, such as learning why people with opposing views might have a different perspective and contradicting stereotypes (@ahler2018, @fishkin2021, @levendusky2016, @pettigrew2008), and that, by engaging with counter arguments from the others, participants must engage using accuracy-based ideas rather than ideas that are based on more than partisan conformity, one-sided argumentation, or a mere impression of sound bites and headlines (@fishkin2021). Thus, we derived three main approaches to apply in our chatbot: asking the user to explain more about their views, presenting a counterargument, and presenting an alternative viewpoint. 
+
+Through a chatbot conversation, the present pilot study will leverage the capabilities of AI and the techniques found in human-to-human research to explore conversational LLMs as tools for increasing Americans' willingness to converse about highly disputed topics. The chatbot that we created for this experiment uses a response-election model: four chatbots, each with a different prompt, generate a unique response to a user message ; We will refer to these chatbots throughout this paper as the response-generating chatbots. Then, a final chatbot selects and outputs one of the responses; we will refer to this chatbot as the response-selecting chatbot. Three of the four approaches for the response-generating chatbots were those gathered in the human-to-human research. The fourth approach gave the bot as much agency as possible in its choice of response through the most minimal prompting that still produced a conversational response (see Appendix: Prompts). The response-selecting chatbot was designed to understand the goal of the conversation and thus select the approach that it thinks will most effectively accomplish that goal. We developed these prompts through methods suggested by leading guides on prompt engineering (cite) and iterative refinement until we reached a satisfactory result. In this way, we hoped to give the chatbot two opportunities to affect users: either through our manipulation of its capabilities or through its own manipulation. We will refer to this response-election model as MOCA: the Mind-Opening Conversational Agent.
+
+There are findings from human-to-human research on approaches, techniques, and situational factors that can make people more willing to have conversations on controversial topics and be more productive/open-minded. 
+
+Some cognitive scientists have found that inviting people to explain, rather than freely reflect on, a contentious political issue may help reduce intergroup toxicity in these discussions (@fernbach2013. @fernbach2013 explained that the attempt to explain the issue often leads people to become confronted with their lack of understanding, which in turn might lead them to become more moderate as well as less hostility towards political outgroup members. However, subsequent scholarship either found no evidence for the effect (Crawford & Ruscio, 2021) or found it to be constrained to specific topics (Sloman & Vives, 2022) or personalities (Voelkel, Brandt, & Colombo, 2018). That is, inviting people to explain specific policy positions did not consistently lead to less extreme policy positions, nor did it influence how they felt about political partisans. Another possibility is that explanations might still hold some promise, changing the process of how people think rather than the content of what people believe. Specifically, inviting people to explain themselves could encourage information search via consulting others’ viewpoints and integration of multiple perspectives, opening the door for wiser, more open-minded political thinking (Baron, 2019; Grossmann et al., 2021; Grossmann & Kross, 2014; Kross & Ayduk, 2017; Stanovich & West, 1997; see Grossmann et al., 2021, Porter et al., 2022, for reviews). 
+
+Research has also found that inviting people to explain a problem to somebody who is unfamiliar with the topic can increase open-mindedness (@elnakouri2024).
+
+Though the findings were abundant and there were thus a myriad of approaches which we could have taken, we extracted three general approaches: providing counterarguments, asking questions about the user's views, and explaining why others might have alternative perspectives. \[cite the research for each one\].
+
+The chatbot that we created for this experiment uses a response election approach: four chatbots, each with a different chat completion prompt, generate a unique response to a user message. Then, a final chatbot selects and outputs one of the responses. Three of the four approaches were those gathered in the human-to-human research. The fourth approach gave the bot as much agency as possible in its choice of response through the most minimal prompting that still produced a conversational response (see Appendix: Prompts). We developed these prompts through methods suggested by leading guides on prompt engineering (cite) and iterative refinement until we reached a satisfactory result. In this way, we hoped to give the chatbot two opportunities to affect users: either through our manipulation of its capabilities or through its own manipulation.
+
+[discuss @matz2024 and personalizing the chatbot style ]
+
+## Appendix: Final bot prompts
 
 *Counterargument bot prompt*:
 
@@ -1846,6 +2585,18 @@ Task: Respond to the user however you see fit to help the user become more willi
 
 Restrictions: You should keep the conversation on the topic of \[topic\]. You should not directly discuss the user's willingness concerns. You should ensure that your message prompts further discussion.
 
+## Appendix: Survey development
+
+[explain why i made the choices that i made in developing the survey]
+
 ## Appendix: Sample transcripts
 
 \[ do we want to insert some example transcripts here so that people can see them without having to go all the way to osf and parse the data?\]
+
+## Excess info 
+
+///// open-mindedness so linked to willingness to converse
+
+[Dolbier, K. L., Dieffenbach, S., & Lieberman, M. D. (2025). Open-Mindedness: An Integrative Review of Interventions. Current Opinion in Behavioral Sciences, 58, 101438. (This is a forthcoming or very recent review, indicating its up-to-date relevance).
+
+Why it's a fit: This review explicitly focuses on open-mindedness and interventions to increase it. It discusses how interventions often target cognitive pathways (e.g., reducing biased thinking, promoting expansive mindsets) and affective pathways (emotion regulation to maintain composure when beliefs are challenged). These mechanisms are inherently activated when engaging with opposing views on controversial topics, as it requires confronting biases and managing emotional responses. It directly links open-mindedness to "willingness to nondefensively entertain alternative ideas" and "willingness to engage with dissenting opinions."]
