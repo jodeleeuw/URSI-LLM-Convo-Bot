@@ -29,6 +29,9 @@ library(corrplot) # for correlation matrix
 library(broom) # for correlation tests
 library(purrr) # for correlation tests 
 library(likert) # for likert plots 
+library(factoextra)
+library(ggfortify)
+library(car) # for mlr
 # library(GGally)
 # library(car)
 # library(MASS)
@@ -145,7 +148,7 @@ surveys_cleaning_df <- raw_df %>%
   mutate(across(everything(), ~ gsub('"openmindedness":', '', .))) %>%
   mutate(across(everything(), ~ gsub(',"offending-reason":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"offending-reason":', '', .))) %>%
-  # republican/democrat (pre-convo)
+  # republican/democrat (pre-intervention)
   mutate(across(everything(), ~ gsub(',"rating-republicans":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub(',"rating-democrats":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"rating-republicans":null,', '', .))) %>%
@@ -158,7 +161,7 @@ surveys_cleaning_df <- raw_df %>%
   mutate(across(everything(), ~ gsub('"rating-democrats":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-republicans":', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-democrats":', '', .))) %>%
-  # republican/democrat (post-convo)
+  # republican/democrat (post-intervention)
   mutate(across(everything(), ~ gsub('"rating-republicans-post":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"rating-democrats-post":null,', '', .))) %>%
   mutate(across(everything(), ~ gsub('"interacting-with-republicans-post":null,', '', .))) %>%
@@ -216,6 +219,7 @@ surveys_df <- surveys_df %>%
      7 - as.numeric(answer),
      answer
    )) 
+
 ```
 
 ```{r}
@@ -527,9 +531,10 @@ print(topic_ratings_plot)
 
 # only works though if all "1" to "7" ratings are in the df
 
-wide_for_likert_df <- surveys_df %>%
+wide_for_likert_offending_reasons_df_with_sub_labels <- surveys_df %>%
   filter(grepl("offending-reason", question)) %>%
   select(question, answer, prolific_subject_id) %>%
+  mutate(answer = as.numeric(answer)) %>%
   pivot_wider(names_from = question, values_from = answer) %>%
   ungroup() %>%
   rename("Might experience negative feelings about self" = "offending-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)", "Might be offended" = "offending-reason-I might take offense to what someone says",
@@ -550,33 +555,36 @@ wide_for_likert_df <- surveys_df %>%
   "Might feel invalidated" = "offending-reason-I might feel disempowered, unheard, or invalidated",
   "Might incur social reprecussions" = "offending-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",  
   "Opinion is unpopular in general" = "offending-reason-My opinion is unpopular in general."
-) %>%
+)
+
+wide_for_likert_offending_reasons_df <- wide_for_likert_offending_reasons_df_with_sub_labels %>%
   select(-prolific_subject_id) %>%
   mutate(across(everything(), ~ factor(.x, levels = 1:7,
      labels = c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree",
                 "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree"),
      ordered = TRUE)))
 
+
 ### REMOVE DURING ACTUAL DATA ANALYSIS. I'M MANUALLY ADDING ALL LIKERT VALUES FOR EACH OFFENDING REASON SO THAT LIKERT PLOT WORKS
 ### create a vector of the all 1-7 values
 all_likert_values <- c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree", "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree")
 ### get the column names from  existing df
-offending_reasons_names <- colnames(wide_for_likert_df)
+offending_reasons_names <- colnames(wide_for_likert_offending_reasons_df)
 ### create 7 new rows
 new_likert_rows <- lapply(all_likert_values, function(response) {
   as.list(setNames(rep(response, length(offending_reasons_names)), offending_reasons_names))
 }) %>%
   bind_rows()
 ### add the new rows to the existing dataframe
-wide_for_likert_df <- bind_rows(wide_for_likert_df, new_likert_rows)
+wide_for_likert_offending_reasons_df <- bind_rows(wide_for_likert_offending_reasons_df, new_likert_rows)
 
 
 
 # standardize all columns to use the same factor object
-wide_for_likert_df <- wide_for_likert_df %>%
+wide_for_likert_offending_reasons_df <- wide_for_likert_offending_reasons_df %>%
   mutate(across(everything(), ~ factor(.x, levels = all_likert_values, ordered = TRUE)))
 
-offending_reason_likert <- likert(as.data.frame(wide_for_likert_df))
+offending_reason_likert <- likert(as.data.frame(wide_for_likert_offending_reasons_df))
 
 # for the future when comparing pre and post, might want to use this example line: df1_likert <- likert(items=df1[,3:4], grouping=df1[,2]) 
 
@@ -604,14 +612,14 @@ print(sliders_density)
 
 ```
 
-
 ```{r}
 #| label: fig-openmindedness-density
 #| echo: false
 #| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of subjects' open-mindedness when discussing their topic. Subjects rated their open-mindedness on a scale from 0 to 7, where a rating of 0 meant subject was not open-minded and a rating of 7 meant subject was open-minded.
 
 openmindedness_df <- surveys_df %>%
-  filter(grepl("openmindedness", question)) 
+  filter(grepl("openmindedness", question)) %>%
+  mutate(answer = as.numeric(answer)) 
 
 openmindedness_df_mean <- openmindedness_df %>%
   group_by(prolific_subject_id) %>%
@@ -635,7 +643,7 @@ print(openmindedness_density)
 
 # only works though if all "1" to "7" ratings are in the df
 
-wide_for_likert_openmindedness_df <- openmindedness_df %>%
+wide_for_likert_openmindedness_df_with_sub_labels <- openmindedness_df %>%
   select(question, answer, prolific_subject_id) %>%
   pivot_wider(names_from = question, values_from = answer) %>%
   ungroup() %>%
@@ -643,7 +651,9 @@ wide_for_likert_openmindedness_df <- openmindedness_df %>%
 "Does not avoid opposing messages" = "openmindedness...avoid messages that I disagree with @R@", 
 "Believes it is important to pay attention to all politics ideas" = "openmindedness...believe it is a waste of time to pay attention to certain political ideas about $topic",
 "Is open to other political viewpoints" = "openmindedness...am open to considering other political viewpoints about $topic",
-"Considers as many different opinions as possible" = "openmindedness...consider as many different opinions as possible about $topic") %>%
+"Considers as many different opinions as possible" = "openmindedness...consider as many different opinions as possible about $topic") 
+
+wide_for_likert_openmindedness_df <- wide_for_likert_openmindedness_df_with_sub_labels %>%
   select(-prolific_subject_id) %>%
   mutate(across(everything(), ~ factor(.x, levels = 1:7,
      labels = c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree",
@@ -675,7 +685,6 @@ openmindedness_likert <- likert(as.data.frame(wide_for_likert_openmindedness_df)
 
 plot(openmindedness_likert, legend.position="right")
 ```
-
 
 ### Free response
 
@@ -729,7 +738,7 @@ print(free_response_bar_plot)
 Secondly, we conducted a factor analysis on the 19 items to explore potential latent factors reflecting correlated concerns. We found that \[list results\].
 
 ```{r}
-#| label: KMO, Bartlett's test, parallel analysis on 19-item matrix
+#| label: WIP - KMO, Bartlett's test, parallel analysis on 19-item matrix
 #| echo: false
 
 # create short labels for each question
@@ -744,11 +753,13 @@ surveys_df_labeled_questions <- surveys_df %>%
   left_join(question_key_for_fa, by = "question") %>%
   filter(grepl("offending-reason", question))
 
-concerns_labeled_wide <- surveys_df_labeled_questions %>%
+concerns_labeled_wide_with_sub_labels <- surveys_df_labeled_questions %>%
   select(prolific_subject_id, short_label, answer) %>%
   pivot_wider(names_from = short_label, values_from = answer) %>%
   mutate(across(starts_with("Q0"), ~ as.numeric(as.character(.)))) %>%
-  ungroup() %>%
+  ungroup()
+
+concerns_labeled_wide <- concerns_labeled_wide_with_sub_labels %>%
   select(-prolific_subject_id)
 
 # KMO and Bartlett’s test
@@ -761,7 +772,7 @@ fa.parallel(concerns_labeled_wide, fa = "fa")
 ```
 
 ```{r}
-#| label: Factor analysis on 19 items 
+#| label: WIP - Factor analysis on 19 items 
 #| echo: false
 
 # determine number of factors with parallel analysis
@@ -782,7 +793,7 @@ print(fa_result, cutoff = 0.3)  # show loadings above .3 NOT SURE IF THIS IS A G
 ```
 
 ```{r}
-#| label: tbl-correlation-matrix
+#| label: WIP - tbl-correlation-matrix
 #| echo: false
 #| tbl-cap: Correlation matrix of reasons for unwillingness
 
@@ -792,7 +803,7 @@ corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
 ```
 
 ```{r}
-#| label: Check internal consistency 
+#| label: WIP - Check internal consistency 
 #| echo: false
 
 psych::alpha(concerns_labeled_wide)
@@ -800,7 +811,7 @@ psych::alpha(concerns_labeled_wide)
 ```
 
 ```{r}
-#| label: tbl-factor-loadings-visual
+#| label: WIP - tbl-factor-loadings-visual
 #| echo: false
 #| tbl-cap: Table visualizing factor loadings.
 
@@ -827,7 +838,7 @@ print(factor_loadings_plot)
 ```
 
 ```{r}
-#| label: tbl-fa-heat-map-df
+#| label: WIP - tbl-fa-heat-map-df
 #| echo: false
 #| tbl-cap: Table showing factor analysis heat map.
 
@@ -854,42 +865,64 @@ print(fa_heat_map)
 Additionally, we looked for any correlations between open-mindedness and willingness concerns.
 
 ```{r}
-#| label: Correlations open-mindedness vs. willingness concerns 
+#| label: WIP - Correlations open-mindedness individual scores vs. willingness concerns 
 #| echo: false
 #| tbl-cap: Correlation matrix of open-mindedness vs. willingness concerns 
 
-# look at correlation between open-mindedness score and each willingness concern
-cor_results <- concerns_labeled_wide %>%
-  map_dfr(~ tidy(cor.test(.x, survey_df$open-mindedness_score)), .id = "item")
+# create merged df 
+openmindedness_and_willingness_merged_df <- merge(wide_for_likert_offending_reasons_df_with_sub_labels, wide_for_likert_openmindedness_df_with_sub_labels, by = 'prolific_subject_id') %>%
+  ungroup() %>%
+  select(-prolific_subject_id)
 
-# view results
-cor_results %>%
+# look at correlation between each open-mindedness score and each willingness concern
+cor(openmindedness_and_willingness_merged_df, use = "pairwise.complete.obs")
+
+```
+
+```{r}
+#| label: WIP - Correlations open-mindedness average vs. willingness concerns 
+#| echo: false
+#| tbl-cap: Correlation matrix of open-mindedness vs. willingness concerns 
+
+# look at correlation relationship between mean open-mindedness score and each willingness concern
+cor_openmindedness_mean_vs_concerns <- concerns_labeled_wide_with_sub_labels %>%
+   map_dfr(~ tidy(cor.test(.x, openmindedness_df_mean$mean_openmindedness)), .id = "prolific_subject_id")
+
+# view results (i don't really understand this code. i had chat generate it to help me)
+cor_openmindedness_mean_vs_concerns %>%
   select(item, estimate, p.value) %>%
   arrange(p.value)
 
 ```
 
 ```{r}
-#| label: Correlations willingness sliders vs. willingness concerns 
+#| label: WIP - Correlations willingness slider average vs. willingness concerns 
 #| echo: false
 
-survey_df$slider_avg <- rowMeans(survey_df %>% select(slider_1, slider_2), na.rm = TRUE)
+reasons_and_willingness_merged_df <- merge(wide_for_likert_offending_reasons_df_with_sub_labels, sliders_df, by = 'prolific_subject_id') %>%
+  ungroup() %>%
+  select(-prolific_subject_id)
 
-apply(concerns_labeled_wide, 2, function(x) cor(x, survey_df$slider_avg, use = "pairwise.complete.obs"))
+cor_willingness_slider_vs_concerns <- map_dfr(reasons_and_willingness_merged_df[-20], ~ 
+  tidy(cor.test(.x, reasons_and_willingness_merged_df$mean_willingness, use = "pairwise.complete.obs")),
+  .id = "reason_item")
+
+cor_willingness_slider_vs_concerns %>%
+  select(item, estimate, p.value) %>%
+  arrange(p.value)
 
 ```
 
 Next, we looked for correlations between willingness concerns and overall willingness as indicated by the slider questions.
 
 ```{r}
-#| label: Look at concerns as predictors of overall willingness 
+#| label: WIP - Look at concerns as predictors of overall willingness 
 #| echo: false 
 
-model <- lm(willingness_avg ~ ., data = cbind(survey_df["slider_avg"], concerns_labeled_wide))
+model <- lm(mean_willingness ~ ., data = reasons_and_willingness_merged_df)
 summary(model)
 
 # Multicollinearity check
-library(car)
 vif(model)
 
 ```
@@ -897,31 +930,32 @@ vif(model)
 Then, we assessed whether any willingness concerns are significant predictors of overall willingness through the use of a multiple linear regression model. We found that [results].
 
 ```{r}
-#| label: Cluster analysis
+#| label: WIP - Cluster analysis
 #| echo: false 
 
 # Scale data
 concerns_labeled_wide_scaled <- scale(concerns_labeled_wide)
 
 # Determine optimal number of clusters
-library(factoextra)
 fviz_nbclust(concerns_labeled_wide_scaled, kmeans, method = "wss")
 
 # K-means with k = 3 (example)
-set.seed(123)
+set.seed(1)
 kmeans_result <- kmeans(concerns_labeled_wide_scaled, centers = 3)
 survey_df$cluster <- kmeans_result$cluster
 
 # Visualize clusters with PCA
-library(ggfortify)
 autoplot(prcomp(concerns_labeled_wide_scaled), data = survey_df, colour = 'cluster')
 ```
 
 We also conducted cluster analysis to determine whether participants generally fell into certain categories of concerns.
 
 ```{r}
+#| label: WIP - ANOVAs 
+#| include: false
+
 # If you have a 'topic' variable
-manova_result <- manova(as.matrix(concerns_labeled_wide) ~ survey_df$topic)
+manova_result <- manova(as.matrix(concerns_labeled_wide_with) ~ survey_df$topic)
 summary(manova_result)
 
 # Follow-up ANOVAs
