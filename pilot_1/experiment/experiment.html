@@ -147,7 +147,7 @@
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
                 <p> In this experiment, you will have a short conversation with an AI chatbot about a disputed topic in America. </p>
-                <p> Before you chat with the bot, there is a survey for you to fill out. </p>
+                <p> We also have a short survey for you to fill out. </p>
                 <div style='width: 700px;'>
                 </div>
                 <p> Press any key to proceed to the questionnaire. </p>
@@ -243,7 +243,7 @@
             survey_json: pre_convo_survey_json,
             survey_function: initializePreSlider,
             data: {
-                phase: "pre-convo-survey-initial",
+                phase: "pre-intervention-survey-initial",
             },
             on_finish: (data) => {
 
@@ -310,7 +310,7 @@
 
         var pre_convo_euthanasia_survey = {
             data: {
-                phase: "pre-convo-survey-euthanasia",
+                phase: "pre-intervention-survey-polarization-euthanasia",
             },
             timeline: [
                 {
@@ -342,7 +342,7 @@
 
         var pre_convo_gender_survey = {
             data: {
-                phase: "pre-convo-survey-gender",
+                phase: "pre-intervention-survey-polarization-gender",
             },
             timeline: [
                 {
@@ -374,7 +374,7 @@
 
         var pre_convo_healthcare_survey = {
             data: {
-                phase: "pre-convo-survey-healthcare",
+                phase: "pre-intervention-survey-polarization-healthcare",
             },
             timeline: [
                 {
@@ -406,7 +406,7 @@
 
         var pre_convo_vaccines_survey = {
             data: {
-                phase: "pre-convo-survey-vaccines",
+                phase: "pre-intervention-survey-polarization-vaccines",
             },
             timeline: [
                 {
@@ -438,7 +438,7 @@
 
         var pre_convo_criminal_survey = {
             data: {
-                phase: "pre-convo-survey-criminal",
+                phase: "pre-intervention-survey-polarization-criminal",
             },
             timeline: [
                 {
@@ -470,7 +470,7 @@
 
         var pre_convo_same_sex_survey = {
             data: {
-                phase: "pre-convo-survey-same-sex",
+                phase: "pre-intervention-survey-polarization-same-sex",
             },
             timeline: [
                 {
@@ -600,7 +600,7 @@
 
         var pre_convo_willingness_openmindedness_survey = {
             data: {
-                phase: "pre-convo-willingness-survey",
+                phase: "pre-intervention-survey-willingness",
             },
             type: jsPsychSurvey,
             survey_function: initializePreSlider,
@@ -658,7 +658,7 @@
                                 },
                                 {
                                     value:
-                                        "pre-openmindedness...believe it is a waste of time to pay attention to certain political ideas about ${topic}",
+                                        "pre-openmindedness...believe it is a waste of time to pay attention to certain political ideas about ${topic} @R@",
                                     text: `...believe it is a waste of time to pay attention to certain political ideas about ${topic}`,
                                 },
                                 {
@@ -879,7 +879,7 @@
         /* break between pre-intervention survey and bot conversation */
         var pre_bot_instructions_break = {
             data: {
-                phase: "pre-bot-break",
+                phase: "pre-convo-break",
             },
             type: jsPsychHtmlKeyboardResponse,
             stimulus: `
@@ -898,7 +898,7 @@
             stimulus: `
         <p> You will be conversing with a chatbot designed for conversations about disputed topics. </p>
         <p> Be as truthful to your beliefs as possible during the conversation, and try your best to give full responses to the bot. </p>
-        <p> The conversation will end after you and the bot exchange seven messages. There is no right or wrong answer, no good or bad response to the bot. </p>
+        <p> The conversation will end after you and the bot exchange ten messages. There is no right or wrong answer, no good or bad response to the bot. </p>
         <p> Copy-pasted messages to the bot will be detected and result in your participation being rejected. </p>
         <p> Press any key when you are ready to begin the conversation. </p>
       `,
@@ -985,8 +985,8 @@
 
         //continue to next portion button will show up after 7 message exchanges
         continue_button = {
-            message_trigger: 7,
-            message: "You have completed your rounds of seven messages! Click continue to proceed with the experiment.",
+            message_trigger: 1,
+            message: "You have completed your rounds of ten messages! Click continue to proceed with the experiment.",
         }
 
 
@@ -1438,7 +1438,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var republican_survey = {
             data: {
-                phase: "post-convo-republican-survey",
+                phase: "post-intervention-survey-republican",
             },
             timeline: [
                 {
@@ -1448,7 +1448,7 @@ Your output: You should remove the number from your selection option, and then r
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-intervention-survey-initial" }).values()[0]
                         .response["political-affiliation"] == "Republican"
                 );
             },
@@ -1456,7 +1456,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var democrat_survey = {
             data: {
-                phase: "post-convo-democrat-survey",
+                phase: "post-intervention-survey-democrat",
             },
             timeline: [
                 {
@@ -1466,7 +1466,7 @@ Your output: You should remove the number from your selection option, and then r
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-intervention-survey-initial" }).values()[0]
                         .response["political-affiliation"] == "Democrat"
                 );
             },
@@ -1474,7 +1474,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var neutral_survey = {
             data: {
-                phase: "post-convo-independent-survey",
+                phase: "post-intervention-survey-independent",
             },
             timeline: [
                 {
@@ -1489,7 +1489,7 @@ Your output: You should remove the number from your selection option, and then r
             ],
             conditional_function: () => {
                 return (
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-intervention-survey-initial" }).values()[0]
                         .response["political-affiliation"] == "Independent"
                 );
             },
@@ -1498,7 +1498,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var other_survey = {
             data: {
-                phase: "post-convo-other-political-affiliation-survey",
+                phase: "post-intervention-survey-other-political-affiliation",
             },
             timeline: [
                 {
@@ -1513,7 +1513,7 @@ Your output: You should remove the number from your selection option, and then r
             conditional_function: () => {
                 // Assuming there's a different or no specific filter condition for "other" affiliations
                 return !["Republican", "Democrat", "Independent"].includes(
-                    jsPsych.data.get().filter({ phase: "pre-convo-survey-initial" }).values()[0]
+                    jsPsych.data.get().filter({ phase: "pre-intervention-survey-initial" }).values()[0]
                         .response["political-affiliation"]
                 );
             },
@@ -1523,7 +1523,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var euthanasia_post_survey = {
             data: {
-                phase: "post-convo-survey-euthanasia",
+                phase: "post-intervention-survey-euthanasia",
             },
             timeline: [
                 {
@@ -1540,7 +1540,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var gender_post_survey = {
             data: {
-                phase: "post-convo-gender-survey",
+                phase: "post-intervention-survey-gender",
             },
             timeline: [
                 {
@@ -1557,7 +1557,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var healthcare_post_survey = {
             data: {
-                phase: "post-convo-healthcare-survey",
+                phase: "post-intervention-survey-healthcare",
             },
             timeline: [
                 {
@@ -1574,7 +1574,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var vaccines_post_survey = {
             data: {
-                phase: "post-convo-vaccines-survey",
+                phase: "post-intervention-survey-vaccines",
             },
             timeline: [
                 {
@@ -1591,7 +1591,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var criminal_post_survey = {
             data: {
-                phase: "post-convo-criminal-survey",
+                phase: "post-intervention-survey-criminal",
             },
             timeline: [
                 {
@@ -1608,7 +1608,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var same_sex_post_survey = {
             data: {
-                phase: "post-convo-same-sex-survey",
+                phase: "post-intervention-survey-same-sex",
             },
             timeline: [
                 {
@@ -1626,7 +1626,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var post_convo_willingness_openmindedness_survey = {
             data: {
-                phase: "post-convo-willingness-survey",
+                phase: "post-intervention-survey-willingness",
             },
             type: jsPsychSurvey,
             survey_function: initializePostSlider,
@@ -1683,7 +1683,7 @@ Your output: You should remove the number from your selection option, and then r
                                 },
                                 {
                                     value:
-                                        "post-openmindedness...believe it is a waste of time to pay attention to certain political ideas about ${topic}",
+                                        "post-openmindedness...believe it is a waste of time to pay attention to certain political ideas about ${topic} @R@",
                                     text: `...believe it is a waste of time to pay attention to certain political ideas about ${topic}`,
                                 },
                                 {
@@ -1892,7 +1892,7 @@ Your output: You should remove the number from your selection option, and then r
 
         var last_questions = {
             data: {
-                phase: "post-convo-last-questions-survey",
+                phase: "post-convo-survey-last-questions",
             },
             type: jsPsychSurvey,
             survey_json: () => {
@@ -2014,11 +2014,11 @@ Your output: You should remove the number from your selection option, and then r
             pre_convo_criminal_survey,
             pre_convo_same_sex_survey,
             pre_convo_willingness_openmindedness_survey,
-            pre_control_break,
+            pre_convo_instructions,
             //individual_testing_trial,
             willingness_selection_trial,
             // willingness_reasons_bot_trial, 
-            post_control_break,
+            post_convo_break,
             republican_survey,
             democrat_survey,
             neutral_survey,
@@ -2030,6 +2030,7 @@ Your output: You should remove the number from your selection option, and then r
             criminal_post_survey,
             same_sex_post_survey,
             post_convo_willingness_openmindedness_survey,
+            last_questions,
             goodbye
         )
 
