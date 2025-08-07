@@ -865,24 +865,9 @@ print(fa_heat_map)
 Additionally, we looked for any correlations between open-mindedness and willingness concerns.
 
 ```{r}
-#| label: WIP - Correlations open-mindedness individual scores vs. willingness concerns 
-#| echo: false
-#| tbl-cap: Correlation matrix of open-mindedness vs. willingness concerns 
-
-# create merged df 
-openmindedness_and_willingness_merged_df <- merge(wide_for_likert_offending_reasons_df_with_sub_labels, wide_for_likert_openmindedness_df_with_sub_labels, by = 'prolific_subject_id') %>%
-  ungroup() %>%
-  select(-prolific_subject_id)
-
-# look at correlation between each open-mindedness score and each willingness concern
-cor(openmindedness_and_willingness_merged_df, use = "pairwise.complete.obs")
-
-```
-
-```{r}
 #| label: WIP - Correlations open-mindedness average vs. willingness concerns 
 #| echo: false
-#| tbl-cap: Correlation matrix of open-mindedness vs. willingness concerns 
+#| tbl-cap: Correlation matrix of average open-mindedness vs. willingness concerns 
 
 # look at correlation relationship between mean open-mindedness score and each willingness concern
 cor_openmindedness_mean_vs_concerns <- concerns_labeled_wide_with_sub_labels %>%
@@ -894,6 +879,15 @@ cor_openmindedness_mean_vs_concerns %>%
   arrange(p.value)
 
 ```
+
+```{r}
+#| label: WIP - correlation between average open-mindedness and unwillingness concern factors
+#| echo: false 
+#| tbl-cap: Correlation matrix of average open-mindedness vs. willingness concern factors 
+
+
+```
+
 
 ```{r}
 #| label: WIP - Correlations willingness slider average vs. willingness concerns 
