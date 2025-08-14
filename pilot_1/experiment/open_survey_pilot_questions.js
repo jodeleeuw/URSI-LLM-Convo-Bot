@@ -21,154 +21,6 @@ var open_survey_json = {
       ],
     },
     {
-      type: "checkbox",
-      name: "ethnicity",
-      title: "What is your ethnicity? (Select all that apply)",
-      isRequired: true,
-      choices: [
-        {
-          value: "White",
-          text: "White",
-        },
-        {
-          value: "Black or African American",
-          text: "Black or African American",
-        },
-        {
-          value: "Hispanic or Latino",
-          text: "Hispanic or Latino",
-        },
-        {
-          value: "Asian",
-          text: "Asian",
-        },
-        {
-          value: "Native American or Alaska Native",
-          text: "Native American or Alaska Native",
-        },
-        {
-          value: "Middle Eastern or North African",
-          text: "Middle Eastern or North African",
-        },
-        {
-          value: "Native Hawaiian or Other Pacific Islander",
-          text: "Native Hawaiian or Other Pacific Islander",
-        },
-      ],
-      showOtherItem: true,
-      otherText: "Other (please specify)",
-    },
-    {
-      type: "radiogroup",
-      name: "political-affiliation",
-      title: "What is your political affiliation? (Select one)",
-      isRequired: true,
-      choices: [
-        {
-          value: "Republican",
-          text: "Republican",
-        },
-        {
-          value: "Democrat",
-          text: "Democrat",
-        },
-        {
-          value: "Independent",
-          text: "Independent",
-        },
-      ],
-      showOtherItem: true,
-      otherText: "Other (please specify)",
-    },
-    {
-      type: "text",
-      name: "gender-identification",
-      title: "With which gender do you most identify? (Fill in)",
-      isRequired: true,
-    },
-    {
-      type: "radiogroup",
-      name: "education-level",
-      title: "What is the highest level of education that you have completed? (Select one)",
-      isRequired: true,
-      choices: [
-        {
-          value: "Less than high school",
-          text: "Less than high school",
-        },
-        {
-          value: "High school diploma or GED",
-          text: "High school diploma or GED",
-        },
-        {
-          value: "Some college; no degree",
-          text: "Some college, no degree",
-        },
-        {
-          value: "Associate degree",
-          text: "Associate degree",
-        },
-        {
-          value: "Bachelor's degree",
-          text: "Bachelor's degree",
-        },
-        {
-          value: "Master's degree",
-          text: "Master's degree",
-        },
-        {
-          value: "Doctoral degree (PhD; EdD; etc.)",
-          text: "Doctoral degree (PhD, EdD, etc.)",
-        },
-        {
-          value: "Professional degree (JD; MD; etc.)",
-          text: "Professional degree (JD, MD, etc.)",
-        },
-      ],
-    },
-    {
-      type: "text",
-      name: "religious-affiliation",
-      title: "What religion do you most identify with? (Fill in)",
-      isRequired: true,
-    },
-    {
-      type: "radiogroup",
-      name: "political-ideology",
-      title: "How would you describe your political ideology? (Select one)",
-      isRequired: true,
-      choices: [
-        {
-          value: "Very conservative",
-          text: "Very conservative",
-        },
-        {
-          value: "Conservative",
-          text: "Conservative",
-        },
-        {
-          value: "Somewhat conservative",
-          text: "Somewhat conservative",
-        },
-        {
-          value: "Moderate",
-          text: "Moderate",
-        },
-        {
-          value: "Somewhat liberal",
-          text: "Somewhat liberal",
-        },
-        {
-          value: "Liberal",
-          text: "Liberal",
-        },
-        {
-          value: "Very liberal",
-          text: "Very liberal",
-        },
-      ],
-    },
-    {
       type: "matrix",
       name: "topic",
       title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following potential conversation topics, rate how willing you would be to join the conversation.",
@@ -209,8 +61,8 @@ var open_survey_json = {
           text: "Human euthanasia in the U.S.",
         },
         {
-          value: "gender equality in the U.S.",
-          text: "Gender equality in the U.S.",
+          value: "transgender athletes in U.S. sports",
+          text: "Transgender athletes in U.S. sports",
         },
         {
           value: "the role of the U.S. government in healthcare",
@@ -221,12 +73,28 @@ var open_survey_json = {
           text: "Mandating vaccines in the U.S.",
         },
         {
-          value: "the criminal justice system in the U.S.",
-          text: "The criminal justice system in the U.S.",
+          value: "deportation policies for undocumented immigrants in the U.S.",
+          text: "Deportation policies for undocumented immigrants in the U.S.",
         },
         {
-          value: "same-sex marriage in the U.S.",
-          text: "Same-sex marriage in the U.S.",
+          value: "U.S. public policy on climate change",
+          text: "U.S. public policy on climate change",
+        },
+        {
+          value: "the use of A.I. in traditionally human-run spaces (e.g., medicine, art, driving)",
+          text: "The use of A.I. in traditionally human-run spaces (e.g., medicine, art, driving)",
+        },
+        {
+          value: "the role of capitalism in the U.S. economy",
+          text: "The role of capitalism in the U.S. economy",
+        },
+        {
+          value: "the role of the U.S. in the Israeli-Palestinian conflict",
+          text: "The role of the U.S. in Israeli-Palestinian conflict",
+        },
+        {
+          value: "police conduct and accountability in the U.S.",
+          text: "Police conduct and accountability in the U.S.",
         },
       ],
       rowsOrder: "random",

@@ -114,7 +114,7 @@
         phase: "welcome-message",
       },
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: "Welcome! In this experiment, you will fill out a questionnaire. Press any key to get started.",
+      stimulus: "Welcome! In this study, you will fill out a questionnaire. Press any key to get started.",
     };
 
     /* pre-chat survey with different topic options implemented via SurveyJS */
@@ -184,7 +184,7 @@
     let topicChoice;
 
     /* pushing survey in timeline with both slider and non-slider questions */
-    const pre_convo_survey_trial = {
+    const survey_trial = {
       type: jsPsychSurvey,
       survey_json: open_survey_json,
       survey_function: initializePreSlider,
@@ -252,17 +252,109 @@
 
     // TOPIC SPECIFIC PRE-CONVERSATION SURVEYS 
 
-    let polarizedStatement;
 
-    var pre_convo_willingness_openmindedness_survey = {
+    // store the unwillingness-reason rows in a var to help us use them in the next survey part 
+    var unwillingness_concern_rows = [
+      {
+        value: "unwillingness-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
+        text: "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
+      },
+      {
+        value: "unwillingness-reason-Someone could criticize or show disapproval of my views",
+        text: "Someone could criticize or show disapproval of my views",
+      },
+      {
+        value:
+          "unwillingness-reason-I would feel like my opinion is unpopular amongst the group.",
+        text: "I would feel like my opinion is unpopular amongst the group.",
+      },
+      {
+        value:
+          "unwillingness-reason-My opinion is unpopular in general.",
+        text: "My opinion is unpopular in general.",
+      },
+      {
+        value:
+          "unwillingness-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
+        text: "Someone could challenge ideas or beliefs that play an important role in making me who I am",
+      },
+      {
+        value:
+          "unwillingness-reason-I could feel humiliated or embarrassed in the conversation",
+        text: "I could feel humiliated or embarrassed in the conversation",
+      },
+      {
+        value:
+          "unwillingness-reason-I might struggle to explain my views to the others and/or come across as uninformed",
+        text: "I might struggle to explain my views to the others and/or come across as uninformed",
+      },
+      {
+        value:
+          "unwillingness-reason-The others might not make a full effort to hear and understand me",
+        text: "The others might not make a full effort to hear and understand me",
+      },
+      {
+        value:
+          "unwillingness-reason-I don’t often participate in conversations like these",
+        text: "I don’t often participate in conversations like these",
+      },
+      {
+        value: "unwillingness-reason-The conversation could become awkward or tense",
+        text: "The conversation could become awkward or tense",
+      },
+      {
+        value: "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
+        text: "The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
+      },
+      {
+        value: "unwillingness-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
+        text: "The conversation could negatively affect how I feel about the world during and/or afterward",
+      },
+      {
+        value: "unwillingness-reason-Someone might take offense to what I say",
+        text: "Someone might take offense to what I say",
+      },
+      {
+        value: "unwillingness-reason-I might take offense to what someone says",
+        text: "I might take offense to what someone says",
+      },
+      {
+        value: "unwillingness-reason-I might feel disempowered, unheard, or invalidated",
+        text: "I might feel disempowered, unheard, or invalidated",
+      },
+      {
+        value: "unwillingness-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+        text: "I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+      },
+      {
+        value: "unwillingness-reason-I might struggle to remain productive and respectful",
+        text: "I might struggle to remain productive and respectful",
+      },
+      {
+        value: "unwillingness-reason-I would not want to listen to the others discuss their views",
+        text: "I would not want to listen to the others discuss their views",
+      },
+      {
+        value: "unwillingness-reason-My views wouldn't change",
+        text: "It would be a waste of time because my views wouldn't change",
+      },
+    ];
+
+    // define some stuff first so we can extract from gen_willingness_openmindedness_survey and use in follow up survey 
+    let polarizedStatement;
+    window.followUpRows = [];
+    let followUpRows = [];
+
+    var gen_willingness_openmindedness_survey = {
       data: {
-        phase: "pre-convo-willingness-survey",
+        phase: "gen-willingness-openmindedness-survey",
       },
       type: jsPsychSurvey,
       survey_function: initializePreSlider,
       survey_json: () => {
+        console.log("Follow-up rows at runtime:", window.followUpRows); // debug
         const topic = topicChoice; // get topic choice
-        var pre_convo_willingness_openmindedness_survey_inner_var = {
+        var gen_willingness_openmindedness_survey_inner_var = {
           elements: [
             {
               type: "matrix",
@@ -304,27 +396,27 @@
                 {
                   value:
                     "openmindedness...have little patience for arguments that I disagree with @R@",
-                  text: `...have little patience for arguments about ${topic} that I disagree with`,
+                  text: `...have little patience for arguments that I disagree with`,
                 },
                 {
                   value:
                     "openmindedness...avoid messages that I disagree with @R@",
-                  text: `...avoid messages about ${topic} that I disagree with`,
+                  text: `...avoid messages that I disagree with`,
                 },
                 {
                   value:
                     "openmindedness...believe it is a waste of time to pay attention to certain political ideas about ${topic}",
-                  text: `...believe it is a waste of time to pay attention to certain political ideas about ${topic}`,
+                  text: `...believe it is a waste of time to pay attention to certain political ideas on the topic`,
                 },
                 {
                   value:
                     "openmindedness...am open to considering other political viewpoints about ${topic}",
-                  text: `...am open to considering other political viewpoints about ${topic}`,
+                  text: `...am open to considering other political viewpoints`,
                 },
                 {
                   value:
                     "openmindedness...consider as many different opinions as possible about ${topic}",
-                  text: `...consider as many different opinions as possible about ${topic}`,
+                  text: `...consider as many different opinions as possible`,
                 },
               ],
             },
@@ -337,6 +429,7 @@
             {
               type: "html",
               name: "slider1-placeholder",
+              isRequired: true,
               title:
                 "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about ${topic}, where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral.",
               html: '<div id="slider1-placeholder"></div>', // Placeholder for the slider
@@ -350,6 +443,7 @@
             {
               type: "html",
               name: "slider2-placeholder",
+              isRequired: true,
               title:
                 "Using the slider, please rate your willingness to have a conversation with someone who would push against your views about ${topic}, where 0 is absolute unwillingness and 100 is absolute willingness.",
               html: '<div id="slider2-placeholder"></div>', // Placeholder for the slider
@@ -362,18 +456,77 @@
             {
               type: "html",
               name: "attention-check-slider-pre-placeholder",
+              isRequired: true,
               title: "Using the slider, please move the slider all the way to the left to the zero value. This is a question to assess whether you are attending to the instructions.",
               html: '<div id="attention-check-slider-pre-placeholder"></div>', // Placeholder for the slider
             },
+          ],
+        };
+        return gen_willingness_openmindedness_survey_inner_var
+      },
+      survey_function: initializePreSlider,
+    };
+
+
+    var unwillingness_concerns_first_survey = {
+      data: {
+        phase: "willingness-concerns-first-survey",
+      },
+      type: jsPsychSurvey,
+      survey_function: initializePreSlider,
+      survey_json: () => {
+        console.log("Follow-up rows at runtime:", window.followUpRows); // debug
+        const topic = topicChoice; // get topic choice
+        var unwillingness_concerns_first_survey_inner_var = {
+          elements: [
             {
-                type: "matrix",
-                name: "unwillingness-reason",
-                title:
-                    `Imagine you're asked to have a serious conversation about ${topic} with a group of people who mostly hold differing views from yours. Below is a list of potential concerns that you might have in the conversation. 
-                    
-                    If an item wouldn’t concern you, mark “Does not concern me.” If an item would concern you, rate how much it would impact your willingness to engage, from “Not at all” to “Extremely.” (You may reflect on past experiences you've had in similar situations.) 
-                    
-                    For example, if you are concerned that somebody might criticize or show disapproval of yours views and this concern makes you completely unwilling to engage, then mark that it affects your willingness "Extremely."`,
+              type: "matrix",
+              name: "unwillingness-reason",
+              title:
+                `Imagine you're asked to have a serious conversation about ${topic} with a group of people who mostly hold differing views from yours. Below is a list of potential concerns that you might have in the conversation. For each item, select Yes if it would concern you, even a little bit; otherwise, select No. (You may reflect on past experiences you've had in similar situations.)`,
+              isRequired: true,
+              columns: [
+                {
+                  value: 1,
+                  text: "Yes",
+                },
+                {
+                  value: 2,
+                  text: "No",
+                },
+              ],
+              rows: unwillingness_concern_rows,
+              rowsOrder: "random",
+            },
+          ],
+        };
+        return unwillingness_concerns_first_survey_inner_var
+      },
+      on_finish: function (data) {
+        let responses = data.response; // already an object
+        let unwillingnessAnswers = responses["unwillingness-reason"];
+
+        let yesRows = unwillingness_concern_rows.filter(row => unwillingnessAnswers[row.value] == 1);
+
+        jsPsych.data.addProperties({ unwillingness_yes_rows: yesRows });
+        window.followUpRows = yesRows;
+      }
+    };
+
+    var follow_up_unwillingness_concerns_survey = {
+      data: {
+        phase: "follow-up-unwillingness-concerns-survey",
+      },
+      type: jsPsychSurvey,
+      survey_function: initializePreSlider,
+      survey_json: () => {
+        const topic = topicChoice; // get topic choice
+        var follow_up_unwillingness_concerns_survey_inner_var = {
+          elements: [
+            {
+              type: "matrix",
+              name: "openmindedness",
+              title: `Continue to imagine you're asked to have a serious conversation about ${topic} with a group of people who mostly hold differing views from yours. For each concern below, rate how much it would impact your willingness to engage, from “Not at all” to “Extremely.“ (You may reflect on past experiences you've had in similar situations.)`,
               isRequired: true,
               columns: [
                 {
@@ -404,112 +557,38 @@
                   value: 7,
                   text: "Extremely",
                 },
-                {
-                  value: 8,
-                  text: "Does not concern me",
-                },
               ],
-              rows: [
-                {
-                  value: "unwillingness-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
-                  text: "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
-                },
-                {
-                  value: "unwillingness-reason-Someone could criticize or show disapproval of my views",
-                  text: "Someone could criticize or show disapproval of my views",
-                },
-                {
-                  value:
-                    "unwillingness-reason-I would feel like my opinion is unpopular amongst the group.",
-                  text: "I would feel like my opinion is unpopular amongst the group.",
-                },
-                {
-                  value:
-                    "unwillingness-reason-My opinion is unpopular in general.",
-                  text: "My opinion is unpopular in general.",
-                },
-                {
-                  value:
-                    "unwillingness-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
-                  text: "Someone could challenge ideas or beliefs that play an important role in making me who I am",
-                },
-                {
-                  value:
-                    "unwillingness-reason-I could feel humiliated or embarrassed in the conversation",
-                  text: "I could feel humiliated or embarrassed in the conversation",
-                },
-                {
-                  value:
-                    "unwillingness-reason-I might struggle to explain my views to the others and/or come across as uninformed",
-                  text: "I might struggle to explain my views to the others and/or come across as uninformed",
-                },
-                {
-                  value:
-                    "unwillingness-reason-The others might not make a full effort to hear and understand me",
-                  text: "The others might not make a full effort to hear and understand me",
-                },
-                {
-                  value:
-                    "unwillingness-reason-I don’t often participate in conversations like these",
-                  text: "I don’t often participate in conversations like these",
-                },
-                {
-                  value: "unwillingness-reason-The conversation could become awkward or tense",
-                  text: "The conversation could become awkward or tense",
-                },
-                {
-                  value: "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
-                  text: "The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)",
-                },
-                {
-                  value: "unwillingness-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
-                  text: "The conversation could negatively affect how I feel about the world during and/or afterward",
-                },
-                {
-                  value: "unwillingness-reason-Someone might take offense to what I say",
-                  text: "Someone might take offense to what I say",
-                },
-                {
-                  value: "unwillingness-reason-I might take offense to what someone says",
-                  text: "I might take offense to what someone says",
-                },
-                {
-                  value: "unwillingness-reason-I might feel disempowered, unheard, or invalidated",
-                  text: "I might feel disempowered, unheard, or invalidated",
-                },
-                {
-                  value: "unwillingness-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
-                  text: "I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
-                },
-                {
-                  value: "unwillingness-reason-I might struggle to remain productive and respectful",
-                  text: "I might struggle to remain productive and respectful",
-                },
-                {
-                  value: "unwillingness-reason-I would not want to listen to the others discuss their views",
-                  text: "I would not want to listen to the others discuss their views",
-                },
-                {
-                  value: "unwillingness-reason-My views wouldn’t change",
-                  text: "My views wouldn’t change",
-                },
-              ],
-              rowsOrder: "random",
-            },
+              rows: window.followUpRows || []
+            }
+          ]
+        };
+        return follow_up_unwillingness_concerns_survey_inner_var;
+      }
+    };
+
+    var free_response_question_phase_survey = {
+      data: {
+        phase: "free-response-survey",
+      },
+      type: jsPsychSurvey,
+      survey_function: initializePreSlider,
+      survey_json: () => {
+        const topic = topicChoice; // get topic choice
+        var free_response_question_survey = {
+          elements: [
             {
               type: "comment",
               name: "willingness-free-response",
               title:
-                `What other reasons, if any, make you less willing to engage in conversations about ${topic}? Please freely reflect in the space below`,
+                `Think back to the last time you chose to not participate in a conversation about ${topic} or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns.`,
               isRequired: true,
             },
-          ],
-
+          ]
         };
-        return pre_convo_willingness_openmindedness_survey_inner_var
-      },
-      survey_function: initializePreSlider
+        return free_response_question_survey;
+      }
     };
+
 
     //goodbye message and brief explanation to user about our experimentation motive
     var goodbye = {
@@ -534,8 +613,11 @@
 
     control_timeline.push(
       welcome,
-      pre_convo_survey_trial,
-      pre_convo_willingness_openmindedness_survey,
+      survey_trial,
+      gen_willingness_openmindedness_survey,
+      unwillingness_concerns_first_survey,
+      follow_up_unwillingness_concerns_survey,
+      free_response_question_phase_survey,
       goodbye
     )
 
