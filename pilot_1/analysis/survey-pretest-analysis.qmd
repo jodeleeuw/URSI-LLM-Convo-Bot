@@ -305,11 +305,17 @@ Our primary goal, though, is to focus on the direct effects of individual interv
 
 ## Methods
 
+### Materials
+
+We used custom software written with the jsPsych framework (@jspsychcite) to create the study, which participants viewed and responded to via their personal laptops or desktops. The javascript code for the experiment and RStudio code for data analysis can both be found at (<https://github.com/jodeleeuw/URSI-LLM-Convo-Bot/tree/main/pilot_1).>
+
+Pre-registrations and all data for this study and previous pilots are available on the Open Science Framework at <https://osf.io/x32pv.> The experiment Web page can be found at \[webpage - insert for real data analysis\].
+
 ### Participants and Procedure
 
-Through Prolific, we gathered data from `r total_num_subjects_in_data` subjects. To remain consistent with the demographic that our main experiment will target, we restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of one dollar. We excluded `r total_failed_attention_checks` subjects for failing one or more of the attention checks. After applying this exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain.
+Through Prolific, we gathered data from `r total_num_subjects_in_data` subjects. To remain consistent with the demographic that our main experiment will target, we restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of one dollar and fifty cents. We excluded data from `r total_failed_attention_checks` subjects for failing our attention check question. After applying this exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain.
 
-Upon agreeing to participate in this experiment, participants were brought to the experiment webpage, http://54.234.217.37/jdeleeuw/ursi2024/experiment/experiment.html, where they were asked to complete our questionnaire. The questionnaire was composed of basic demographic questions, a question to ascertain which of our six topics the participant was most unwilling to discuss, and then our willingness survey questions. After completing the questionnaire, participants were sent back to Prolific.
+Upon agreeing to participate in this experiment, participants were brought to the experiment webpage, \[insert webpage for real experiment\], where they were asked to complete our questionnaire. The questionnaire was composed of questions to ascertain which of our six topics the participant was most unwilling to discuss, the participant's topic-specific open-mindedness, the participant's willingness to converse with others about the topic, and the concerns that negatively impact the user's willingness. After completing the questionnaire, participants were sent back to Prolific.
 
 ```{r}
 #| label: Find time taken specifically on the surveys (by subject and overall)
@@ -449,11 +455,11 @@ as_gt(demographics_table)
 
 ```
 
-### Materials
+### Survey design
 
 #### Supporting Literature
 
-We developed our willingness questions based on existing literature about the concerns and reason that contribute to a person's unwillingness to participate in conversations, especially conversations about divisive topics.
+We developed our willingness questions based on existing literature about the concerns reasons that contribute to a person's unwillingness to participate in conversations, especially conversations about divisive topics.
 
 Elisabeth Noelle-Neumann's Spiral of Silence theory, developed in the 1960s and '70s, offers a foundational understanding of how individuals' willingness to express opinions on controversial public issues is influenced by their perception of those opinions as popular or unpopular. This theory suggests that the prevailing opinion held by the majority in a specific social setting, such as a classroom or public forum, profoundly influences an individual's willingness to participate in discussions. If one's view is perceived as opposed to the majority, individuals are less likely to express it, a phenomenon directly linked to the Spiral of Silence. Individual psychological factors, such as communication apprehension and fear of conflict, are not isolated but are significantly influenced by the prevailing opinion climate.
 
@@ -481,11 +487,9 @@ Thus, avoidance is also an internal struggle to manage uncomfortable feelings an
 
 If a significant portion of a population struggles with emotional regulation and relies on avoidance as a primary coping mechanism for unpleasant feelings, this has implications beyond individual mental health. When collective emotional dysregulation is widespread, it can hinder a society's capacity for constructive dialogue on complex, emotionally charged issues. Individuals less equipped to handle the inherent discomfort of disagreement may resort to withdrawal, aggression, or rigid adherence to existing beliefs, rather than engaging in nuanced discussion. This suggests that the inability to manage emotions constructively during controversial discussions can lead to societal fragmentation, increased polarization, and a diminished capacity to find common ground or collectively problem-solve issues that require navigating diverse, often conflicting, emotional responses.
 
-#### Willingness survey design
-
 Based on this existing research, we developed a Likert-scale questionnaire which lists 19 concerns that might contribute to users' unwillingness to engage in a conversation about a topic that they are unwilling to discuss with others. We also created two questions which ask users to rate, on a scale from 0 to 100, their willingness to "have a conversation with someone who strongly disagrees with \[them\] about \[conversation topic\]" and "to have a conversation with someone who would push against \[their\] views about \[conversation topic\]," where a score of 0 is complete unwillingness, a score of 50 is neutral, and a score of 100 is absolute willingness to converse.
 
-In our full-scale experiment, we intend to administer this questionnaire both before and after our chatbot intervention to assess which concerns, if any, our chatbot can mitigate. To ensure that this survey captures all of the primary reasons that contribute to unwillingness and can be targeted on the individual level, this pre-test experiment administered the questionnaire once and with a free-response question at the end: "What other reasons, if any, make you less willing to engage in conversations about \[conversation topic\]?"
+In our full-scale experiment, we intend to administer this questionnaire both before and after our intervention to assess which concerns, if any, our intervention can mitigate. To ensure that this survey captures all of the primary reasons that contribute to unwillingness and can be targeted on the individual level, this pretest study administered the questionnaire once and with a free-response question at the end: "\[insert the exact question for real data analysis\]
 
 ## Results
 
@@ -703,7 +707,9 @@ plot(openmindedness_likert, legend.position="right")
 
 ### Free response
 
-We conducted two primary analyses. First, we analyzed free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data. This analysis was performed manually. We found that \[list results\].
+We conducted two primary analyses. First, we assessed whether our 19-item survey question accurately captures Americans' most pressing willingness concerns. Towards this end, we had CHAT-GPT 4o analyze the free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data. Specifically, we prompted CHAT-GPT to extract and list all distinct concerns mentioned across responses, to group similar concerns (e.g., “Fear of confrontation,” “Lack of trust in others,” “Feeling unqualified to speak,” etc.), and to accompany these groupings with summaries and representative examples. We also manually analyzed ten percent of the data to validate CHAT-GPT's assessment.
+
+We found that \[results\]
 
 ```{r}
 #| label: tbl-free-response-examples-table
@@ -902,7 +908,6 @@ cor_openmindedness_mean_vs_concerns %>%
 
 
 ```
-
 
 ```{r}
 #| label: WIP - Correlations willingness slider average vs. willingness concerns 
