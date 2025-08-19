@@ -36,7 +36,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
+          # Upload just where index.html is
           path: 'pilot_1/experiment'
       - name: Deploy to GitHub Pages
         id: deployment
