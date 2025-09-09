@@ -23,7 +23,7 @@ var open_survey_json = {
     {
       type: "matrix",
       name: "topic",
-      title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following potential conversation topics, rate how willing you would be to join the conversation.",
+      title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following potential conversation topics, rate how willing you would be to engage in the conversation.",
       isRequired: true,
       columns: [
         {
