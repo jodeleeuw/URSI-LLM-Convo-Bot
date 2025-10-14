@@ -7,8 +7,6 @@ reference-location: section
 editor: visual
 ---
 
-\*# intended for summer 2025
-
 ```{r}
 #| label: Data Fetching. Load R packages
 #| include: false 
@@ -31,7 +29,9 @@ library(purrr) # for correlation tests
 library(likert) # for likert plots 
 library(factoextra)
 library(ggfortify)
-library(car) # for mlr
+library(car) 
+library(GPArotation) # for factor analysis 
+# for mlr
 # library(GGally)
 # library(car)
 # library(MASS)
@@ -63,8 +63,8 @@ filter(Status != "RETURNED") %>%
 rename("start" = "Started at") %>%
 # make time more readable but keep the seconds version for analysis stuff later
 mutate(`time_taken_overall_minutes` = as.numeric(`Time taken`) / 60) %>%
-# remove the no code people 
-filter(`Completion code` != "NOCODE")
+#remove the no code and unknown code people 
+  filter(`Completion code` == "CVWBBA5S")
 
 str(cleaned_prolific_demographics_df)
 
@@ -73,36 +73,40 @@ str(cleaned_prolific_demographics_df)
 ```{r}
 #| label: Retrieve data for the specific date of the willingness pretest from our OSF project. Loading into a data folder, which  we manually create
 #| include: false 
-
-# list all files
-files <- osf_retrieve_node("x32pv") %>%
-  osf_ls_files(n_max = 1000)
-
-# for some reason, it's not downloading: 
-#csv 1ftd0hhjnr.csv which has subject id 5f82567f1e720a3842580d23
-#csv fn1vmsaka7 which has subject id 66d8837
-#csv zxynjls3ql.csv which has subject id 5ffb8c5b6... 
-
-# filter for the correct date
-files_filtered <- files %>%
-  mutate(date_created = map_chr(meta, ~ as.character(.x$attributes$date_created)),
-    date_created = as_date(date_created)
-  ) %>%
-  filter(date_created %in% as_date(c("2025-09-16", "2025-09-29", "2025-09-30")))
+# 
+# # list all files
+# files <- osf_retrieve_node("x32pv") %>%
+#   osf_ls_files(n_max = 1000)
+# 
+# # originally it wasn't downloading: 
+# #csv 1ftd0hhjnr.csv which has subject id 5f82567f1e720a3842580d23
+# #csv fn1vmsaka7 which has subject id 66d8837
+# #csv zxynjls3ql.csv which has subject id 5ffb8c5b6... 
+# 
+# # filter for the correct date
+# files_filtered <- files %>%
+#   mutate(date_created = map_chr(meta, ~ as.character(.x$attributes$date_created)),
+#     date_created = as_date(date_created)
+#   ) %>%
+#   filter(date_created %in% as_date(c("2025-09-16", "2025-09-29", "2025-09-30")))
 
 # download files for the correct date 
-osf_download(files_filtered, path = "data", conflicts = "skip")
-
+#osf_download(files_filtered, path = "data", conflicts = "skip")
 ```
 
 ```{r}
 #| label: Bind csv's
 #| include: false 
+# 
+#  osf_csv_filenames <- list.files(path = "data/")
+#  osf_csv_filenames_filtered <- osf_csv_filenames[osf_csv_filenames %in% files_filtered$name]
 
-osf_csv_filenames <- list.files(path = "data/")
-osf_csv_filenames_filtered <- osf_csv_filenames[osf_csv_filenames %in% files_filtered$name]
-raw_dfs_tibbles <- map(osf_csv_filenames, ~read_csv(file.path("data/", .)))
-rawwwwwww_df <- bind_rows(raw_dfs_tibbles)
+# LOAD IN DATA FROM FOLDER IN THIS R PROJ SINCE RETRIEVAL NODE IS WEIRD 
+
+file_names <- list.files("osfstorage-archive/", pattern = "\\.csv$", full.names = FALSE)
+
+ raw_dfs_tibbles <- map(file_names, ~read_csv(file.path("osfstorage-archive/", .)))
+ rawwwwwww_df <- bind_rows(raw_dfs_tibbles)
 
 ```
 
@@ -112,15 +116,27 @@ rawwwwwww_df <- bind_rows(raw_dfs_tibbles)
 
 # verify that we have the data for all the people by making sure that the data df has as many subs as the demo df
 
-difference <- setdiff(
-  cleaned_prolific_demographics_df$prolific_subject_id,
-  rawwwwwww_df$prolific_subject_id
-)
+# difference <- setdiff(
+#   cleaned_prolific_demographics_df$prolific_subject_id,
+#   rawwwwwww_df$prolific_subject_id
+# )
+# 
+# if (length(difference) > 0) {
+#   print("ALERT: MISSING DATA FROM PARTICIPANTS:")
+#   print(difference)
+# }
 
-if (length(difference) > 0) {
-  print("ALERT: MISSING DATA FROM PARTICIPANTS:")
-  print(difference)
-}
+#664287debe4750708ea0ecf7 has our url as their completion code 
+#6173c0bb92e149b4127563fe has their submission id as completion code 
+# the rest are completely normal, idk why they're not downloading:
+# not sure what is going on with "5dceca2541afe801a32e27ac", 
+
+#qeg3nvqqbc.csv which has "646792a49a85f35e7a7f5169",
+#omkd7wc2nm.csv which has "5e07d174da6bad1342bafab2", 
+#08yq5tsl91.csv which has "67ac21373a76570ef0a5c0d3" , 
+#4y1akeuxu9.csv which has "5dac4dad5e53cc001499f1f6", 
+#9vtg72o38k.csv which has "6296bef3248bf76cc113926b"
+
 ```
 
 ```{r}
@@ -129,14 +145,14 @@ if (length(difference) > 0) {
 
 raw_df <- rawwwwwww_df %>%
   # inner join with the demographics df from pilot 2 so we can eliminate pilot 1 subjects
-  left_join(cleaned_prolific_demographics_df, by = "prolific_subject_id") %>%
+  right_join(cleaned_prolific_demographics_df, by = "prolific_subject_id") %>%
   # remove unnecessary syntax from topicChoiceAsString for readability later
   mutate(topicChoiceAsString = gsub('\\{"row":"', '', topicChoiceAsString)) %>%
   mutate(topicChoiceAsString = gsub('"}', '', topicChoiceAsString)) %>%
   # fill condition column and row and topic strings
   group_by(prolific_subject_id) %>%
   fill(topicChoiceAsString, .direction = "downup") %>%
-  ungroup()
+  ungroup() 
 
 # number of subjects in data 
 total_num_subjects_in_data <- nrow(raw_df %>%
@@ -228,7 +244,6 @@ surveys_cleaning3_df <- surveys_cleaning2_df %>%
 surveys_df <- surveys_cleaning3_df %>%
   select(-c(stimulus, trial_type, trial_index, time_elapsed, internal_node_id, study_id, session_id, unwillingness_yes_rows, "Submission id", Status, "Custom study tncs accepted at", "Reviewed at", "Archived at", "Completion code", "Total approvals"))
 
-
 willingness <- surveys_df %>%
   filter(question == "commitment-check")
 ```
@@ -296,7 +311,7 @@ raw_df <- raw_df %>%
     
 surveys_df <- surveys_df %>%
   filter(!prolific_subject_id %in% failed_attention_check_ids) 
-  
+
 total_num_clean_subjects_in_data <- nrow(raw_df %>%
   group_by(prolific_subject_id) %>%
   summarize(total_num_clean_subjects_in_data = n()))
@@ -305,15 +320,15 @@ total_num_clean_subjects_in_data <- nrow(raw_df %>%
 
 ## Introduction
 
-Existing literature indicates that a complex interplay of psychological factors—including fear of social isolation (Spiral of Silence), identity protection (Social Identity Theory), communication anxiety (Communication Apprehension), and emotional dysregulation—converge with sociocultural influences like opinion climate, misinformation, and cognitive biases to deter open dialogue. People avoid controversial discussions primarily due to perceived threats to their social standing, personal identity, and emotional well-being. This avoidance is often a coping mechanism, reinforced by group dynamics and the spread of misinformation, ultimately hindering constructive discourse and critical thinking. Understanding this phenomenon is critical for fostering democratic citizenship, promoting critical thinking, and cultivating inclusive learning environments.
+Existing literature indicates that a complex interplay of psychological factors—including fear of social isolation (Spiral of Silence; [@NoelleNeumann1974]; [@Chen2018]; [@Haug2025]), identity protection (Social Identity Theory; [@Tajfel1979]; [@Hunter1996]), communication anxiety (Communication Apprehension; [@Beatty1987]; [@Schulenberg2023]), and emotional dysregulation [@Masters2019; @Aldao2010]—converge with sociocultural influences like opinion climate [@Haug2025], misinformation [@Lewandowsky2017], and cognitive biases [@Kahneman2011] to deter open dialogue. People avoid controversial discussions primarily due to perceived threats to their social standing, personal identity, and emotional well-being [@Chen2018; @Tajfel1979]. This avoidance is often a coping mechanism, reinforced by group dynamics and the spread of misinformation [@Lewandowsky2017], ultimately hindering constructive discourse and critical thinking [@NoelleNeumann1974; @Haug2025]. Understanding this phenomenon is critical for fostering democratic citizenship, promoting critical thinking, and cultivating inclusive learning environments [@Duarte2015].
 
-These problems can be combated on systemic and individual levels. Based on the information that will follow in this report, interventions on the individual level can include reducing communication apprehension, providing tools for difficult conversations, and building skills such as emotional regulation, respectful dissent, sensitivity towards others, and open-minded perspective-taking. We are focusing on the individual level through one-on-one human-chatbot conversations. These conversations are about controversial topics with strong moral components, which are thought to evoke many of the factors that play into individual unwillingness to converse. By curating a space where users are led to cultivate and practice the individual-level interventions which should increase users’ competencies in navigating difficult conversations, we hope to increase users’ willingness to participate in these difficult conversations.
+These problems can be combated on systemic and individual levels. Based on the information that will follow in this report, interventions on the individual level can include reducing communication apprehension [@Beatty1987; @Schulenberg2023], providing tools for difficult conversations, and building skills such as emotional regulation [@Gross1998], respectful dissent [@Rehg2022], sensitivity towards others [@Decety2006], and open-minded perspective-taking [@Galinsky2008]. We are focusing on the individual level through one-on-one human-chatbot conversations. These conversations are about controversial topics with strong moral components, which are thought to evoke many of the factors that play into individual unwillingness to converse [@Aldao2010; @Tajfel1979]. By curating a space where users are led to cultivate and practice the individual-level interventions which should increase users’ competencies in navigating difficult conversations, we hope to increase users’ willingness to participate in these difficult conversations.
 
 ### Limitations
 
-The literature clearly indicates that while individual skills like emotional regulation, communication competence, and conflict management are vital for engaging in difficult conversations, their effective application is deeply intertwined with the social environment. Thus, by not directly intervening on the systemic level, which includes aspects such as creating a psychologically safe environment, challenging negative norms, and promoting inclusivity, we are missing pieces of the puzzle that significantly influence individual willingness, especially “psychological safety.”
+The literature clearly indicates that while individual skills like emotional regulation [@Gross1998], communication competence [@Spitzberg1983], and conflict management [@Rahim2011] are vital for engaging in difficult conversations, their effective application is deeply intertwined with the social environment [@Edmondson1999; @Newman2017]. Thus, by not directly intervening on the systemic level, which includes aspects such as creating a psychologically safe environment [@Edmondson1999], challenging negative norms, and promoting inclusivity [@Carmeli2010], we are missing pieces of the puzzle that significantly influence individual willingness, especially “psychological safety.”
 
-Psychological safety is the belief that one can speak openly and truthfully about problems without fear of reprisal; it is built upon three core pillars: care, consistency, and normalizing mistakes. Psychological safety is suggested to largely relate to group culture and norms in a conversation. Through developing greater abilities to navigate difficult conversations, users of our intervention may influence future group climates, which, in turn, could contribute to each member’s sense of psychological safety. This idea goes hand in hand with the finding that widespread individual avoidance can contribute to the formation of a silent, unsupportive opinion climate. However, the literature suggests that psychological safety is largely curated through systemic changes, especially for creating an environment where people from marginalized communities can experience the same sense of psychological safety as conventionally celebrated voices. Future research could explore applications of chatbots for systemic interventions.
+Psychological safety—the belief that one can speak openly and truthfully about problems without fear of reprisal—is built upon three core pillars: care, consistency, and normalizing mistakes [@Newman2017]. Psychological safety is suggested to largely relate to group culture and norms in a conversation [@Edmondson2014]. Through developing greater abilities to navigate difficult conversations, users of our intervention may influence future group climates, which, in turn, could contribute to each member’s sense of psychological safety [@Carmeli2010]. This idea goes hand in hand with the finding that widespread individual avoidance can contribute to the formation of a silent, unsupportive opinion climate [@NoelleNeumann1974; @Chen2018]. However, the literature suggests that psychological safety is largely curated through systemic changes, especially for creating an environment where people from marginalized communities can experience the same sense of psychological safety as conventionally celebrated voices [@Edmondson2014; @Roberts2022]. Future research could explore applications of chatbots for systemic interventions.
 
 Our primary goal, though, is to focus on the direct effects of individual interventions. By focusing solely on the individual level, perhaps users will grow in their abilities to navigate these difficult conversations even in spaces with poor group cultures or norms.
 
@@ -361,7 +376,8 @@ max_survey_time <- time_stats$Max
 #| echo: false
 #| tbl-cap: Table of basic demographics.
 
-### CHECK THAT THIS WORKS IN REAL DATA ANALYSIS 
+#reloading package because functions from other packages were overriding??
+library(gtsummary) 
 
 #we already read in demographics earlier 
 
@@ -440,11 +456,6 @@ demographics_table <- tbl_summary(survey_demographics_df,
     all_continuous() ~ 2,
     all_categorical() ~ 0
   ),
-  value = NULL,
-  missing = NULL,
-  missing_text = NULL,
-  sort = NULL,
-  percent = NULL,
  include = c(
 'time_taken_overall_minutes',
 'Age',
@@ -468,27 +479,27 @@ as_gt(demographics_table)
 
 We developed our willingness questions based on existing literature about the concerns reasons that contribute to a person's unwillingness to participate in conversations, especially conversations about divisive topics.
 
-Elisabeth Noelle-Neumann's Spiral of Silence theory, developed in the 1960s and '70s, offers a foundational understanding of how individuals' willingness to express opinions on controversial public issues is influenced by their perception of those opinions as popular or unpopular. This theory suggests that the prevailing opinion held by the majority in a specific social setting, such as a classroom or public forum, profoundly influences an individual's willingness to participate in discussions. If one's view is perceived as opposed to the majority, individuals are less likely to express it, a phenomenon directly linked to the Spiral of Silence. Individual psychological factors, such as communication apprehension and fear of conflict, are not isolated but are significantly influenced by the prevailing opinion climate.
+Elisabeth Noelle-Neumann’s Spiral of Silence theory, developed in the 1960s and ’70s, offers a foundational understanding of how individuals’ willingness to express opinions on controversial public issues is influenced by their perception of those opinions as popular or unpopular [@NoelleNeumann1974; @metaSpiralSilence]. This theory suggests that the prevailing opinion held by the majority in a specific social setting, such as a classroom or public forum, profoundly influences an individual’s willingness to participate in discussions. If one’s view is perceived as opposed to the majority, individuals are less likely to express it, a phenomenon directly linked to the Spiral of Silence [@metaSpiralSilence; @ExpSpiralSilence]. Individual psychological factors, such as communication apprehension and fear of conflict, are not isolated but are significantly influenced by the prevailing opinion climate.
 
-The theory's key elements revolve around a fundamental human apprehension: the fear of social isolation, which is triggered by the belief that others will consider the individual not merely mistaken, but morally deficient. Individuals thus tend to refrain from publicly stating their views on controversial matters when they perceive that doing so would attract criticism, scorn, laughter, or other signs of disapproval.
+The theory’s key elements revolve around a fundamental human apprehension: the fear of social isolation, which is triggered by the belief that others will consider the individual not merely mistaken, but morally deficient [@ExpSpiralSilence; @metaSpiralSilence]. Individuals thus tend to refrain from publicly stating their views on controversial matters when they perceive that doing so would attract criticism, scorn, laughter, or other signs of disapproval.
 
-The Social Identity Theory (SIT) suggests that when controversial issues are discussed, individuals may experience "identity threat" if their ideas and feelings about these issues are deeply connected to their identity or in-group, such as their race. Identity threat is defined as "experiences appraised as indicating potential harm to the value, meanings, or enactment of an identity.”
+The Social Identity Theory (SIT) suggests that when controversial issues are discussed, individuals may experience “identity threat” if their ideas and feelings about these issues are deeply connected to their identity or in-group, such as their race [@Tajfel1979; @Hunter1996]. Identity threat is defined as “experiences appraised as indicating potential harm to the value, meanings, or enactment of an identity” (in e.g. [@Steele1997]).
 
-The accentuation of differences between in-groups and out-groups, coupled with the desire for positive distinctiveness, can intensify intergroup hostility and conflict, especially when competition or perceived threats exist. This can lead to negative perceptions of out-groups, even bordering on dehumanization, where less of certain human attributes are ascribed to the "other". Such vilifying views, often marked by beliefs that opponents are "wicked and untrustworthy", make constructive dialogue exceedingly difficult, as the "other" is seen as an adversary rather than a conversational partner.
+The accentuation of differences between in-groups and out-groups, coupled with the desire for positive distinctiveness, can intensify intergroup hostility and conflict, especially when competition or perceived threats exist [@Tajfel1979; @Turner1987]. This can lead to negative perceptions of out-groups, even bordering on dehumanization, where fewer human attributes are ascribed to the “other” [@Haslam2006; @Fiske2002], and beliefs that opponents are “wicked and untrustworthy”—making constructive dialogue exceedingly difficult, as the “other” is seen as an adversary rather than a conversational partner.
 
-This strong in-group cohesion, while providing social support and validation, can paradoxically foster communication siloing. SIT highlights that people identify with in-groups to enhance their self-esteem and perceive their in-group favorably. This desire for "positive distinctiveness" motivates them to accentuate differences with out-groups. When controversial topics arise, challenging an in-group's perspective can be perceived as an "identity threat", leading to defensive behaviors like derogating or distancing from out-group views. This process also contributes to "group polarization," where discussions with like-minded peers strengthen original beliefs and lead to more extreme stances.
+This strong in-group cohesion, while providing social support and validation, can paradoxically foster communication siloing. SIT highlights that people identify with in-groups to enhance their self-esteem and perceive their in-group favorably. This desire for “positive distinctiveness” motivates them to accentuate differences with out-groups. When controversial topics arise, challenging an in-group’s perspective can be perceived as an “identity threat,” leading to defensive behaviors like derogating or distancing from out-group views. This process also contributes to “group polarization,” where discussions with like-minded peers strengthen original beliefs and lead to more extreme stances [@Sunstein2009; @Moscovici1976].
 
-Communication Apprehension (CA) is a broad term referring to an individual's "fear or anxiety associated with either real or anticipated communication with another person or persons". It is thought to be a fundamental psychological response to evaluation. Research indicates that approximately 70% of individuals in the US experience CA when giving a speech, with 20% having severe CA that leads to avoidance of oral communication in personal, public, and professional settings. A significant driver of communication avoidance is the fear of conflict. People often avoid communication when it is likely to lead to an unpleasant outcome, such as offending someone or entering into conflict. This avoidance is primarily driven by a desire to minimize perceived threats to self-esteem and well-being, including the fear of rejection, disapproval, criticism, humiliation, or loss of security.
+Communication Apprehension (CA) is a broad term referring to an individual’s “fear or anxiety associated with either real or anticipated communication with another person or persons” [@McCroskey1977; @Beatty1987]. It is thought to be a fundamental psychological response to evaluation. Research indicates that approximately 70 % of individuals in the U.S. experience CA when giving a speech, with 20 % having severe CA that leads to avoidance of oral communication in personal, public, and professional settings [@McCroskey1977; @Eilert2025]. A significant driver of communication avoidance is the fear of conflict. People often avoid communication when it is likely to lead to an unpleasant outcome, such as offending someone or entering into conflict. This avoidance is primarily driven by a desire to minimize perceived threats to self-esteem and well-being, including the fear of rejection, disapproval, criticism, humiliation, or loss of security [@Beatty1987; @Eilert2025].
 
-CA suggests that the fear of conflict can lead people to systematically avoid "zero-sum situations"—where one party's gains are offset by another's losses—even when such avoidance is costly. This belief can erode interpersonal trust and increase hostility. Moreover, avoiding necessary difficult conversations leads to "conflict debt," which breeds resentment and allows unaddressed concerns to escalate into crises.
+CA suggests that the fear of conflict can lead people to systematically avoid “zero-sum situations”—where one party’s gains are offset by another’s losses—even when such avoidance is costly. This belief can erode interpersonal trust and increase hostility. Moreover, avoiding necessary difficult conversations leads to “conflict debt,” which breeds resentment and allows unaddressed concerns to escalate into crises.
 
 Individuals with high CA experience significant fear and anxiety when faced with communication. This internal discomfort, along with a fear of negative outcomes like conflict or rejection, leads them to actively avoid communication. This avoidance, while providing immediate relief from anxiety, prevents the individual from experiencing that the feared outcomes might not occur or that they can cope with the anxiety. This creates a negative reinforcement loop: avoidance reduces immediate discomfort, but simultaneously strengthens the underlying fear and the avoidance habit, making it harder to engage in future difficult conversations.
 
-The concepts of emotional avoidance, emotional dysregulation, and affective forecasting, reveal that avoidance is not just about external threats, but also an internal struggle. Emotional avoidance refers to the deliberate effort to suppress, ignore, or distract oneself from experiencing unpleasant feelings such as fear, sadness, anger, or vulnerability. Common tactics include denial, suppression, distraction, busyness, and steering clear of situations, people, or places that might evoke uncomfortable emotions.
+The concepts of emotional avoidance, emotional dysregulation, and affective forecasting reveal that avoidance is not just about external threats, but also an internal struggle. Emotional avoidance refers to the deliberate effort to suppress, ignore, or distract oneself from experiencing unpleasant feelings such as fear, sadness, anger, or vulnerability. Common tactics include denial, suppression, distraction, busyness, and steering clear of situations, people, or places that might evoke uncomfortable emotions.
 
-Emotional dysregulation (ED) is defined as the inability to regulate the intensity and quality of emotions to generate an appropriate emotional response. Emotional regulation strategies involve the ability to recognize, evaluate, modify, and manage emotions in a personal and socially acceptable way to maintain mental control over strong feelings and achieve adaptive functioning.
+Emotional dysregulation (ED) is defined as the inability to regulate the intensity and quality of emotions to generate an appropriate emotional response. Emotional regulation strategies involve the ability to recognize, evaluate, modify, and manage emotions in a personal and socially acceptable way to maintain mental control over strong feelings and achieve adaptive functioning [@Gross1998; @Aldao2010]. A meta-analysis recently found maladaptive emotion regulation to be strongly associated with internalizing symptoms, aggression, and poorer social functioning [@SalazarKampf2023].
 
-Affective forecasting, or hedonic forecasting, is the prediction of how one will feel in the future. Research consistently demonstrates that people are poor predictors of their future well-being. They tend to overestimate the impact and duration of negative emotions in response to loss or difficult situations. This inaccuracy occurs because individuals often focus more on what they will lose than on what will stay the same (focalism), fail to envision how their own coping skills will lessen their unhappiness (immune neglect), and fail to envision how they might develop new values (adaptation).
+Affective forecasting, or hedonic forecasting, is the prediction of how one will feel in the future. Research consistently demonstrates that people are poor predictors of their future well-being. They tend to overestimate the impact and duration of negative emotions in response to loss or difficult situations [@Wilson2000; @Levine2012; @Liu2022]. This inaccuracy occurs because individuals often focus more on what they will lose than on what will stay the same (focalism), fail to envision how their own coping skills will lessen their unhappiness (immune neglect), and fail to envision how they might develop new values (adaptation) [@Wilson2000; @Levine2012].
 
 Thus, avoidance is also an internal struggle to manage uncomfortable feelings and a flawed prediction of future emotional states, making the perceived "cost" of engagement seem higher than it might be.
 
@@ -500,7 +511,7 @@ In our full-scale experiment, we intend to administer this questionnaire both be
 
 ## Results
 
-### Basic stats
+### Topic choice
 
 On average, participants completed the questionnaire in `r mean_survey_time` minutes (`r min_survey_time`, `r max_survey_time`).
 
@@ -515,7 +526,7 @@ topic_ratings_df <- surveys_df %>%
   filter(question != "commitment-check") %>%
   mutate(answer = as.numeric(answer)) %>%
   select(prolific_subject_id, question, answer, topicChoiceAsString)
-  
+
 topic_labels <- c( 
   "mandating vaccines in the U.S." = 
     "Mandating vaccines",
@@ -554,6 +565,81 @@ topic_ratings_plot <- ggplot(topic_ratings_df, aes(x = answer, y = question, fil
 
 print(topic_ratings_plot)
 ```
+
+```{r}
+#| label: fig-topic-ratings-only-chosen-topics
+#| echo: false
+#| fig-cap: In the pre-intervention survey, each subject used a 7-pt scale to rate how comfortable they would be discussing each of the following topics. One of the subject's most strongly rated topics were randomly selected as the topic that the subject would focus on for the remainder of the experiment. The scale went from strongly uncomfortable (1), to moderately uncomfortable, a little uncomfortable, neutral (4), a little comfortable, moderately comfortable, and strongly comfortable (7).
+
+# create figure/table showing distribution of ratings on chosen topics only
+
+topic_choice_rating <- topic_ratings_df %>%
+  group_by(prolific_subject_id) %>%
+  filter(question == topicChoiceAsString)
+
+topic_choice_ratings_plot <- ggplot(topic_choice_rating, aes(x = answer, y = question, fill = question)) +
+  geom_density_ridges(bandwidth = 0.931) + # using the bandwidth that it automatically picks 
+  # give the qualitative meanings of 1-7
+  scale_x_continuous(breaks = seq(1, 7, by = 1)) +
+   scale_y_discrete(labels = topic_labels) +
+  # make it look nicer
+  theme_ridges() +      
+  # remove the legend
+  theme(legend.position = "none") +
+  labs(title = "Ridgeline Plot of Ratings by Topic",
+       x = "Rating (1 = Strongly uncomfortable, 7 = Strongly comfortable)",
+       y = "Contentious Topic")
+
+print(topic_choice_ratings_plot)
+```
+
+Figure \@ref(fig: fig-topic-ratings) indicates that, on average, subjects appeared to show a little to moderate willingness to discuss our ten controversial topics, though subjects exhibited some additional discomfort towards the topics of transgender athletes in sports and the U.S. in the Israeli-Palestinian conflict. We had intended to select topics that participants were generally less comfortable discussing than indicated by these results, as we want to understand why Americans are unwilling to discuss the topics that they are a little to strongly unwilling to discuss. However, Figure \@ref(fig: fig-topic-ratings-only-chosen-topics) indicates that, on average for most of our topics, participants were indeed a little to strongly unwilling to discuss their topic choice. Only three of the seven topics---climate change policy, A.I. in human-run spaces, and government in healthcare---still garnered many participants who were more willing than we had intended. It seems participants were a little to strongly willing to discuss many of the ten topics, but, for each participant, there tended to be at least one topic that the participant was a little to strongly unwilling to discuss.
+
+```{r}
+#| label: fig-bar-chart-topic-choice
+#| echo: false 
+#| fig-cap: Bar chart showing the number of participants in each topic
+
+topic_votes_plot <- ggplot(topic_choice_rating, aes(x = answer, fill = topicChoiceAsString)) + 
+  geom_bar() + 
+  xlab("Willingness (1 = Strongly Unwilling, 7 = Strongly Willing)") +
+  ylab("Number of participants")
+
+topic_votes_plot
+```
+
+### Average willingness
+
+```{r}
+#| label: fig-avg-willingness-by-topic
+#| echo: false
+#| fig-cap: Ridgeline plot of willingness to engage in conversation about topic by topic. Participants only rated their willingness for their topic choice. Participants' willingness values were calculated through averaging the responses to the following questions: "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about [topic], where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral," and "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about [topic], where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral."
+
+#make avg willingness df by taking mean of both slides for each participant 
+
+avg_willingness_df <- surveys_df %>%
+  filter(question == "slider1-placeholder" | question == "slider2-placeholder") %>% 
+  group_by(prolific_subject_id, topicChoiceAsString) %>%
+  summarise(avg_willingness = mean(as.numeric(answer), na.rm = TRUE)) %>%
+  ungroup()
+
+topic_choice_ratings_plot <- ggplot(avg_willingness_df, aes(x = avg_willingness, y = topicChoiceAsString, fill = topicChoiceAsString)) +
+  geom_density_ridges(bandwidth = 0.931) + # using the bandwidth that it automatically picks 
+  scale_x_continuous() +
+   scale_y_discrete(labels = topic_labels) +
+  # make it look nicer
+  theme_ridges() +      
+  # remove the legend
+  theme(legend.position = "none") +
+  labs(title = "Ridgeline Plot of Willingness to Engage by Topic",
+       x = "Rating (0 = Strongly unwilling, 100 = Strongly willing)",
+       y = "Contentious Topic")
+
+topic_choice_ratings_plot
+
+```
+
+### Willingness concerns
 
 ```{r}
 #| label: fig-unwillingness-reason-likert-bar-plot
@@ -627,6 +713,8 @@ print(sliders_density)
 
 ```
 
+### Open-mindedness
+
 ```{r}
 #| label: fig-openmindedness-density
 #| echo: false
@@ -675,7 +763,6 @@ wide_for_likert_openmindedness_df <- wide_for_likert_openmindedness_df_with_sub_
                 "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree"),
      ordered = TRUE)))
 
-### REMOVE DURING ACTUAL DATA ANALYSIS. I'M MANUALLY ADDING ALL LIKERT VALUES FOR EACH UNWILLINGNESS REASON SO THAT LIKERT PLOT WORKS
 ### create a vector of the all 1-7 values. defining again here in case stuff gets moved around 
 
 all_likert_values <- c("Strongly Disagree", "Moderately Disagree", "Somewhat Disagree", "Neutral", "Somewhat Agree", "Moderately Agree", "Strongly Agree")
@@ -688,7 +775,6 @@ new_openmindedness_likert_rows <- lapply(all_likert_values, function(response) {
   bind_rows()
 ### add the new rows to the existing dataframe
 wide_for_likert_openmindedness_df <- bind_rows(wide_for_likert_openmindedness_df, new_openmindedness_likert_rows)
-
 
 
 # standardize all columns to use the same factor object
@@ -706,24 +792,36 @@ plot(openmindedness_likert, legend.position="right")
 
 We conducted two primary analyses. First, we assessed whether our 19-item survey question accurately captures Americans' most pressing willingness concerns. Towards this end, we had CHAT-GPT 4o analyze the free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data. Specifically, we prompted CHAT-GPT to extract and list all distinct concerns mentioned across responses, to group similar concerns (e.g., “Fear of confrontation,” “Lack of trust in others,” “Feeling unqualified to speak,” etc.), and to accompany these groupings with summaries and representative examples. We also manually analyzed ten percent of the data to validate CHAT-GPT's assessment.
 
-We found that \[results\]
+*I need to run this*
+
+```{r}
+#| label: Making free response csv for chat analysis 
+#| echo: false
+
+free_response_df <- surveys_df %>%
+  filter(question == "willingness-free-response") %>%
+  ungroup() %>%
+  select(prolific_subject_id, answer, topicChoiceAsString, Age, Sex, Ethnicity, "Ethnicity simplified", "Highest education level completed", "U.s. political affiliation", "Political spectrum (us)", "Religious affiliation", "Employment status", "Student status") %>%
+  rename(
+    #Condition = condition,
+    'Focus topic' = 'topicChoiceAsString',
+    'Free response' = 'answer'
+    )
+
+write.csv(free_response_df, "pretest_free_response_data.csv", row.names = FALSE)
+```
 
 ```{r}
 #| label: tbl-free-response-examples-table
 #| echo: false
 #| tbl-cap: Table showing examples of subjects' responses to free response question, which asked subjects "Think back to the last time you chose to not participate in a conversation about ${topic} or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns."
 
-free_response <- surveys_df %>%
-  filter(question == "willingness-free-response") %>%
-  ungroup() %>%
-  select(answer, topicChoiceAsString) %>%
-  rename(
-    #Condition = condition,
-    'Topic Choice' = 'topicChoiceAsString',
-    'Other reasons for unwillingness?' = 'answer'
-    )
+# free_response_for_table <- free_response_df %>%
+#   filter(prolific_subject_id == [select people we want to show as examples]) %>%
+#   select("Free response", "Focus topic")
 
-kable(free_response, "html") 
+#kable(free_response_for_table, "html")
+
 # %>%
 #   kable_styling() %>%
 #   column_spec(2, width = "5em") %>%
@@ -754,15 +852,15 @@ kable(free_response, "html")
 
 ### Factor analysis
 
-Secondly, we conducted a factor analysis on the 19 items to explore potential latent factors reflecting correlated concerns. We found that \[list results\].
-
 ```{r}
-#| label: WIP - KMO & Bartlett's test on 19-item matrix
+#| label: Wrangle data for factor analysis
 #| echo: false
 
 # create short labels for each question
 question_key_for_fa <- surveys_df %>%
   filter(phase == "follow-up-unwillingness-concerns-survey") %>%
+  ungroup() %>%
+  select(question) %>%
   distinct(question) %>%
   arrange(question) %>%  # ensure consistent order
   mutate(short_label = paste0("Q0", row_number()))
@@ -770,210 +868,480 @@ question_key_for_fa <- surveys_df %>%
 # join short labels back to the main data
 surveys_df_labeled_questions <- surveys_df %>%
   filter(phase == "follow-up-unwillingness-concerns-survey") %>%
-  left_join(question_key_for_fa, by = "question") 
+  left_join(question_key_for_fa, by = "question") %>%
+  select(prolific_subject_id, question, short_label, answer)
 
-concerns_labeled_wide_with_sub_labels <- surveys_df_labeled_questions %>%
-  select(prolific_subject_id.x, short_label, answer) %>%
+concerns_labeled_wide <- surveys_df_labeled_questions %>%
+  select(prolific_subject_id, short_label, answer) %>%
   pivot_wider(names_from = short_label, values_from = answer) %>%
   mutate(across(starts_with("Q0"), ~ as.numeric(as.character(.)))) %>%
-  ungroup()
+  ungroup() %>%
+  mutate(across(everything(), ~ replace_na(.x, 1))) # making the concerns that participants weren't even worried about into a 1 so that they can be represented in the likert graph as "not at all"
 
-concerns_labeled_wide <- concerns_labeled_wide_with_sub_labels %>%
-  select(-prolific_subject_id.x)
-
-# KMO and Bartlett’s test
-#kmo <- KMO(concerns_labeled_wide)
-#cortest_bartlett <- cortest.bartlett(cor(concerns_labeled_wide), n = nrow(concerns_labeled_wide))
-
-#NEED TO SEE WHETHER KMO AND COTEST WORK W ENOUGH DATA
+concerns_wide <- concerns_labeled_wide %>%
+  select(-prolific_subject_id)
 ```
 
 ```{r}
-#| label: WIP - Factor analysis on 19 items 
-#| echo: false
-# 
-# # determine number of factors with parallel analysis
-#fa_parallel <- fa.parallel(concerns_labeled_wide, fa = "fa")
-
-# # run factor analysis with the chosen number of factors
- # fa_result <- fa(
- #   concerns_labeled_wide,
- #   nfactors = [INSERT_NUMBER_OF_FACTORS],
- #   rotate = "oblimin",
- #   fm = "ml"
- #   )
- 
-# # print results
- #print(fa_result, cutoff = 0.3)  # show loadings above .3 NOT SURE IF THIS IS A GOOD CHOICE OF CUTOFF 
-```
-
-```{r}
-#| label: WIP - tbl-correlation-matrix
+#| label: tbl-correlation-matrix
 #| echo: false
 #| tbl-cap: Correlation matrix of reasons for unwillingness
-# 
- #cor_matrix <- cor(concerns_labeled_wide, use = "pairwise.complete.obs")
-# corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
+
+cor_matrix <- cor(concerns_wide, use = "pairwise.complete.obs")
+
+library(corrplot)
+corrplot <- corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
+
+# the items all seem to show low to moderate correlations. pretty solid
+```
+
+```{r}
+#| label: Check KMO, Bartlett's test, and Rit values to see if data is well-suited for factor analysis 
+#| include: false 
+
+# KMO and Bartlett’s test
+kmo <- KMO(concerns_wide)
+cortest_bartlett <- cortest.bartlett(cor(concerns_wide), n = nrow(concerns_wide))
+
+#kmo is above 0.8 so our data is well-suited for factor analysis!  
+
+#cortest_bartlett shows that the p-value is VERY small, so correlations are statistically significant 
+
+#check internal consistency
+rit.vals <- alpha(concerns_wide)
+
+#raw alpha is 0.88 which is pretty good 
+#all the r.cor values are pretty good 
+
+# all indicators suggest that the data is well-suited for factor analysis 
 
 ```
 
 ```{r}
-#| label: WIP - Check internal consistency 
+#| label: Factor analysis on 19 items 
+#| include: false
+
+# determine number of factors with parallel analysis. this will output a suggested number of factors and a scree plot 
+fa_parallel_results <- fa.parallel(concerns_wide, fa = "fa")
+
+# the results of parallel analysis suggest 3 factors 
+
+# run factor analysis with 3 factors 
+## we use oblimin because the factors are probably correlated 
+fa_result <- fa(
+    concerns_wide,
+    nfactors = 3,
+    rotate = "oblimin"
+    )
+
+#get explained variance for report 
+total_var_explained_percent <- round(sum(fa_result$Vaccounted["Proportion Var", ]) * 100, 1)
+
+#get factor correlations 
+factor_corrs <- fa_result$r 
+
+# extract min and max off-diagonal correlations
+cor_range <- range(factor_corrs[lower.tri(factor_corrs)])
+cor_min <- round(cor_range[1], 2)
+cor_max <- round(cor_range[2], 2)
+```
+
+```{r}
+#| label: tbl-factor-loadings-visual
 #| echo: false
+#| tbl-cap: Table visualizing factor loadings in exploratory factor analysis.
 
-#psych::alpha(concerns_labeled_wide)
+library(tidyverse)
 
+# visualize factor loadings
+loadings_df <- as.data.frame(fa_result$loadings[1:19, ])
+loadings_df$short_label <- rownames(loadings_df)
+
+loadings_long <- loadings_df %>% 
+  pivot_longer(-short_label, names_to = "factor", values_to = "loading")
+
+factor_loadings_plot <- ggplot(loadings_long, aes(x = reorder(short_label, loading), y = loading, fill = factor)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Factor Loadings",
+    x = "Question",
+    y = "Loading",
+    fill = "Factor"
+  ) +
+  theme_minimal()
+
+# not printing this because i prefer the heat map 
 ```
 
 ```{r}
-#| label: WIP - tbl-factor-loadings-visual
-#| echo: false
-#| tbl-cap: Table visualizing factor loadings.
-# 
-# # visualize factor loadings
-# loadings_df <- as.data.frame(fa_result$loadings[1:19, ])
-# loadings_df$short_label <- rownames(loadings_df)
-# 
-# loadings_long <- loadings_df %>%
-#   pivot_longer(-question, names_to = "factor", values_to = "loading")
-# 
-# factor_loadings_plot <- ggplot(loadings_long, aes(x = reorder(question, loading), y = loading, fill = factor)) +
-#   geom_col(position = "dodge") +
-#   coord_flip() +
-#   labs(
-#     title = "Factor Loadings",
-#     x = "Question",
-#     y = "Loading",
-#     fill = "Factor"
-#   ) +
-#   theme_minimal()
-# 
-# print(factor_loadings_plot)
-
-```
-
-```{r}
-#| label: WIP - tbl-fa-heat-map-df
+#| label: tbl-fa-heat-map-df
 #| echo: false
 #| tbl-cap: Table showing factor analysis heat map.
-# 
-# fa_heat_map <- ggplot(loadings_long, aes(x = factor, y = reorder(question, desc(question)), fill = loading)) +
-#   geom_tile(color = "white") +
-#   scale_fill_gradient2(
-#     low = "blue", mid = "white", high = "red",
-#     midpoint = 0, limit = c(-1, 1), name = "Loading"
-#   ) +
-#   labs(
-#     title = "Heat Map of Factor Loadings",
-#     x = "Factor",
-#     y = "Question"
-#   ) +
-#   theme_minimal() +
-#   theme(axis.text.y = element_text(size = 10))
-# 
-# print(fa_heat_map)
+
+fa_heat_map <- ggplot(loadings_long, aes(x = factor, y = reorder(short_label, desc(short_label)), fill = loading)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(
+    low = "blue", mid = "white", high = "red",
+    midpoint = 0, limit = c(-1, 1), name = "Loading"
+  ) +
+  labs(
+    title = "Heat Map of Factor Loadings",
+    x = "Factor",
+    y = "Question"
+  ) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(size = 10))
+
+print(fa_heat_map)
 
 ```
 
-### Additional analyses
+```{r}
+#| label: Interpreting the factors
+#| echo: false 
 
-Additionally, we looked for any correlations between open-mindedness and willingness concerns.
+
+```
+
+We conducted an exploratory factor analysis on the 19 items using oblimin rotation to explore potential latent factors reflecting correlated concerns. This analysis yielded a three-factor solution explaining `r total_var_explained_percent`% of the total variance. The factors were moderately correlated (r = `r cor_min`–`r cor_max`) as shown in Figure \@ref(fig:tbl-correlation-matrix). Items tended to load cleanly on one factor, though several cross-loadings were present, suggesting some conceptual overlap among factors. Because the analysis was exploratory, all items were retained to allow full examination of the emerging structure.
+
+The first factor seems to reflect emotional vulnerability or threat to self-concept. This factor consists of: "I might take offense to what someone says," "Someone could challenge ideas or beliefs that play an important role in making me who I am," "I might feel disempowered, unheard, or invalidated," "The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)," "Someone could criticize or show disapproval of my views," and "The conversation could negatively affect how I feel about the world during and/or afterward."
+
+The second factor appears to capture concerns about conversational efficacy and engagement. The focus here is on whether the conversation will be respectful, worthwhile, or productive. This factor consists of: "I might struggle to remain productive and respectful," "I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)", "I would not want to listen to the others discuss their views", and "It would be a waste of time because my views wouldn't change."
+
+The third factor seems to represent social evaluation or social risk concerns. It emphasizes concern about how others perceive the participants, including fear of embarrassment, judgment, or negative social consequences. This factor consists of: "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)", "I would feel like my opinion is unpopular amongst the group," "I could feel humiliated or embarrassed in the conversation," "I might struggle to explain my views to the others and/or come across as uninformed," "My opinion is unpopular in general."
+
+Four items did not load above 0.32 on any factor in the 3-factor solution nor in an additional exploratory 4-factor solution. These items were: "Someone might take offense to what I say," "The conversation could become awkward or tense," "The others might not make a full effort to hear and understand me," and "I don’t often participate in conversations like these". It would be expected that these items represent idiosyncratic concerns or situational/contextual items that don't fit neatly into emotional vulnerability, process, or social evaluation; however, these items seem as though they would fit within the social evaluation factor.
+
+It is also interesting that factors 1 and 3 are distinct from each other, as most of the items within these factors seem as though they could very well be interchangeable in the factors. For example, "I could feel humiliated or embarrassed in the conversation" fell within factor 3 with a loading of `r loadings_df$MR3[loadings_df$short_label == "Q01"]`, but conceptually could very well fit within the emotional vulnerability concepts of factor 1 even though it had a loading within factor 1 of `r loadings_df$MR1[loadings_df$short_label == "Q01"]`.
+
+### Correlations
 
 ```{r}
-#| label: WIP - Correlations open-mindedness average vs. willingness concerns 
+#| label: Correlations open-mindedness average vs. willingness concerns 
 #| echo: false
 #| tbl-cap: Correlation matrix of average open-mindedness vs. willingness concerns 
 
 # look at correlation relationship between mean open-mindedness score and each willingness concern
-#cor_openmindedness_mean_vs_concerns <- concerns_labeled_wide %>%
-#   map_dfr(~ tidy(cor.test(.x, openmindedness_df_mean$mean_openmindedness)), .id = "concern")
+library(broom)
 
-# view results (i don't really understand this code. i had chat generate it to help me)
-#cor_openmindedness_mean_vs_concerns %>%
-#  select(concern, estimate, p.value) %>%
-#  arrange(p.value)
+cor_openmindedness_mean_vs_concerns <- concerns_wide %>% map_dfr(~ tidy(cor.test(.x, openmindedness_df_mean$mean_openmindedness)), .id = "concern")
 
+# view results
+cor_openmindedness_mean_vs_concerns_simplified <- cor_openmindedness_mean_vs_concerns %>%
+  select(concern, estimate, p.value) %>%
+  arrange(p.value)
+
+# extract the relevant correlations and p-values
+q05_r <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q05") |> pull(estimate)
+q05_p <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q05") |> pull(p.value)
+
+q06_r <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q06") |> pull(estimate)
+q06_p <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q06") |> pull(p.value)
+
+q016_r <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q016") |> pull(estimate)
+q016_p <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q016") |> pull(p.value)
 ```
 
-```{r}
-#| label: WIP - correlation between average open-mindedness and unwillingness concern factors
-#| echo: false 
-#| tbl-cap: Correlation matrix of average open-mindedness vs. willingness concern factors 
-
-
-```
+A correlation matrix of average open-mindedness vs. each willingness concern found statistically significant relationships between three concerns and average open-mindedness. These concerns were "I might struggle to explain my views to the others and/or come across as uninformed" (*r* = `r round(q06_r, 3)`, *p* = `r signif(q06_p, 3)`), "I might struggle to remain productive and respectful" (*r* = `r round(q05_r, 3)`, *p* = `r signif(q05_p, 3)`), and "The conversation could become awkward or tense" (*r* = `r round(q016_r, 3)`, *p* = `r signif(q016_p, 3)`). These three concerns showed inverse associations with open-mindedness, meaning people with higher open-mindedness scores tended to express less concern for those specific items. This is very interesting but I'm not sure what to draw from it.
 
 ```{r}
-#| label: WIP - Correlations willingness slider average vs. willingness concerns 
+#| label: Correlations willingness slider average vs. willingness concerns
 #| echo: false
 
-# reasons_and_willingness_merged_df <- merge(wide_for_likert_unwillingness_reasons_df_with_sub_labels, sliders_df, by = 'prolific_subject_id') %>%
-#   ungroup() %>%
-#   select(-prolific_subject_id)
-# 
-# cor_willingness_slider_vs_concerns <- map_dfr(reasons_and_willingness_merged_df[-20], ~
-#   tidy(cor.test(.x, reasons_and_willingness_merged_df$mean_willingness, use = "pairwise.complete.obs")),
-#   .id = "reason_item")
-# 
-# cor_willingness_slider_vs_concerns %>%
-#   select(reason_item, estimate, p.value) %>%
-#   arrange(p.value)
+#prepping data
+reasons_and_willingness_merged_df <- merge(wide_unwill_reasons_df_1, sliders_df, by = 'prolific_subject_id') %>%
+  ungroup() %>%
+  select(-prolific_subject_id)
+
+#run cor test
+cor_willingness_slider_vs_concerns <- map_dfr(reasons_and_willingness_merged_df[-20], ~
+  tidy(cor.test(.x, reasons_and_willingness_merged_df$mean_willingness, use = "pairwise.complete.obs")),
+  .id = "reason_item")
+
+#process results 
+cor_willingness_slider_vs_concerns <- cor_willingness_slider_vs_concerns %>%
+  mutate(
+    significance = case_when(
+      p.value < 0.001 ~ "< 0.001",
+      p.value < 0.01  ~ "< 0.01",
+      p.value < 0.05  ~ "< 0.05",
+      TRUE            ~ "ns"  # not significant
+    ),
+    direction = if_else(estimate < 0, "negative", "positive"),
+    estimate_rounded = round(estimate, 3),
+    pvalue_rounded = signif(p.value, 3)
+  ) %>%
+  select(reason_item, estimate_rounded, pvalue_rounded, direction, significance)
 
 ```
 
-Next, we looked for correlations between willingness concerns and overall willingness as indicated by the slider questions.
+Next, we looked for correlations between willingness concerns and overall willingness as indicated by the slider questions. Most concerns were significantly negatively associated with willingness. The strongest negative associations were observed for "Doesn't participate in these conversations often" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Doesn't participate in these conversations often"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Doesn't participate in these conversations often"]`), "Conversation might be awkward or tense" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Conversation might be awkward or tense"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Conversation might be awkward or tense"]`), "Might be offended" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might be offended"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might be offended"]`), "Others might be unproductive or disrespectful" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Others might be unproductive or disrespectful"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Others might be unproductive or disrespectful"]`), "Doesn't want to listen to others" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Doesn't want to listen to others"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Doesn't want to listen to others"]`), "Views wouldn't change" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Views wouldn't change"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Views wouldn't change"]`), and "Might feel invalidated" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might feel invalidated"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might feel invalidated"]`).
+
+Other significant negative associations were observed for "Might offend someone" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might offend someone"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might offend someone"]`), "Experience negative feelings about the world" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Experience negative feelings about the world"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Experience negative feelings about the world"]`), "Might struggle to explain views or seem uninformed" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might struggle to explain views or seem uninformed"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might struggle to explain views or seem uninformed"]`), "Might struggle to remain productive and respectful" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might struggle to remain productive and respectful"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might struggle to remain productive and respectful"]`), "Opinion is unpopular amongst group" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Opinion is unpopular amongst group"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Opinion is unpopular amongst group"]`), "Might be criticized" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might be criticized"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might be criticized"]`), "Others won't make effort to listen" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Others won't make effort to listen"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Others won't make effort to listen"]`), and "Might experience negative feelings about self" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might experience negative feelings about self"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might experience negative feelings about self"]`).
+
+### Cluster analysis
 
 ```{r}
-#| label: WIP - Look at concerns as predictors of overall willingness 
-#| echo: false 
-# 
-# model <- lm(mean_willingness ~ ., data = reasons_and_willingness_merged_df)
-# summary(model)
-# 
-# # Multicollinearity check
-# vif(model)
+#| label: Cluster analysis
+#| echo: false
+
+# Scale data
+concerns_wide_scaled <- scale(concerns_wide)
+ 
+# determine optimal number of clusters
+optimal_n_clusters <- fviz_nbclust(concerns_wide_scaled, kmeans, method = "wss")
+
+# K-means with k = 3 (example)
+set.seed(1)
+kmeans_result <- kmeans(concerns_wide_scaled, centers = 3)
+
+# merge back with subject id df so we can see sub id, cluster, and the questions w ratings
+cluster_labeled <- concerns_labeled_wide %>%
+  mutate(cluster = factor(kmeans_result$cluster))
+
+# extract cluster info to add to surveys_df becuase the df is structured differently so i'm not sure how to merge otherwise 
+cluster_info <- cluster_labeled %>%
+  select(prolific_subject_id, cluster)
+
+surveys_df <- surveys_df %>%
+  left_join(cluster_info, by = "prolific_subject_id")
+
+#extract the percent of participants in each cluster so i can report
+cluster_percentages <- cluster_info %>%
+  group_by(cluster) %>%                       # group by cluster
+  summarise(n = n_distinct(prolific_subject_id)) %>%  # count unique subjects
+  mutate(percent = round(n / sum(n) * 100, 1))       # calculate percentage
 
 ```
 
-Then, we assessed whether any willingness concerns are significant predictors of overall willingness through the use of a multiple linear regression model. We found that [results].
-
 ```{r}
-#| label: WIP - Cluster analysis
-#| echo: false 
-# 
-# # Scale data
-# concerns_labeled_wide_scaled <- scale(concerns_labeled_wide)
-# 
-# # Determine optimal number of clusters
-# fviz_nbclust(concerns_labeled_wide_scaled, kmeans, method = "wss")
-# 
-# # K-means with k = 3 (example)
-# set.seed(1)
-# kmeans_result <- kmeans(concerns_labeled_wide_scaled, centers = 3)
-# survey_df$cluster <- kmeans_result$cluster
-# 
-# # Visualize clusters with PCA
-# autoplot(prcomp(concerns_labeled_wide_scaled), data = survey_df, colour = 'cluster')
-```
-
-We also conducted cluster analysis to determine whether participants generally fell into certain categories of concerns.
-
-```{r}
-#| label: WIP - ANOVAs 
+#| label: tbl-cluster-analysis-pca
 #| include: false
-# 
-# 
-# manova_result <- manova(as.matrix(concerns_labeled_wide_with) ~ survey_df$topic)
-# summary(manova_result)
-# 
-# # Follow-up ANOVAs
-# aov_results <- lapply(concerns_labeled_wide, function(item) aov(item ~ survey_df$topic))
-# lapply(aov_results, summary)
+#| fig-cap: PCA plot with clusters to visualize the three clusters
+
+# visualize clusters with PCA
+cluster_visualization <- autoplot(prcomp(concerns_wide_scaled), data = cluster_labeled, colour = 'cluster')
+
+print(cluster_visualization)
 
 ```
 
-Finally, we ran ANOVAs to determine whether there were significant differences in how participants with different conversation topics responded to our survey.
+```{r}
+#| label: fig-heat-map-clusters-willingness-concerns
+#| echo: false 
+#| fig-cap: Heat map of each cluster's average rating of each potential concern
+
+# figure out the average score on each question of a cluster so we can see if certain clusters generally scored higher on certain questions 
+
+cluster_concerns <- cluster_labeled %>%
+  group_by(cluster) %>%
+  summarise(across(starts_with("Q"), mean, na.rm = TRUE))
+
+#heat map
+
+cluster_long <- cluster_concerns %>%
+  pivot_longer(cols = starts_with("Q"), names_to = "question", values_to = "mean_rating")
+
+ggplot(cluster_long, aes(x = question, y = factor(cluster), fill = mean_rating)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(y = "Cluster", x = "Concern", fill = "Mean Rating") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+#| label: Interpreting clusters and concerns 
+#| echo: false 
+
+# find each cluster's overall mean rating to see if any clusters generally rate things significantly higher 
+cluster_means <- cluster_concerns %>%
+  rowwise() %>%
+  mutate(overall_mean = round(mean(c_across(Q01:Q019)), 1)) %>%
+  select(cluster, overall_mean)
+
+# find which questions had the greatest range in average responses from clusters to see which differ most between clusters 
+
+top_questions <- cluster_concerns %>%
+  pivot_longer(cols = c(Q01,Q02,Q03,Q04,Q05,Q06,Q07,Q08,Q09,Q010,Q011,Q012,Q013,Q014,Q015,Q016,Q017,Q018,Q019), names_to = "question", values_to = "mean_rating") %>%
+  group_by(question) %>%
+  summarize(range = max(mean_rating) - min(mean_rating)) %>%
+  arrange(desc(range)) %>%
+  slice_head(n = 19) %>%   # top 19 questions with largest differences
+  pull(question)
+
+# create a table of clusters × top questions
+table_concerns <- cluster_concerns %>%
+  select(cluster, all_of(top_questions)) %>%
+  pivot_longer(cols = -cluster, names_to = "question", values_to = "mean_rating") %>%
+  arrange(question, desc(mean_rating)) %>%
+  group_by(question) %>%
+  mutate(rank = row_number()) %>%
+  select(question, cluster, mean_rating, rank)
+
+
+### cluster-focused
+
+cluster_long <- cluster_concerns %>%
+  pivot_longer(cols = c(Q01,Q02,Q03,Q04,Q05,Q06,Q07,Q08,Q09,Q010,Q011,Q012,Q013,Q014,Q015,Q016,Q017,Q018,Q019), names_to = "question", values_to = "mean_rating")
+
+# for each question, find which cluster had the highest mean
+top_by_cluster <- cluster_long %>%
+  group_by(question) %>%
+  mutate(max_cluster = mean_rating == max(mean_rating)) %>%
+  ungroup() %>%
+  filter(max_cluster) %>%
+  select(cluster, question, mean_rating) %>%
+  arrange(cluster, desc(mean_rating))
+
+# join top_by_cluster with questions_key_fa to get full question text
+top_by_cluster_full <- top_by_cluster %>%
+  left_join(question_key_for_fa, by = c("question" = "short_label")) %>%
+  mutate(across(everything(), ~ gsub('unwillingness-reason-', '', .))) 
+
+## for inline report: 
+# cluster 1 top questions
+cluster1_top <- top_by_cluster_full %>%
+  filter(cluster == 1) %>%
+  arrange(desc(mean_rating)) %>%
+  pull(question.y)
+
+# cluster 2 top questions
+cluster2_top <- top_by_cluster_full %>%
+  filter(cluster == 2) %>%
+  arrange(desc(mean_rating)) %>%
+  pull(question.y)
+
+# cluster 3 top questions
+cluster3_top <- top_by_cluster_full %>%
+  filter(cluster == 3) %>%
+  arrange(desc(mean_rating)) %>%
+  pull(question.y)
+
+```
+
+```{r}
+#| label: fig-clusters-avg-willingness   
+#| echo: false 
+#| fig-cap: Box plot of average willingness to converse about topic by cluster. On average, cluster 2 appears to be more willing to converse than the other clusters; this would be consistent with cluster 2's lower average rating of how much the 19 items impact willingness.
+
+avg_willingness_cluster_df <- avg_willingness_df %>%
+  merge(cluster_info, by = "prolific_subject_id")
+
+ggplot(avg_willingness_cluster_df, aes(x = factor(cluster), y = avg_willingness)) +
+  geom_boxplot() +
+  labs(x = "Cluster", y = "Average Willingness") +
+  theme_minimal()
+
+```
+
+```{r}
+#| label: fig-clusters-avg-openmindedness 
+#| echo: false 
+#| fig-cap: Box plot of average open-mindedness about topic by cluster. 
+
+open_mindedness_w_clusters <- openmindedness_df_mean %>%
+  merge(cluster_info, by = "prolific_subject_id")
+
+ggplot(open_mindedness_w_clusters, aes(x = factor(cluster), y = mean_openmindedness)) +
+  geom_boxplot() +
+  labs(x = "Cluster", y = "Average Open-Mindedness") +
+  theme_minimal()
+
+```
+
+We also conducted cluster analysis on the 19 concerns to determine whether participants generally fell into certain categories. The analysis suggested that participants generally fell into one of three clusters, with `r cluster_percentages$percent[cluster_percentages$cluster == 1]`% of participants falling into Cluster 1, `r cluster_percentages$percent[cluster_percentages$cluster == 2]`% of participants falling into Cluster 2, and `r cluster_percentages$percent[cluster_percentages$cluster == 3]`% of participants falling into Cluster 3.
+
+Consistent with Figure \@ref(fig:heat-map-clusters-willingness-concerns), Cluster 1 and Cluster 3, on average, indicated that the 19 concerns overall impact their willingness much more compared to Cluster 3. Cluster 1's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 1]`, Cluster 2's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 2]`, and Cluster 3's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 3]`.
+
+On average, Cluster 1 rated the following concerns the highest: `r paste(cluster1_top, collapse = "; ")`.
+
+Cluster 2 did not rate any concern higher, on average, than the other clusters.
+
+On average, cluster 3's top concerns were `r paste(cluster3_top, collapse = "; ")`.
+
+These patterns suggest that Cluster 3 participants were the most concerned across the set of items, Cluster 1 participants were slightly less concerned, and Cluster 2 participants were much less concerned, which is particularly interesting since Cluster 2 participants made up half of the sample.
+
+This appears to be consistent with the average willingness of each cluster: as shown in Figure \@ref(fig:fig-clusters-avg-willingness), Cluster 2 appears to be more willing to converse than the other two clusters. Interestingly, as shown in Figure \@ref(fig:fig-clusters-avg-openmindedness), Cluster 2 also appears to be more open-minded than the other two clusters. These interpretations have not been rigorously assessed and it should be recalled that these data were self-reported.
+
+```{r}
+#| label: fig-demographics-clusters
+#| echo: false 
+#| fig-cap: Plots of demographics by cluster helps us explore whether the clusters may have significantly different demographics.
+
+ggplot(surveys_df, aes(x = cluster, fill = Sex)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", title = "Gender composition by cluster")
+
+ggplot(surveys_df, aes(x = cluster, fill = topicChoiceAsString)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", title = "Topic choice by cluster")
+
+ggplot(surveys_df, aes(x = cluster, fill = `Highest education level completed`)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", title = "Education level by cluster") # idk why this isn't working
+
+ggplot(surveys_df, aes(x = cluster, fill = Ethnicity)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", title = "Ethnicity by cluster")
+
+ggplot(surveys_df, aes(x = cluster, fill = `U.s. political affiliation`)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", title = "U.s. political affiliation")
+
+ggplot(surveys_df, aes(x = cluster, fill = `Political spectrum (us)`)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", title = "Political spectrum (us) by cluster")
+
+ggplot(surveys_df, aes(x = cluster, fill = `Religious affiliation`)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", title = "Religious affiliation by cluster")
+
+ggplot(surveys_df, aes(x = cluster, y = as.numeric(Age))) +
+  geom_boxplot() +
+  labs(title = "Age by cluster")
+
+```
+
+```{r}
+#| label: fig-topic-choice-clusters
+#| echo: false 
+#| fig-cap: Plots of topic choice by cluster helps us explore whether the clusters may have significant differences in which topics they focused on. Cluster 2 appears to have had more participants focused on human euthanasia and had fewer participants focused on the role of the U.S. in the Israeli-Palestinian conflict, but the differences are not immense and further analyses should verify whether these differences are significant before drawing conclusions.
+
+# within each cluster, finding percent of subjects on each topic. i tried to do this in one df but kept getting an error that i couldn't figure out 
+cluster1_topic_percent <- surveys_df %>%
+  filter(cluster == 1) %>%
+  distinct(prolific_subject_id, .keep_all = TRUE) %>%
+  group_by(topicChoiceAsString) %>%
+  summarise(n1 = n(), .groups = "drop") %>%
+  mutate(percent1 = n1 / sum(n1))
+
+cluster2_topic_percent <- surveys_df %>%
+  filter(cluster == 2) %>%
+  distinct(prolific_subject_id, .keep_all = TRUE) %>%
+  group_by(topicChoiceAsString) %>%
+  summarise(n2 = n(), .groups = "drop") %>%
+  mutate(percent2 = n2 / sum(n2))
+
+cluster3_topic_percent <- surveys_df %>%
+  filter(cluster == 3) %>%
+  distinct(prolific_subject_id, .keep_all = TRUE) %>%
+  group_by(topicChoiceAsString) %>%
+  summarise(n3 = n(), .groups = "drop") %>%
+  mutate(percent3 = n3 / sum(n3))
+
+#join together
+cluster_topic_percent <- cluster1_topic_percent %>%
+  full_join(cluster2_topic_percent, by = "topicChoiceAsString") %>% 
+  full_join(cluster3_topic_percent, by = "topicChoiceAsString")
+
+ggplot(surveys_df, aes(x = cluster, fill = topicChoiceAsString)) +
+  geom_bar(position = "fill") +
+  labs(y = "Proportion", title = "Topic choice by cluster")
+
+```
+
+There may be significant differences in the demographic profiles of the clusters as shown in Figure \@ref(fig:fig-demographics-clusters); however, further analyses would need to assess statistical significance. As observed in Figure \@ref(fig:fig-topic-choice-clusters), there may also be some notable differences in the topic choices of each cluster. Particularly, `r round(cluster_topic_percent$percent2[cluster_topic_percent$topicChoiceAsString == "human euthanasia in the U.S."], 2)`% of participants in cluster 2 focused on human euthanasia in the U.S., compared to `r round(cluster_topic_percent$percent1[cluster_topic_percent$topicChoiceAsString == "human euthanasia in the U.S."], 2)`% of participants in cluster 1 and `r round(cluster_topic_percent$percent3[cluster_topic_percent$topicChoiceAsString == "human euthanasia in the U.S."], 2)`% of participants in cluster 3. Also, `r round(cluster_topic_percent$percent2[cluster_topic_percent$topicChoiceAsString == "the role of the U.S. in the Israeli-Palestinian conflict"], 2)`% of participants in cluster 2 focused on the role of the U.S. in the Israeli-Palestinian conflict, compared to `r round(cluster_topic_percent$percent1[cluster_topic_percent$topicChoiceAsString == "the role of the U.S. in the Israeli-Palestinian conflict"], 2)`% of participants in cluster 1 and `r round(cluster_topic_percent$percent3[cluster_topic_percent$topicChoiceAsString == "the role of the U.S. in the Israeli-Palestinian conflict"], 2)`% of participants in cluster 3. These differences have also not been assessed for statistical significance.
 
 ## Discussion
-
-## References
