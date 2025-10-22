@@ -318,11 +318,22 @@ total_num_clean_subjects_in_data <- nrow(raw_df %>%
 
 ```
 
+```{r}
+#| label: Print surveys_df csv (and txt for Claude)
+#| echo: false 
+
+write.csv(surveys_df, "pretest_survey_data.csv", row.names = FALSE)
+
+
+write.table(surveys_df, file = "pretest_survey_data.txt", sep = "\t", row.names = FALSE, quote = FALSE)
+
+```
+
 ## Introduction
 
-Existing literature indicates that a complex interplay of psychological factors—including fear of social isolation (Spiral of Silence; [@NoelleNeumann1974]; [@Chen2018]; [@Haug2025]), identity protection (Social Identity Theory; [@Tajfel1979]; [@Hunter1996]), communication anxiety (Communication Apprehension; [@Beatty1987]; [@Schulenberg2023]), and emotional dysregulation [@Masters2019; @Aldao2010]—converge with sociocultural influences like opinion climate [@Haug2025], misinformation [@Lewandowsky2017], and cognitive biases [@Kahneman2011] to deter open dialogue. People avoid controversial discussions primarily due to perceived threats to their social standing, personal identity, and emotional well-being [@Chen2018; @Tajfel1979]. This avoidance is often a coping mechanism, reinforced by group dynamics and the spread of misinformation [@Lewandowsky2017], ultimately hindering constructive discourse and critical thinking [@NoelleNeumann1974; @Haug2025]. Understanding this phenomenon is critical for fostering democratic citizenship, promoting critical thinking, and cultivating inclusive learning environments [@Duarte2015].
+Existing literature indicates that a complex interplay of psychological factors—including fear of social isolation (Spiral of Silence; [@NoelleNeumann1974]; [@Chen2018]; [@Haug2025]), identity protection (Social Identity Theory; [@Tajfel1979]; [@Hunter1996]), communication anxiety (Communication Apprehension; [@Beatty1987]; [@Schulenberg2023]), and emotional dysregulation [@Masters2019; @Aldao2010]—converge with sociocultural influences like opinion climate [@Haug2025], misinformation [@Lewandowsky2017], and cognitive biases [@Kahneman2011] to deter open dialogue. Following from these ideas, researchers have suggested that people avoid controversial discussions primarily due to perceived threats to their social standing, personal identity, and emotional well-being [@Chen2018; @Tajfel1979]. This avoidance is thought to often be a coping mechanism, reinforced by group dynamics and the spread of misinformation [@Lewandowsky2017], ultimately hindering constructive discourse and critical thinking [@NoelleNeumann1974; @Haug2025]. Understanding this phenomenon is critical for fostering democratic citizenship, promoting critical thinking, and cultivating inclusive learning environments [@Duarte2015].
 
-These problems can be combated on systemic and individual levels. Based on the information that will follow in this report, interventions on the individual level can include reducing communication apprehension [@Beatty1987; @Schulenberg2023], providing tools for difficult conversations, and building skills such as emotional regulation [@Gross1998], respectful dissent [@Rehg2022], sensitivity towards others [@Decety2006], and open-minded perspective-taking [@Galinsky2008]. We are focusing on the individual level through one-on-one human-chatbot conversations. These conversations are about controversial topics with strong moral components, which are thought to evoke many of the factors that play into individual unwillingness to converse [@Aldao2010; @Tajfel1979]. By curating a space where users are led to cultivate and practice the individual-level interventions which should increase users’ competencies in navigating difficult conversations, we hope to increase users’ willingness to participate in these difficult conversations.
+These problems can be combated on systemic and individual levels. Previous research indicates that interventions on the individual level can include reducing communication apprehension [@Beatty1987; @Schulenberg2023], providing tools for difficult conversations, and building skills such as emotional regulation [@Gross1998], respectful dissent [@Rehg2022], sensitivity towards others [@Decety2006], and open-minded perspective-taking [@Galinsky2008]. In a future experiment, we will be focusing on the individual level through one-on-one human-chatbot conversations. These conversations are about controversial topics with strong moral components, which are thought to evoke many of the factors that play into individual unwillingness to converse [@Aldao2010; @Tajfel1979]. By curating a space where users are led to cultivate and practice the individual-level interventions which should increase users’ competencies in navigating difficult conversations, we hope to increase users’ willingness to participate in these difficult conversations. Before we can perform this intervention, though, we need to properly measure individuals' reasons for not engaging in these conversations about controversial topics. Towards this end, we designed a 19-item questionnaire that seeks to capture the primary concerns that contribute to an individual's reluctance to engage in conversations on controversial topics. In this survey pretest, we will assess whether our questionnaire succeeds in this endeavor.
 
 ### Limitations
 
@@ -613,7 +624,7 @@ topic_votes_plot
 ```{r}
 #| label: fig-avg-willingness-by-topic
 #| echo: false
-#| fig-cap: Ridgeline plot of willingness to engage in conversation about topic by topic. Participants only rated their willingness for their topic choice. Participants' willingness values were calculated through averaging the responses to the following questions: "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about [topic], where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral," and "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about [topic], where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral."
+#| fig-cap: Ridgeline plot of willingness to engage in conversation about topic by topic. Participants only rated their willingness for their topic choice. Participants' willingness values were calculated through averaging the responses to the questions, "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about [topic], where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral," and "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about [topic], where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral."
 
 #make avg willingness df by taking mean of both slides for each participant 
 
@@ -636,6 +647,43 @@ topic_choice_ratings_plot <- ggplot(avg_willingness_df, aes(x = avg_willingness,
        y = "Contentious Topic")
 
 topic_choice_ratings_plot
+
+```
+
+```{r}
+#| label: fig-box-plot-willingness 
+#| echo: false
+#| fig-cap: Distribution of average willingness ratings by topic from 0 (completely unwilling) to 100 (completely willing), where 50 is neutral.
+
+
+avg_willingness_box_plot <- ggplot(avg_willingness_df, aes(x = avg_willingness, y = as.factor(topicChoiceAsString), fill = as.factor(topicChoiceAsString))) +
+  geom_boxplot() + 
+  labs(title = "Boxplots of Willingness to Engage by Topic",
+       x = "Rating (0 = Strongly unwilling, 100 = Strongly willing)",
+       y = "Contentious Topic") + 
+  guides(fill = "none")
+
+avg_willingness_box_plot
+
+```
+
+```{r}
+#| label: Diff btwn two avg willingness questions 
+#| echo: false 
+
+
+will_df <- surveys_df %>%
+  filter(question == "slider1-placeholder" | question == "slider2-placeholder") %>%
+  pivot_wider(
+    names_from = question,
+    values_from = answer
+  ) %>%
+  mutate(
+    diff_willingness = as.numeric(`slider1-placeholder`) - as.numeric(`slider2-placeholder`)
+  ) %>%
+  select(prolific_subject_id, topicChoiceAsString, diff_willingness)
+
+# there are some p big differences for a handful of people, so it's good that we have both questions
 
 ```
 
@@ -710,6 +758,58 @@ sliders_density <- ggplot(sliders_df, aes(x = mean_willingness)) + #, color = co
  #                    labels = c("control free reflection" = "Control group", "selection bot" = "Experimental group: Selection bot", "combination bot" = "Experimental group: Combination bot"))
 
 print(sliders_density)
+
+```
+
+```{r}
+#| label: Basic info abt concerns
+#| echo: false
+
+concern_map <- c("Might experience negative feelings about self" = "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)", "Might be offended" = "unwillingness-reason-I might take offense to what someone says",
+  "Opinion is unpopular amongst group" = "unwillingness-reason-I would feel like my opinion is unpopular amongst the group.",
+  "Doesn't participate in these conversations often" = "unwillingness-reason-I don’t often participate in conversations like these",
+  "Might struggle to explain views or seem uninformed" = "unwillingness-reason-I might struggle to explain my views to the others and/or come across as uninformed",
+  "Others might be unproductive or disrespectful" = "unwillingness-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+  "Views wouldn't change" = "unwillingness-reason-It would be a waste of time because my views wouldn't change",
+  "Doesn't want to listen to others" = "unwillingness-reason-I would not want to listen to the others discuss their views",
+  "Might be criticized" = "unwillingness-reason-Someone could criticize or show disapproval of my views",
+  "Experience negative feelings about the world" = "unwillingness-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
+  "Conversation might be awkward or tense" = "unwillingness-reason-The conversation could become awkward or tense",
+  "Might feel embarrassed" = "unwillingness-reason-I could feel humiliated or embarrassed in the conversation",
+  "Might offend someone" = "unwillingness-reason-Someone might take offense to what I say",
+  "Might struggle to remain productive and respectful" = "unwillingness-reason-I might struggle to remain productive and respectful",
+  "Others won't make effort to listen" = "unwillingness-reason-The others might not make a full effort to hear and understand me",
+  "Identity might be challenged" = "unwillingness-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
+  "Might feel invalidated" = "unwillingness-reason-I might feel disempowered, unheard, or invalidated",
+  "Might incur social reprecussions" = "unwillingness-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
+  "Opinion is unpopular in general" = "unwillingness-reason-My opinion is unpopular in general."
+)
+
+percent_concerned_df <- surveys_df %>%
+  filter(phase == "willingness-concerns-first-survey") %>%
+    # Keep only the columns needed
+    select(question, answer) %>%
+    # Group by the question text
+    group_by(question) %>%
+    # Summarize the data for each question
+    summarise(
+        # Calculate the count of "Yes" answers for this question
+        N_yes = sum(answer == "2", na.rm = TRUE),
+        # Calculate the percentage
+        percent_yes = (N_yes / n()) * 100,
+        .groups = 'drop' # Ungroup after summarizing
+    ) %>%
+    # Select and rename the final columns
+    select(
+        concern = question, 
+        percent_yes
+    ) %>%
+    # Format to 1 decimal place
+    mutate(
+        percent_yes = round(percent_yes, 1)
+    ) %>%
+    # Order the results from highest to lowest percentage
+    arrange(desc(percent_yes))
 
 ```
 
@@ -790,10 +890,6 @@ plot(openmindedness_likert, legend.position="right")
 
 ### Free response
 
-We conducted two primary analyses. First, we assessed whether our 19-item survey question accurately captures Americans' most pressing willingness concerns. Towards this end, we had CHAT-GPT 4o analyze the free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data. Specifically, we prompted CHAT-GPT to extract and list all distinct concerns mentioned across responses, to group similar concerns (e.g., “Fear of confrontation,” “Lack of trust in others,” “Feeling unqualified to speak,” etc.), and to accompany these groupings with summaries and representative examples. We also manually analyzed ten percent of the data to validate CHAT-GPT's assessment.
-
-*I need to run this*
-
 ```{r}
 #| label: Making free response csv for chat analysis 
 #| echo: false
@@ -812,9 +908,63 @@ write.csv(free_response_df, "pretest_free_response_data.csv", row.names = FALSE)
 ```
 
 ```{r}
+#| label: Df for 20 manually reviewed free responses 
+#| echo: false 
+
+# I used random.org to randomly select 20 numbers from 1 to 202, which will correspond to the row number in the free_response df
+
+# 1. 129 
+# 2. 179
+# 3. 164
+# 4. 199
+# 5. 184
+# 6. 116
+# 7. 160
+# 8. 38
+# 9. 60
+# 10. 76
+# 11. 165
+# 12. 1
+# 13. 83
+# 14. 106
+# 15. 70
+# 16. 33
+# 17. 15
+# 18. 46
+# 19. 82
+# 20. 81
+
+free_response_manual_df <- free_response_df %>%
+  filter(prolific_subject_id == "662938efd711c3639bd68aa3" |# 1. 129 
+           prolific_subject_id == "675de3bd64119cef93edfc75" |# 2. 179
+           prolific_subject_id == "672eda41e28ba46f845249df" |# 3. 164
+           prolific_subject_id == "65c10e1bba59f80070501946" |# 4. 199
+           prolific_subject_id == "64012a2623351894f2917605" |# 5. 184
+           prolific_subject_id == "667610590a062036fb381ccd" |# 6. 116
+           prolific_subject_id == "60712d937752fb8780e89951" |# 7. 160
+           prolific_subject_id == "6624638357b56eb340c8f109" |# 8. 38
+           prolific_subject_id == "660460162a2b3e5c554cf140" |# 9. 60
+           prolific_subject_id == "609f58e8af0f5f3acedd9806" |# 10. 76
+           prolific_subject_id == "646e4572cbed17f6bbacec12" |# 11. 165
+           prolific_subject_id == "5dd86784dcec8782b85cb5bb" |# 12. 1
+           prolific_subject_id == "66b979589d208d3ec691d89b" |# 13. 83
+           prolific_subject_id == "66961b0829c07b563688c86d" |# 14. 106
+           prolific_subject_id == "678ff81c8c6b56f93355e0bb" |# 15. 70
+           prolific_subject_id == "63671bfc81a5eca4218b6417" |# 16. 33
+           prolific_subject_id == "666efed91a31f3c82021f11d" |# 17. 15
+           prolific_subject_id == "67335e8a302aac96120cc104" |# 18. 46
+           prolific_subject_id == "671bf57baf2c2374636a8c4d" |# 19. 82
+           prolific_subject_id == "6724260700cede758eb0c062" # 20. 81
+           )
+
+```
+
+```{r}
 #| label: tbl-free-response-examples-table
 #| echo: false
 #| tbl-cap: Table showing examples of subjects' responses to free response question, which asked subjects "Think back to the last time you chose to not participate in a conversation about ${topic} or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns."
+
+# This table should show a couple very typical responses, which, based on LLM analysis, should probably be consistent with our nineteen items 
 
 # free_response_for_table <- free_response_df %>%
 #   filter(prolific_subject_id == [select people we want to show as examples]) %>%
@@ -827,6 +977,123 @@ write.csv(free_response_df, "pretest_free_response_data.csv", row.names = FALSE)
 #   column_spec(2, width = "5em") %>%
 #   column_spec(c(3,4,5,5), width = "40em")
 ```
+
+We conducted two primary analyses. First, we assessed whether our 19-item survey question accurately captures Americans' most pressing willingness concerns. Towards this end, we had LLMs analyze the free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data.
+
+Specifically, we fed the following prompt to ChatGPT5 and Gemini 2.5 Flash: "You are a research assistant analyzing qualitative data from a survey pretest about the reasons why Americans are unwilling to engage in conversations on controversial topics. The file pretest_free_response_data.csv contains participants’ open-ended responses to the following question: “Think back to the last time you chose to not participate in a conversation about \${topic} or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns.” Participants previously rated nineteen potential concerns, which were:
+
+\[1\] "unwillingness-reason-I could feel humiliated or embarrassed in the conversation" \[2\] "unwillingness-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)" \[3\] "unwillingness-reason-I don’t often participate in conversations like these" \[4\] "unwillingness-reason-I might feel disempowered, unheard, or invalidated" \[5\] "unwillingness-reason-I might struggle to explain my views to the others and/or come across as uninformed" \[6\] "unwillingness-reason-I might struggle to remain productive and respectful" \[7\] "unwillingness-reason-I might take offense to what someone says" \[8\] "unwillingness-reason-I would feel like my opinion is unpopular amongst the group." \[9\] "unwillingness-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)" \[10\] "unwillingness-reason-I would not want to listen to the others discuss their views" \[11\] "unwillingness-reason-It would be a waste of time because my views wouldn't change" \[12\] "unwillingness-reason-My opinion is unpopular in general." \[13\] "unwillingness-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am" \[14\] "unwillingness-reason-Someone could criticize or show disapproval of my views" \[15\] "unwillingness-reason-Someone might take offense to what I say" \[16\] "unwillingness-reason-The conversation could become awkward or tense" \[17\] "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)" \[18\] "unwillingness-reason-The conversation could negatively affect how I feel about the world during and/or afterward" \[19\] "unwillingness-reason-The others might not make a full effort to hear and understand me"
+
+Your goal is to identify new or distinct concerns that appear in these free responses that are not captured by the nineteen items.
+
+Please do the following: 1) Load and read the CSV file of free responses. Each row corresponds to one participant. 2) Analyze all responses to find recurring themes or concerns that are not already included in the existing nineteen. Do not just search for key words; you should manually review each free response. 3) For each new concern you identify, provide: A descriptive name for the concern. A brief summary of what it captures. 2–3 representative excerpts or paraphrased examples from participants’ responses (including the subject id).
+
+Optional: any relevant notes or nuances (e.g., emotional tone, context, overlaps with existing concerns).
+
+If no new concerns emerge, state that explicitly and explain why the responses align with existing categories."
+
+We also manually analyzed ten percent of the data to validate the LLMs' assessments.
+
+A total of six unique uncaptured concerns were identified by the LLMs. Gemini 2.5 Flash identified two uncaptured concerns: perceived lack of knowledge and lack of personal relevance. ChatGPT-5 identified five uncaptured concerns: professional consequences, public/permanent record and online exposure, context/setting constraints, lack of personal relevance, and low emotional/cognitive bandwith. These findings are consistent with the manual review that we performed on a random subset of 20 responses (\~10% of sample), in which potential missing items were professional consequences, perceived lack of knowledge, and additional emphasis on straining personal relationships.
+
+Concerningly, both Gemini and ChatGPT misreported many of the representative examples of the uncaptured concerns that it identified, citing participant IDs that did not exist or misquoting existing participants. When we sent follow-up questions and requests to amend these errors, both LLMs responded with more errors and no real examples. All but one of the six representative examples provided by Gemini did not exist. ChatGPT mostly failsified examples when discussing professional consequences and the public/permanent record concerns. Beacuse of this, we manually combed through subjects' free responses for key words related to the concerns identified by Gemini, as well as the professional consequences concern and the public/permanent record concern identified by ChatGPT. We found a handful of responses in support of the concerns identified by Gemini. We found some excerpts in support of the professional concerns identified by ChatGPT but only identified one excerpt in support of the public-permanent records concern. Hence, we will not consider the public/permanent record concern.
+
+```{r}
+#| label: tbl-knowledge-free-response
+#| echo: false
+#| fig-cap: Table of example free responses in which participants expressed avoidance of conversations because they felt that the topic was too complex or that they did not know enough about the topic to engage in a conversation about it.
+
+
+fr_knowledge <- free_response_df %>%
+  filter(prolific_subject_id == "67ac21373a76570ef0a5c0d3" | prolific_subject_id == "66b979589d208d3ec691d89b" | prolific_subject_id == "5d3695969749cc00165c222f") %>%
+  select("Free response", "Focus topic")
+
+kable(fr_knowledge, "html") %>%
+  kable_styling() %>%
+  column_spec(2, width = "5em")
+
+```
+
+Topic complexity/lack of knowledge: Gemini identified lack of knowledge as an uncaptured concern. These participants reported that they avoided conversations because they did not know enough about the topic to engage in a conversation about it. With items like "I might struggle to explain my views to the others and/or come across as uninformed," we sought to capture feelings of inadequacy or embarrassment that might result from a lack of knowledge and thus drive the fear of participating in the conversation. However, our nineteen items did not directly identify the pragmatic concern that the subject feels they do not know enough about the topic to have a productive conversation. We could capture this with something like "I would feel like the topic is too complex or requires more knowledge than I have."
+
+```{r}
+#| label: tbl-relevance-free-response
+#| echo: false
+#| fig-cap: Table of example free responses in which participants expressed avoidance of conversations because they felt that they did not know enough about the topic to engage in a productive conversation about it with people who hold differing opinions. 
+
+#6101d290cc9593237a346123
+
+fr_relevance <- free_response_df %>%
+  filter(prolific_subject_id == "5d3695969749cc00165c222f" | prolific_subject_id == "66293ab7b323f5f7ce785c38" | prolific_subject_id == "5b5a822e1ad8270001c4f28d") %>%
+  select("Free response", "Focus topic")
+
+kable(fr_relevance, "html") %>%
+  kable_styling() %>%
+  column_spec(2, width = "5em")
+
+```
+
+Perceived lack of relevance: Both Gemini and ChatGPT identified perceived lack of relevance as an uncaptured concern. These participants reported avoiding conversations because they felt that the topic was not personally relevant to them, that it was not their place to comment because they did not have first-hand experiences or were not affected by the topic, that they did not have anything to add to the conversation because the topic isn't relevant to them, or that they simply did not care enough or have strong enough opinions to engage. This is distinct from not participating because of fear or being uninformed — it’s a disinterest or intentional ethical boundary. I don't think this is the type of concern that we're necessarily looking to change through MOCA, so I'm not sure that it's relevant for our purposes; however, in the scope of trying to capture people's reasons for being unwilling, it is worth including items like: "I don't have first-hand experience with the topic and/or it isn't relevant to me" and "I don't care enough about the topic."
+
+```{r}
+#| label: tbl-prof-consequences-free-response
+#| echo: false
+#| fig-cap: Table of example free responses that were concerned with professional/workplace consequences that might follow from participating in a conversation about a controversial topic
+
+
+fr_prof <- free_response_df %>%
+  filter(prolific_subject_id == "55ecd6ff748092000daa9f5f" | prolific_subject_id == "5ac440da9534ba0001c736da" | prolific_subject_id == "63469e0a9552017beb3cfb82") %>%
+  select("Free response", "Focus topic")
+
+kable(fr_prof, "html") %>%
+  kable_styling() %>%
+  column_spec(2, width = "5em")
+
+```
+
+Professional consequences: According to ChatGPT, some participants reported avoiding conversations because they could have consequences in the workplace such as employment/HR problems, damaged professional standing, or workplace drama. We originally anticipated that workplace-related concerns would be captured by our social evaluation items; however, because the social risks in a workplace can engender consequences to one's livelihood/career that go beyond the typical repercussions in other social contexts, perhaps professional consequences should be a new item. This could be captured by an item like: "I could experience significant repercussions at work or in other spaces beyond my personal social network." \# potential items to add on:
+
+```{r}
+#| label: tbl-boundary-free-response
+#| echo: false
+#| fig-cap: Table of example free responses that were concerned with personal/family boundaries and the relational contexts of the conversation.
+
+
+fr_family <- free_response_df %>%
+  filter(prolific_subject_id == "63469e0a9552017beb3cfb82" | prolific_subject_id == "66c1c5cb4b460dacc8290b9e" | prolific_subject_id == "58fa3437f718c900016ea5e4") %>%
+  select("Free response", "Focus topic")
+
+kable(fr_family, "html") %>%
+  kable_styling() %>%
+  column_spec(2, width = "5em")
+
+```
+
+Context/setting constraints: ChatGPT reported that some participants identified situational appropriateness as the cause of their reluctance to engage. While situational willingness is indeed a very important addition to dispositional willingness in real-life contexts, we are not tackling situational awareness in this study. Also, it could be argued that situational willingness ultimately goes back to concerns such as straining relationships, not having a productive conversation, and other concerns that we have already included.
+
+```{r}
+#| label: tbl-bandwith-free-response
+#| echo: false
+#| fig-cap: Table of example free responses that were concerned with emotional and cognitive fatigue that might follow from participating in a conversation about a controversial topic
+
+
+fr_energy <- free_response_df %>%
+  filter(prolific_subject_id == "61074ae762b0186a302f1028" | prolific_subject_id == "6648becccd1bf5a6e253577b" | prolific_subject_id == "565bff58c121fe0005fc390d") %>%
+  select("Free response", "Focus topic")
+
+kable(fr_energy, "html") %>%
+  kable_styling() %>%
+  column_spec(2, width = "5em")
+
+```
+
+Emotional/cognitive bandwith: According to ChatGPT-5, many participants reported that it was not worth their energy to engage in these conversations. We originally excluded this concern because we anticipated that lacking the energy for these types of conversations and/or not wanting to expend energy on them is a product of the concerns that we included. For example, in the free response "It's not worth my energy to try to push my ideas or beliefs onto someone else. They will believe what they want," the participant does not want to expend energy because they don't think the others will listen to them. However, many of our nineteen items have the potential to be products of each other (e.g., "I might feel disempowered, unheard, or invalidated" and "The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)"), so the potential inter-relatedness of emotional/cognitive fatigue and our other reasons shouldn't prevent inclusion of this concern. Also, it is very possible that some participants who identify with the concern about emotional/cognitive energy might not identify with the related reasons that we have written, and thus we would not capture their concerns properly without including the energy concern itself. This concern could be captured by an item like "It wouldn't be worth the emotional and/or mental energy."
+
+Through manual review and searching for representative examples of the uncaptured concerns identified by the LLMs, it also became evident that hurting personal relationships, or upsetting people with whom the participant is close, is a large concern for many individuals. This concern was often discussed in a personal or intimate sense, distinguishing it from the more abstract or broad concept of social reprecussions. Because of this, perhaps we should have hurting personal relationships be separate from our item "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)." We could have one item be "I would not want to hurt my relationship(s) with others or upset them" and another be "I could incur social reprecussions (e.g., being excluded by others in the future, negative changes to my reputation, feeling ostracized)."
+
+Another reason for not engaging that many people expressed was that the conversation would be a waste of time because others' views wouldn't change. This could be considered a subset of the concern that the others wouldn't keep the conversation productive; however, perhaps it should be its own concern because so many people specifically phrased their thoughts in this way. This is probably also a concern that MOCA can't help with; however, for the sake of capturing people's reasons for unwillingness, perhaps it is worth including.
+
+A final item that we could consider adding is "I would be scared for my safety if I expressed my thoughts." This concern probably would not be chosen by many, if any, participants; however, if can be a real concern in various contexts and is a very significant reason for not engaging when it is a factor at play. This is also something that MOCA wouldn't be able to target, though.
 
 ```{r}
 #| label: tbl-free-response-tally-plot
@@ -876,7 +1143,7 @@ concerns_labeled_wide <- surveys_df_labeled_questions %>%
   pivot_wider(names_from = short_label, values_from = answer) %>%
   mutate(across(starts_with("Q0"), ~ as.numeric(as.character(.)))) %>%
   ungroup() %>%
-  mutate(across(everything(), ~ replace_na(.x, 1))) # making the concerns that participants weren't even worried about into a 1 so that they can be represented in the likert graph as "not at all"
+ mutate(across(everything(), ~ replace_na(.x, 1))) # making the concerns that participants weren't even worried about into a 1 so that they can be represented in the likert graph as "not at all"
 
 concerns_wide <- concerns_labeled_wide %>%
   select(-prolific_subject_id)
@@ -1087,10 +1354,14 @@ Other significant negative associations were observed for "Might offend someone"
 #| label: Cluster analysis
 #| echo: false
 
-# Scale data
-concerns_wide_scaled <- scale(concerns_wide)
+# fill in the not at alls
+concerns_wide <- concerns_wide %>%
+  mutate(across(everything(), ~ replace_na(.x, 1))) 
  
-# determine optimal number of clusters
+# scale 
+concerns_wide_scaled <- scale(concerns_wide) 
+
+# determine optimal number of clusters using wss 
 optimal_n_clusters <- fviz_nbclust(concerns_wide_scaled, kmeans, method = "wss")
 
 # K-means with k = 3 (example)
