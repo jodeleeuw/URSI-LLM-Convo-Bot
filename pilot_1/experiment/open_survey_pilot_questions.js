@@ -28,15 +28,15 @@ var open_survey_json = {
       columns: [
         {
           value: 1,
-          text: "Strongly uncomfortable",
+          text: "Strongly unwilling",
         },
         {
           value: 2,
-          text: "Moderately uncomfortable",
+          text: "Moderately unwilling",
         },
         {
           value: 3,
-          text: "A little uncomfortable",
+          text: "A little unwilling",
         },
         {
           value: 4,
@@ -44,15 +44,15 @@ var open_survey_json = {
         },
         {
           value: 5,
-          text: "A little comfortable",
+          text: "A little willing",
         },
         {
           value: 6,
-          text: "Moderately comfortable",
+          text: "Moderately willing",
         },
         {
           value: 7,
-          text: "Strongly comfortable",
+          text: "Strongly willing",
         },
       ],
       rows: [

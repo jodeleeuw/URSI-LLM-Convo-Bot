@@ -331,17 +331,13 @@ write.table(surveys_df, file = "pretest_survey_data.txt", sep = "\t", row.names 
 
 ## Introduction
 
-Existing literature indicates that a complex interplay of psychological factors—including fear of social isolation (Spiral of Silence; [@NoelleNeumann1974]; [@Chen2018]; [@Haug2025]), identity protection (Social Identity Theory; [@Tajfel1979]; [@Hunter1996]), communication anxiety (Communication Apprehension; [@Beatty1987]; [@Schulenberg2023]), and emotional dysregulation [@Masters2019; @Aldao2010]—converge with sociocultural influences like opinion climate [@Haug2025], misinformation [@Lewandowsky2017], and cognitive biases [@Kahneman2011] to deter open dialogue. Following from these ideas, researchers have suggested that people avoid controversial discussions primarily due to perceived threats to their social standing, personal identity, and emotional well-being [@Chen2018; @Tajfel1979]. This avoidance is thought to often be a coping mechanism, reinforced by group dynamics and the spread of misinformation [@Lewandowsky2017], ultimately hindering constructive discourse and critical thinking [@NoelleNeumann1974; @Haug2025]. Understanding this phenomenon is critical for fostering democratic citizenship, promoting critical thinking, and cultivating inclusive learning environments [@Duarte2015].
+Existing literature indicates that a complex interplay of psychological factors—including fear of social isolation (@NoelleNeumann1974; @Chen2018; @Haug2025), identity protection (@Tajfel1979; @Hunter1996), communication anxiety (@Beatty1987; @Schulenberg2023), and emotional dysregulation (@Masters2019; @Aldao2010)—converge with sociocultural influences to deter open dialogue (@Haug2025; @Kahneman2011; @Lewandowsky2017). This avoidance is a significant barrier to constructive discourse. Understanding this phenomenon is critical for fostering democratic citizenship and cultivating inclusive learning environments.
 
-These problems can be combated on systemic and individual levels. Previous research indicates that interventions on the individual level can include reducing communication apprehension [@Beatty1987; @Schulenberg2023], providing tools for difficult conversations, and building skills such as emotional regulation [@Gross1998], respectful dissent [@Rehg2022], sensitivity towards others [@Decety2006], and open-minded perspective-taking [@Galinsky2008]. In a future experiment, we will be focusing on the individual level through one-on-one human-chatbot conversations. These conversations are about controversial topics with strong moral components, which are thought to evoke many of the factors that play into individual unwillingness to converse [@Aldao2010; @Tajfel1979]. By curating a space where users are led to cultivate and practice the individual-level interventions which should increase users’ competencies in navigating difficult conversations, we hope to increase users’ willingness to participate in these difficult conversations. Before we can perform this intervention, though, we need to properly measure individuals' reasons for not engaging in these conversations about controversial topics. Towards this end, we designed a 19-item questionnaire that seeks to capture the primary concerns that contribute to an individual's reluctance to engage in conversations on controversial topics. In this survey pretest, we will assess whether our questionnaire succeeds in this endeavor.
+We are developing an individual-level intervention to help increase Americans' willingness to engage in conversations on divisive topics. To properly measure the barriers to engagement and assess the effectiveness of our intervention, we first designed a 19-item questionnaire to capture the core concerns that contribute to an individual's reluctance to engage in conversations on controversial topics. This pretest study aims to assess the effectiveness of this 19-item questionnaire through addressing two primary preregistered research questions:
 
-### Limitations
+Comprehensiveness: Do the 19 items in our questionnaire capture the primary concerns that contribute to Americans' unwillingness to engage in productive, open-minded discussions about divisive topics?
 
-The literature clearly indicates that while individual skills like emotional regulation [@Gross1998], communication competence [@Spitzberg1983], and conflict management [@Rahim2011] are vital for engaging in difficult conversations, their effective application is deeply intertwined with the social environment [@Edmondson1999; @Newman2017]. Thus, by not directly intervening on the systemic level, which includes aspects such as creating a psychologically safe environment [@Edmondson1999], challenging negative norms, and promoting inclusivity [@Carmeli2010], we are missing pieces of the puzzle that significantly influence individual willingness, especially “psychological safety.”
-
-Psychological safety—the belief that one can speak openly and truthfully about problems without fear of reprisal—is built upon three core pillars: care, consistency, and normalizing mistakes [@Newman2017]. Psychological safety is suggested to largely relate to group culture and norms in a conversation [@Edmondson2014]. Through developing greater abilities to navigate difficult conversations, users of our intervention may influence future group climates, which, in turn, could contribute to each member’s sense of psychological safety [@Carmeli2010]. This idea goes hand in hand with the finding that widespread individual avoidance can contribute to the formation of a silent, unsupportive opinion climate [@NoelleNeumann1974; @Chen2018]. However, the literature suggests that psychological safety is largely curated through systemic changes, especially for creating an environment where people from marginalized communities can experience the same sense of psychological safety as conventionally celebrated voices [@Edmondson2014; @Roberts2022]. Future research could explore applications of chatbots for systemic interventions.
-
-Our primary goal, though, is to focus on the direct effects of individual interventions. By focusing solely on the individual level, perhaps users will grow in their abilities to navigate these difficult conversations even in spaces with poor group cultures or norms.
+Structure: Are there any distinct, underlying factors that organize these 19 concerns?
 
 ## Methods
 
@@ -350,10 +346,6 @@ Our primary goal, though, is to focus on the direct effects of individual interv
 We used custom software written with the jsPsych framework (@jspsychcite) to create the study, which participants viewed and responded to via their personal laptops or desktops. The javascript code for the experiment and RStudio code for data analysis can both be found at (<https://github.com/jodeleeuw/URSI-LLM-Convo-Bot/tree/main/pilot_1).> Pre-registrations and all data for this study and previous pilots are available on the Open Science Framework at <https://osf.io/x32pv.>
 
 ### Participants and Procedure
-
-Through Prolific, we gathered data from `r total_num_subjects_in_data` subjects. To remain consistent with the demographic that our main experiment will target, we restricted our study to Prolific users who currently reside in the states, fluently speak English, and reported the United States as their nationality and country of birth. Per Prolific's harmful content criteria, we also restricted our study to participants who have consented to participating in studies with harmful content. Participants received a compensation of one dollar and fifty cents. We excluded data from `r total_failed_attention_checks` subjects for failing our attention check question. After applying this exclusion criteria, `r total_num_clean_subjects_in_data` subjects remain.
-
-Upon agreeing to participate in this experiment, participants were brought to the experiment webpage where they were asked to complete our questionnaire. The questionnaire was composed of questions to ascertain which of our six topics the participant was most unwilling to discuss, the participant's topic-specific open-mindedness, the participant's willingness to converse with others about the topic, and the concerns that negatively impact the user's willingness. After completing the questionnaire, participants were sent back to Prolific.
 
 ```{r}
 #| label: Find time taken specifically on the surveys (by subject and overall)
@@ -484,51 +476,17 @@ as_gt(demographics_table)
 
 ```
 
-### Survey design
+Through Prolific, we initially gathered data from `r total_num_subjects_in_data` subjects. Participants were restricted to U.S. residents who fluently speak English. We excluded data from `r total_failed_attention_checks` subjects for failing the attention check question. The final cleaned sample consisted of `r total_num_clean_subjects_in_data` subjects. Participants completed the questionnaire in an average of `r mean_survey_time` minutes (Range: `r min_survey_time` – `r max_survey_time`).
 
-#### Supporting Literature
-
-We developed our willingness questions based on existing literature about the concerns reasons that contribute to a person's unwillingness to participate in conversations, especially conversations about divisive topics.
-
-Elisabeth Noelle-Neumann’s Spiral of Silence theory, developed in the 1960s and ’70s, offers a foundational understanding of how individuals’ willingness to express opinions on controversial public issues is influenced by their perception of those opinions as popular or unpopular [@NoelleNeumann1974; @metaSpiralSilence]. This theory suggests that the prevailing opinion held by the majority in a specific social setting, such as a classroom or public forum, profoundly influences an individual’s willingness to participate in discussions. If one’s view is perceived as opposed to the majority, individuals are less likely to express it, a phenomenon directly linked to the Spiral of Silence [@metaSpiralSilence; @ExpSpiralSilence]. Individual psychological factors, such as communication apprehension and fear of conflict, are not isolated but are significantly influenced by the prevailing opinion climate.
-
-The theory’s key elements revolve around a fundamental human apprehension: the fear of social isolation, which is triggered by the belief that others will consider the individual not merely mistaken, but morally deficient [@ExpSpiralSilence; @metaSpiralSilence]. Individuals thus tend to refrain from publicly stating their views on controversial matters when they perceive that doing so would attract criticism, scorn, laughter, or other signs of disapproval.
-
-The Social Identity Theory (SIT) suggests that when controversial issues are discussed, individuals may experience “identity threat” if their ideas and feelings about these issues are deeply connected to their identity or in-group, such as their race [@Tajfel1979; @Hunter1996]. Identity threat is defined as “experiences appraised as indicating potential harm to the value, meanings, or enactment of an identity” (in e.g. [@Steele1997]).
-
-The accentuation of differences between in-groups and out-groups, coupled with the desire for positive distinctiveness, can intensify intergroup hostility and conflict, especially when competition or perceived threats exist [@Tajfel1979; @Turner1987]. This can lead to negative perceptions of out-groups, even bordering on dehumanization, where fewer human attributes are ascribed to the “other” [@Haslam2006; @Fiske2002], and beliefs that opponents are “wicked and untrustworthy”—making constructive dialogue exceedingly difficult, as the “other” is seen as an adversary rather than a conversational partner.
-
-This strong in-group cohesion, while providing social support and validation, can paradoxically foster communication siloing. SIT highlights that people identify with in-groups to enhance their self-esteem and perceive their in-group favorably. This desire for “positive distinctiveness” motivates them to accentuate differences with out-groups. When controversial topics arise, challenging an in-group’s perspective can be perceived as an “identity threat,” leading to defensive behaviors like derogating or distancing from out-group views. This process also contributes to “group polarization,” where discussions with like-minded peers strengthen original beliefs and lead to more extreme stances [@Sunstein2009; @Moscovici1976].
-
-Communication Apprehension (CA) is a broad term referring to an individual’s “fear or anxiety associated with either real or anticipated communication with another person or persons” [@McCroskey1977; @Beatty1987]. It is thought to be a fundamental psychological response to evaluation. Research indicates that approximately 70 % of individuals in the U.S. experience CA when giving a speech, with 20 % having severe CA that leads to avoidance of oral communication in personal, public, and professional settings [@McCroskey1977; @Eilert2025]. A significant driver of communication avoidance is the fear of conflict. People often avoid communication when it is likely to lead to an unpleasant outcome, such as offending someone or entering into conflict. This avoidance is primarily driven by a desire to minimize perceived threats to self-esteem and well-being, including the fear of rejection, disapproval, criticism, humiliation, or loss of security [@Beatty1987; @Eilert2025].
-
-CA suggests that the fear of conflict can lead people to systematically avoid “zero-sum situations”—where one party’s gains are offset by another’s losses—even when such avoidance is costly. This belief can erode interpersonal trust and increase hostility. Moreover, avoiding necessary difficult conversations leads to “conflict debt,” which breeds resentment and allows unaddressed concerns to escalate into crises.
-
-Individuals with high CA experience significant fear and anxiety when faced with communication. This internal discomfort, along with a fear of negative outcomes like conflict or rejection, leads them to actively avoid communication. This avoidance, while providing immediate relief from anxiety, prevents the individual from experiencing that the feared outcomes might not occur or that they can cope with the anxiety. This creates a negative reinforcement loop: avoidance reduces immediate discomfort, but simultaneously strengthens the underlying fear and the avoidance habit, making it harder to engage in future difficult conversations.
-
-The concepts of emotional avoidance, emotional dysregulation, and affective forecasting reveal that avoidance is not just about external threats, but also an internal struggle. Emotional avoidance refers to the deliberate effort to suppress, ignore, or distract oneself from experiencing unpleasant feelings such as fear, sadness, anger, or vulnerability. Common tactics include denial, suppression, distraction, busyness, and steering clear of situations, people, or places that might evoke uncomfortable emotions.
-
-Emotional dysregulation (ED) is defined as the inability to regulate the intensity and quality of emotions to generate an appropriate emotional response. Emotional regulation strategies involve the ability to recognize, evaluate, modify, and manage emotions in a personal and socially acceptable way to maintain mental control over strong feelings and achieve adaptive functioning [@Gross1998; @Aldao2010]. A meta-analysis recently found maladaptive emotion regulation to be strongly associated with internalizing symptoms, aggression, and poorer social functioning [@SalazarKampf2023].
-
-Affective forecasting, or hedonic forecasting, is the prediction of how one will feel in the future. Research consistently demonstrates that people are poor predictors of their future well-being. They tend to overestimate the impact and duration of negative emotions in response to loss or difficult situations [@Wilson2000; @Levine2012; @Liu2022]. This inaccuracy occurs because individuals often focus more on what they will lose than on what will stay the same (focalism), fail to envision how their own coping skills will lessen their unhappiness (immune neglect), and fail to envision how they might develop new values (adaptation) [@Wilson2000; @Levine2012].
-
-Thus, avoidance is also an internal struggle to manage uncomfortable feelings and a flawed prediction of future emotional states, making the perceived "cost" of engagement seem higher than it might be.
-
-If a significant portion of a population struggles with emotional regulation and relies on avoidance as a primary coping mechanism for unpleasant feelings, this has implications beyond individual mental health. When collective emotional dysregulation is widespread, it can hinder a society's capacity for constructive dialogue on complex, emotionally charged issues. Individuals less equipped to handle the inherent discomfort of disagreement may resort to withdrawal, aggression, or rigid adherence to existing beliefs, rather than engaging in nuanced discussion. This suggests that the inability to manage emotions constructively during controversial discussions can lead to societal fragmentation, increased polarization, and a diminished capacity to find common ground or collectively problem-solve issues that require navigating diverse, often conflicting, emotional responses.
-
-Based on this existing research, we developed a Likert-scale questionnaire which lists 19 concerns that might contribute to users' unwillingness to engage in a conversation about a topic that they are unwilling to discuss with others. We also created two questions which ask users to rate, on a scale from 0 to 100, their willingness to "have a conversation with someone who strongly disagrees with \[them\] about \[conversation topic\]" and "to have a conversation with someone who would push against \[their\] views about \[conversation topic\]," where a score of 0 is complete unwillingness, a score of 50 is neutral, and a score of 100 is absolute willingness to converse.
-
-In our full-scale experiment, we intend to administer this questionnaire both before and after our intervention to assess which concerns, if any, our intervention can mitigate. To ensure that this survey captures all of the primary reasons that contribute to unwillingness and can be targeted on the individual level, this pretest study administered the questionnaire once and with a free-response question at the end: "Think back to the last time you chose to not participate in a conversation about \${topic} or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns."
+Participants were first asked to rate their comfort level with 10 controversial topics. The topic that they were least willing to discuss was selected as their focus topic for the remainder of the survey. The full questionnaire included self-reported willingness to converse (via two slider questions from 0-100), self-reported open-mindedness (a 5-item Likert scale from 1-7), the 19-item concern inventory (a Likert scale from 1-7, along with an initial binary "Yes/No" endorsement). The session concluded with a free-response question about participants' reasons for reluctance, which we will assess for any uncaptured reasons.
 
 ## Results
 
-### Topic choice
-
-On average, participants completed the questionnaire in `r mean_survey_time` minutes (`r min_survey_time`, `r max_survey_time`).
+### Basic results
 
 ```{r}
 #| label: fig-topic-ratings
-#| echo: false
+#| include: false
 #| fig-cap: In the pre-intervention survey, each subject used a 7-pt scale to rate how comfortable they would be discussing each of the following topics. One of the subject's most strongly rated topics were randomly selected as the topic that the subject would focus on for the remainder of the experiment. The scale went from strongly uncomfortable (1), to moderately uncomfortable, a little uncomfortable, neutral (4), a little comfortable, moderately comfortable, and strongly comfortable (7).
 
 # create figure/table showing distribution of ratings on topics
@@ -540,7 +498,7 @@ topic_ratings_df <- surveys_df %>%
 
 topic_labels <- c( 
   "mandating vaccines in the U.S." = 
-    "Mandating vaccines",
+    "Vaccine Mandates",
   "human euthanasia in the U.S." = 
     "Human euthanasia",
   "deportation policies for undocumented immigrants in the U.S." = 
@@ -559,6 +517,30 @@ topic_labels <- c(
     "U.S. in Israeli-Palestinian conflict",
   "police conduct and accountability in the U.S." =
     "Police conduct and accountability"
+)
+
+
+really_short_topic_labels <- c( 
+  "mandating vaccines in the U.S." = 
+    "Vaccines",
+  "human euthanasia in the U.S." = 
+    "Euthanasia",
+  "deportation policies for undocumented immigrants in the U.S." = 
+    "Deportation",
+  "transgender athletes in U.S. sports" = 
+    "Trans athletes",
+  "the role of the U.S. government in healthcare" = 
+    "Healthcare",
+  "U.S. public policy on climate change" = 
+    "Climate change",
+  "the use of A.I. in traditionally human-run spaces (e.g., medicine, art, driving)" = 
+    "A.I.",
+  "the role of capitalism in the U.S. economy" = 
+    "Capitalism",
+  "the role of the U.S. in the Israeli-Palestinian conflict" = 
+    "Israel-Palestine",
+  "police conduct and accountability in the U.S." =
+    "Police"
 )
 
 topic_ratings_plot <- ggplot(topic_ratings_df, aes(x = answer, y = question, fill = question)) +
@@ -580,13 +562,16 @@ print(topic_ratings_plot)
 ```{r}
 #| label: fig-topic-ratings-only-chosen-topics
 #| echo: false
-#| fig-cap: In the pre-intervention survey, each subject used a 7-pt scale to rate how comfortable they would be discussing each of the following topics. One of the subject's most strongly rated topics were randomly selected as the topic that the subject would focus on for the remainder of the experiment. The scale went from strongly uncomfortable (1), to moderately uncomfortable, a little uncomfortable, neutral (4), a little comfortable, moderately comfortable, and strongly comfortable (7).
+#| fig-cap: In the pre-intervention survey, each participant used a 7-pt scale (where 1 = Strongly uncomfortable and 7 = Strongly comfortable) to rate how willing they would be to discuss each of the ten divisive topics. For the remainder of the survey, participants were asked questions about the topic that they rated themselves as least willing to discuss. 
 
 # create figure/table showing distribution of ratings on chosen topics only
 
 topic_choice_rating <- topic_ratings_df %>%
   group_by(prolific_subject_id) %>%
-  filter(question == topicChoiceAsString)
+  filter(question == topicChoiceAsString) %>%
+   mutate(topicChoiceAsString = factor(topicChoiceAsString, 
+                                     levels = names(sort(table(topicChoiceAsString), decreasing = TRUE))))
+
 
 topic_choice_ratings_plot <- ggplot(topic_choice_rating, aes(x = answer, y = question, fill = question)) +
   geom_density_ridges(bandwidth = 0.931) + # using the bandwidth that it automatically picks 
@@ -604,12 +589,38 @@ topic_choice_ratings_plot <- ggplot(topic_choice_rating, aes(x = answer, y = que
 print(topic_choice_ratings_plot)
 ```
 
-Figure \@ref(fig: fig-topic-ratings) indicates that, on average, subjects appeared to show a little to moderate willingness to discuss our ten controversial topics, though subjects exhibited some additional discomfort towards the topics of transgender athletes in sports and the U.S. in the Israeli-Palestinian conflict. We had intended to select topics that participants were generally less comfortable discussing than indicated by these results, as we want to understand why Americans are unwilling to discuss the topics that they are a little to strongly unwilling to discuss. However, Figure \@ref(fig: fig-topic-ratings-only-chosen-topics) indicates that, on average for most of our topics, participants were indeed a little to strongly unwilling to discuss their topic choice. Only three of the seven topics---climate change policy, A.I. in human-run spaces, and government in healthcare---still garnered many participants who were more willing than we had intended. It seems participants were a little to strongly willing to discuss many of the ten topics, but, for each participant, there tended to be at least one topic that the participant was a little to strongly unwilling to discuss.
+```{r}
+#| label: Looking at high willingness topics more 
+#| echo: false
+
+# I want to see the percent of people who selected climate change policy, A.I. in human-run spaces, and government in healthcare with a rating of 5 or higher
+
+topics_rating_high_will_df <- topic_ratings_df %>%
+  filter(topicChoiceAsString == "U.S. public policy on climate change" | topicChoiceAsString == "human euthanasia in the U.S." | topicChoiceAsString == "the use of A.I. in traditionally human-run spaces (e.g., medicine, art, driving)") %>%
+  filter(question == topicChoiceAsString) 
+
+
+count_AI <- nrow(filter(topics_rating_high_will_df, topicChoiceAsString == "the use of A.I. in traditionally human-run spaces (e.g., medicine, art, driving)"))
+count_climate_change <- nrow(filter(topics_rating_high_will_df, topicChoiceAsString == "U.S. public policy on climate change"))
+count_euthanasia <- nrow(filter(topics_rating_high_will_df, topicChoiceAsString == "human euthanasia in the U.S."))
+
+count_AI_high_willing <- nrow(filter(topics_rating_high_will_df, topicChoiceAsString == "the use of A.I. in traditionally human-run spaces (e.g., medicine, art, driving)" & answer %in% c(5, 6, 7)))
+count_climate_change_high_willing <- nrow(filter(topics_rating_high_will_df, topicChoiceAsString == "U.S. public policy on climate change" & answer %in% c(5, 6, 7)))
+count_euthanasia_high_willing <- nrow(filter(topics_rating_high_will_df, topicChoiceAsString == "human euthanasia in the U.S." & answer %in% c(5, 6, 7)))
+
+percent_highly_willing_ai= count_AI_high_willing/count_AI
+  
+percent_highly_willing_climate_change = count_climate_change_high_willing/count_climate_change
+
+percent_highly_willing_euthanasia = count_euthanasia_high_willing/count_euthanasia
+
+
+```
 
 ```{r}
 #| label: fig-bar-chart-topic-choice
-#| echo: false 
-#| fig-cap: Bar chart showing the number of participants in each topic
+#| include: false 
+#| fig-cap: Bar chart showing the number of participants in each topic.
 
 topic_votes_plot <- ggplot(topic_choice_rating, aes(x = answer, fill = topicChoiceAsString)) + 
   geom_bar() + 
@@ -619,11 +630,30 @@ topic_votes_plot <- ggplot(topic_choice_rating, aes(x = answer, fill = topicChoi
 topic_votes_plot
 ```
 
-### Average willingness
+```{r}
+#| label: fig-bar-topic-counts
+#| echo: false 
+#| fig-cap: Bar plot showing the number of participants in each topic.
+
+topic_hist <- ggplot(topic_choice_rating, aes(x = topicChoiceAsString)) + 
+  geom_bar() + 
+  xlab("Focus topic") +
+  scale_x_discrete(labels = really_short_topic_labels) +
+  ylab("Number of participants") #+ 
+  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+topic_hist
+```
+
+Our topic assignment method successfully generated a sample for whom engagement with their focus topic was a genuine concern. As shown in Figure \@ref(fig: fig-topic-ratings-only-chosen-topics), the distribution of comfort ratings for the chosen topics was generally skewed below the neutral point of 4, validating the selection mechanism. Three of the ten topics---climate change policy, A.I. in human-run spaces, and government in healthcare---garnered many participants who were more willing than we had intended; however, these topics were also less popular (Figure \@ref(fig: fig-bar-topic-counts).
+
+Specifically, `r count_climate_change_high_willing` participants were least willing to discuss climate change policies but still rated themselves as slightly to strongly comfortable discussing the topic, `r count_euthanasia_high_willing` participants were least willing to discuss human euthanasia but still rated themselves as slightly to strongly comfortable discussing the topic, and `r count_AI_high_willing` participants were least willing to discuss A.I. in human-run spaces but still rated themselves as slightly to strongly comfortable discussing the topic. Overall, most participants focused on a topic that they were slightly to strongly uncomfortable discussing.
+
+As shown in Figure \@ref(fig: fig-bar-topic-counts), the majority of participants were least willing to discuss the role of the U.S. in the Israeli-Palestinian conflict, human euthanasia, and transgender athletes in sports.
 
 ```{r}
 #| label: fig-avg-willingness-by-topic
-#| echo: false
+#| include: false # this is such a fugly graph
 #| fig-cap: Ridgeline plot of willingness to engage in conversation about topic by topic. Participants only rated their willingness for their topic choice. Participants' willingness values were calculated through averaging the responses to the questions, "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about [topic], where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral," and "Using the slider, please rate your willingness to have a conversation with someone who strongly disagrees with you about [topic], where a score of 0 is absolute unwillingness to converse and 100 is absolute willingness to converse. A score of 50 is neutral."
 
 #make avg willingness df by taking mean of both slides for each participant 
@@ -633,6 +663,11 @@ avg_willingness_df <- surveys_df %>%
   group_by(prolific_subject_id, topicChoiceAsString) %>%
   summarise(avg_willingness = mean(as.numeric(answer), na.rm = TRUE)) %>%
   ungroup()
+
+#merge back with surveys_df in case i want all info in one spot in the future 
+surveys_df <- avg_willingness_df %>%
+  select(-topicChoiceAsString) %>%
+  full_join(surveys_df, by = "prolific_subject_id")
 
 topic_choice_ratings_plot <- ggplot(avg_willingness_df, aes(x = avg_willingness, y = topicChoiceAsString, fill = topicChoiceAsString)) +
   geom_density_ridges(bandwidth = 0.931) + # using the bandwidth that it automatically picks 
@@ -655,7 +690,6 @@ topic_choice_ratings_plot
 #| echo: false
 #| fig-cap: Distribution of average willingness ratings by topic from 0 (completely unwilling) to 100 (completely willing), where 50 is neutral.
 
-
 avg_willingness_box_plot <- ggplot(avg_willingness_df, aes(x = avg_willingness, y = as.factor(topicChoiceAsString), fill = as.factor(topicChoiceAsString))) +
   geom_boxplot() + 
   labs(title = "Boxplots of Willingness to Engage by Topic",
@@ -667,10 +701,13 @@ avg_willingness_box_plot
 
 ```
 
+Separately from assigning focus topics, we asked participants to rate their willingness to discuss their focus topic with someone who strongly disagrees with them and with someone who would push back against their views. Participants used a slider ranging from 0 (absolute unwillingness) to 100 (absolute willingness) to respond, and we averaged the two responses to find participants' average willingness. This assessment was quite similar to that of the topic selection question; however, we asked these questions separately to ensure quality of data (should probably expand on what I mean by quality data) and to use alternative phrasing that emphasized the potential divisiveness of the discussion.
+
+Participants' average willingness, shown in Figure \@ref(fig:fig-box-plot-willingness), was widely spread with a notable density of participants reporting scores at or above the neutral point of 50. This is an unexpected contrast from participants' responses in the earlier Likert-scale question; we had anticipated that the Likert-scale indicator of willingness and the average willingness seen here would indicate similar overall trends.
+
 ```{r}
 #| label: Diff btwn two avg willingness questions 
 #| echo: false 
-
 
 will_df <- surveys_df %>%
   filter(question == "slider1-placeholder" | question == "slider2-placeholder") %>%
@@ -681,69 +718,15 @@ will_df <- surveys_df %>%
   mutate(
     diff_willingness = as.numeric(`slider1-placeholder`) - as.numeric(`slider2-placeholder`)
   ) %>%
-  select(prolific_subject_id, topicChoiceAsString, diff_willingness)
+  select(prolific_subject_id, diff_willingness)
 
 # there are some p big differences for a handful of people, so it's good that we have both questions
 
 ```
 
-### Willingness concerns
-
-```{r}
-#| label: fig-unwillingness-reason-likert-bar-plot
-#| echo: false
-#| fig-cap: Likert bar plot displaying subjects' ratings of how much certain concerns contribute to their unwillingness to converse. The nineteen potential concerns were derived from existing literature and pretested in a pilot experiment. On a scale from 0 to 7, where a rating of 0 meant participant's willingness is not at all impacted by the concern and a rating of 7 meant participant's willingness is strongly impacted by the concern, participants rated the potential concerns' effects on their willingness to converse.
-
-# only works though if all "1" to "7" ratings are in the df
-
-wide_unwill_reasons_df_1 <- surveys_df %>%
-  filter(grepl("unwillingness-reason", question)) %>%
-  filter(phase == "follow-up-unwillingness-concerns-survey") %>%
-  select(question, answer, prolific_subject_id) %>%
-  group_by(prolific_subject_id) %>%
-  mutate(answer = as.numeric(answer)) %>%
-  pivot_wider(id_cols = prolific_subject_id, names_from = question, values_from = answer) %>%
-  ungroup() %>%
-  rename("Might experience negative feelings about self" = "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)", "Might be offended" = "unwillingness-reason-I might take offense to what someone says",
-  "Opinion is unpopular amongst group" = "unwillingness-reason-I would feel like my opinion is unpopular amongst the group.",
-  "Doesn't participate in these conversations often" = "unwillingness-reason-I don’t often participate in conversations like these",
-  "Might struggle to explain views or seem uninformed" = "unwillingness-reason-I might struggle to explain my views to the others and/or come across as uninformed",
-  "Others might be unproductive or disrespectful" = "unwillingness-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
-  "Views wouldn't change" = "unwillingness-reason-It would be a waste of time because my views wouldn't change",
-  "Doesn't want to listen to others" = "unwillingness-reason-I would not want to listen to the others discuss their views",
-  "Might be criticized" = "unwillingness-reason-Someone could criticize or show disapproval of my views",
-  "Experience negative feelings about the world" = "unwillingness-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
-  "Conversation might be awkward or tense" = "unwillingness-reason-The conversation could become awkward or tense",
-  "Might feel embarrassed" = "unwillingness-reason-I could feel humiliated or embarrassed in the conversation",
-  "Might offend someone" = "unwillingness-reason-Someone might take offense to what I say",
-  "Might struggle to remain productive and respectful" = "unwillingness-reason-I might struggle to remain productive and respectful",
-  "Others won't make effort to listen" = "unwillingness-reason-The others might not make a full effort to hear and understand me",
-  "Identity might be challenged" = "unwillingness-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
-  "Might feel invalidated" = "unwillingness-reason-I might feel disempowered, unheard, or invalidated",
-  "Might incur social reprecussions" = "unwillingness-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
-  "Opinion is unpopular in general" = "unwillingness-reason-My opinion is unpopular in general."
-) %>%
-  mutate(across(everything(), ~ replace_na(.x, 1))) # making the concerns that participants weren't even worried about into a 1 so that they can be represented in the likert graph as "not at all"
-
-
-wide_unwill_reasons_df_2 <- wide_unwill_reasons_df_1 %>%
-  select(-prolific_subject_id) %>%
-  mutate(across(everything(), ~ factor(.x, levels = 1:7,
-     labels = c("Not at all", "Slightly", "Somewhat",
-                "Moderately", "Quite a bit", "Very much", "Extremely"),
-     ordered = TRUE))) 
-
-unwillingness_reason_likert <- likert(as.data.frame(wide_unwill_reasons_df_2))
-
-# for the future when comparing pre and post, might want to use this example line: df1_likert <- likert(items=df1[,3:4], grouping=df1[,2])
-
-plot(unwillingness_reason_likert, legend.position="right")
-
-```
-
 ```{r}
 #| label: fig-sliders-density
-#| echo: false
+#| include: false
 #| fig-cap: Density plot displaying subjects' self-reported willingness to converse about their topic with somebody who disagrees with them and/or will challenge their views. Subjects used a scale from 0 to 100, where a rating of 0 meant subject was absolutely unwilling and a rating of 100 meant subject was absolutely willing. Subjects were asked this question in two ways; this density plot shows the mean of the two ratings. 
 
 sliders_df <- surveys_df %>%
@@ -762,7 +745,7 @@ print(sliders_density)
 ```
 
 ```{r}
-#| label: Basic info abt concerns
+#| label: Most frequently endorsed concerns 
 #| echo: false
 
 concern_map <- c("Might experience negative feelings about self" = "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)", "Might be offended" = "unwillingness-reason-I might take offense to what someone says",
@@ -811,13 +794,58 @@ percent_concerned_df <- surveys_df %>%
     # Order the results from highest to lowest percentage
     arrange(desc(percent_yes))
 
+
+# select the top 5 most frequently endorsed 
+top_5_concerns <- percent_concerned_df %>%
+  slice(1:5) %>%
+  mutate(across(everything(), ~ gsub('unwillingness-reason-', '', .))) %>%
+ pull(concern)  
+
 ```
 
-### Open-mindedness
+```{r}
+#| label: Most severely impacting willingness concerns 
+#| echo: false
+
+percent_severe_df <- surveys_df %>%
+  filter(phase == "follow-up-unwillingness-concerns-survey") %>%
+    # Keep only the columns needed
+    select(question, answer) %>%
+    # Group by the question text
+    group_by(question) %>%
+    mutate(across(everything(), ~ replace_na(.x, 1))) %>% # making the concerns that participants weren't even worried about into a 1 so they can be represented properly 
+    # Summarize the data for each question
+    summarise(
+        # Calculate the count of "Yes" answers for this question
+        N_severe = sum(answer == "7" | answer == "6", na.rm = TRUE),
+        # Calculate the percentage
+        percent_severe = (N_severe / n()) * 100,
+        .groups = 'drop' # Ungroup after summarizing
+    ) %>%
+    # Select and rename the final columns
+    select(
+        concern = question, 
+        percent_severe
+    ) %>%
+    # Format to 1 decimal place
+    mutate(
+        percent_severe = round(percent_severe, 1)
+    ) %>%
+    # Order the results from highest to lowest percentage
+    arrange(desc(percent_severe))
+
+
+# select the top 5 most frequently endorsed 
+top_5_severe <- percent_severe_df %>%
+  slice(1:5) %>%
+  mutate(across(everything(), ~ gsub('unwillingness-reason-', '', .))) %>%
+ pull(concern)  
+
+```
 
 ```{r}
 #| label: fig-openmindedness-density
-#| echo: false
+#| include: false
 #| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of subjects' open-mindedness when discussing their topic. Subjects rated their open-mindedness on a scale from 0 to 7, where a rating of 0 meant subject was not open-minded and a rating of 7 meant subject was open-minded.
 
 openmindedness_df <- surveys_df %>%
@@ -888,7 +916,7 @@ openmindedness_likert <- likert(as.data.frame(wide_for_likert_openmindedness_df)
 plot(openmindedness_likert, legend.position="right")
 ```
 
-### Free response
+Subjects generally rated their open-mindedness quite high, as observed in Figure @ref(fig-openmindedness-likert-bar-plot).
 
 ```{r}
 #| label: Making free response csv for chat analysis 
@@ -962,45 +990,31 @@ free_response_manual_df <- free_response_df %>%
 ```{r}
 #| label: tbl-free-response-examples-table
 #| echo: false
-#| tbl-cap: Table showing examples of subjects' responses to free response question, which asked subjects "Think back to the last time you chose to not participate in a conversation about ${topic} or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns."
+#| tbl-cap: Table showing examples of uncaptured concerns in subjects' responses to free response question, which asked subjects "Think back to the last time you chose to not participate in a conversation about [topic] or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns."
 
 # This table should show a couple very typical responses, which, based on LLM analysis, should probably be consistent with our nineteen items 
 
-# free_response_for_table <- free_response_df %>%
-#   filter(prolific_subject_id == [select people we want to show as examples]) %>%
-#   select("Free response", "Focus topic")
+free_response_for_table <- free_response_df %>%
+   filter(prolific_subject_id == "5d3695969749cc00165c222f"
+          | prolific_subject_id == "66293ab7b323f5f7ce785c38"
+          | prolific_subject_id == "60712d937752fb8780e89951"
+          | prolific_subject_id == "61074ae762b0186a302f1028"
+          | prolific_subject_id == "565bff58c121fe0005fc390d"
+          | prolific_subject_id == "666efed91a31f3c82021f11d") %>%
+   select("Free response", "Focus topic")
 
-#kable(free_response_for_table, "html")
-
-# %>%
-#   kable_styling() %>%
-#   column_spec(2, width = "5em") %>%
-#   column_spec(c(3,4,5,5), width = "40em")
+kable(free_response_for_table, "html") %>%
+  kable_styling() %>%
+  column_spec(2, width = "5em")
 ```
 
-We conducted two primary analyses. First, we assessed whether our 19-item survey question accurately captures Americans' most pressing willingness concerns. Towards this end, we had LLMs analyze the free-response data to determine whether users felt that there were concerns contributing to their unwillingness other than the 19 items that we provided and whether any of these additional concerns were common in the data.
+### Comprehensiveness of Concerns
 
-Specifically, we fed the following prompt to ChatGPT5 and Gemini 2.5 Flash: "You are a research assistant analyzing qualitative data from a survey pretest about the reasons why Americans are unwilling to engage in conversations on controversial topics. The file pretest_free_response_data.csv contains participants’ open-ended responses to the following question: “Think back to the last time you chose to not participate in a conversation about \${topic} or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns.” Participants previously rated nineteen potential concerns, which were:
-
-\[1\] "unwillingness-reason-I could feel humiliated or embarrassed in the conversation" \[2\] "unwillingness-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)" \[3\] "unwillingness-reason-I don’t often participate in conversations like these" \[4\] "unwillingness-reason-I might feel disempowered, unheard, or invalidated" \[5\] "unwillingness-reason-I might struggle to explain my views to the others and/or come across as uninformed" \[6\] "unwillingness-reason-I might struggle to remain productive and respectful" \[7\] "unwillingness-reason-I might take offense to what someone says" \[8\] "unwillingness-reason-I would feel like my opinion is unpopular amongst the group." \[9\] "unwillingness-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)" \[10\] "unwillingness-reason-I would not want to listen to the others discuss their views" \[11\] "unwillingness-reason-It would be a waste of time because my views wouldn't change" \[12\] "unwillingness-reason-My opinion is unpopular in general." \[13\] "unwillingness-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am" \[14\] "unwillingness-reason-Someone could criticize or show disapproval of my views" \[15\] "unwillingness-reason-Someone might take offense to what I say" \[16\] "unwillingness-reason-The conversation could become awkward or tense" \[17\] "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)" \[18\] "unwillingness-reason-The conversation could negatively affect how I feel about the world during and/or afterward" \[19\] "unwillingness-reason-The others might not make a full effort to hear and understand me"
-
-Your goal is to identify new or distinct concerns that appear in these free responses that are not captured by the nineteen items.
-
-Please do the following: 1) Load and read the CSV file of free responses. Each row corresponds to one participant. 2) Analyze all responses to find recurring themes or concerns that are not already included in the existing nineteen. Do not just search for key words; you should manually review each free response. 3) For each new concern you identify, provide: A descriptive name for the concern. A brief summary of what it captures. 2–3 representative excerpts or paraphrased examples from participants’ responses (including the subject id).
-
-Optional: any relevant notes or nuances (e.g., emotional tone, context, overlaps with existing concerns).
-
-If no new concerns emerge, state that explicitly and explain why the responses align with existing categories."
-
-We also manually analyzed ten percent of the data to validate the LLMs' assessments.
-
-A total of six unique uncaptured concerns were identified by the LLMs. Gemini 2.5 Flash identified two uncaptured concerns: perceived lack of knowledge and lack of personal relevance. ChatGPT-5 identified five uncaptured concerns: professional consequences, public/permanent record and online exposure, context/setting constraints, lack of personal relevance, and low emotional/cognitive bandwith. These findings are consistent with the manual review that we performed on a random subset of 20 responses (\~10% of sample), in which potential missing items were professional consequences, perceived lack of knowledge, and additional emphasis on straining personal relationships.
-
-Concerningly, both Gemini and ChatGPT misreported many of the representative examples of the uncaptured concerns that it identified, citing participant IDs that did not exist or misquoting existing participants. When we sent follow-up questions and requests to amend these errors, both LLMs responded with more errors and no real examples. All but one of the six representative examples provided by Gemini did not exist. ChatGPT mostly failsified examples when discussing professional consequences and the public/permanent record concerns. Beacuse of this, we manually combed through subjects' free responses for key words related to the concerns identified by Gemini, as well as the professional consequences concern and the public/permanent record concern identified by ChatGPT. We found a handful of responses in support of the concerns identified by Gemini. We found some excerpts in support of the professional concerns identified by ChatGPT but only identified one excerpt in support of the public-permanent records concern. Hence, we will not consider the public/permanent record concern.
+To assess the comprehensiveness of the inventory, we analyzed the free-response data using LLMs with manual review on 10% of the sample for validation. We found that topic complexity/lack of knowledge, perceived lack of relevance, professional consequences, and emotional/cognitive bandwidth were not captured by our nineteen items. Additionally, we found that while the concerns that others' views wouldn't change or that personal relationships might get damaged were both nested within our items, their prevalence among the data may warrant us turning these concerns into their own items.
 
 ```{r}
-#| label: tbl-knowledge-free-response
-#| echo: false
+#| label: tbl-free-response
+#| include: false
 #| fig-cap: Table of example free responses in which participants expressed avoidance of conversations because they felt that the topic was too complex or that they did not know enough about the topic to engage in a conversation about it.
 
 
@@ -1014,11 +1028,11 @@ kable(fr_knowledge, "html") %>%
 
 ```
 
-Topic complexity/lack of knowledge: Gemini identified lack of knowledge as an uncaptured concern. These participants reported that they avoided conversations because they did not know enough about the topic to engage in a conversation about it. With items like "I might struggle to explain my views to the others and/or come across as uninformed," we sought to capture feelings of inadequacy or embarrassment that might result from a lack of knowledge and thus drive the fear of participating in the conversation. However, our nineteen items did not directly identify the pragmatic concern that the subject feels they do not know enough about the topic to have a productive conversation. We could capture this with something like "I would feel like the topic is too complex or requires more knowledge than I have."
+Topic complexity/lack of knowledge: These participants reported that they avoided conversations because they did not know enough about the topic to engage in a conversation about it. We have items that can capture fear or embarrassment about appearing to be uninformed, but not the pragmatic concern that an individual does not know enough. We plan to capture this with the new item: "I would feel like the topic is too complex or requires more knowledge than I have."
 
 ```{r}
 #| label: tbl-relevance-free-response
-#| echo: false
+#| include: false
 #| fig-cap: Table of example free responses in which participants expressed avoidance of conversations because they felt that they did not know enough about the topic to engage in a productive conversation about it with people who hold differing opinions. 
 
 #6101d290cc9593237a346123
@@ -1033,11 +1047,11 @@ kable(fr_relevance, "html") %>%
 
 ```
 
-Perceived lack of relevance: Both Gemini and ChatGPT identified perceived lack of relevance as an uncaptured concern. These participants reported avoiding conversations because they felt that the topic was not personally relevant to them, that it was not their place to comment because they did not have first-hand experiences or were not affected by the topic, that they did not have anything to add to the conversation because the topic isn't relevant to them, or that they simply did not care enough or have strong enough opinions to engage. This is distinct from not participating because of fear or being uninformed — it’s a disinterest or intentional ethical boundary. I don't think this is the type of concern that we're necessarily looking to change through MOCA, so I'm not sure that it's relevant for our purposes; however, in the scope of trying to capture people's reasons for being unwilling, it is worth including items like: "I don't have first-hand experience with the topic and/or it isn't relevant to me" and "I don't care enough about the topic."
+Perceived lack of relevance: Some participants reported avoiding conversations because they felt that the topic was not personally relevant to them or that it was not their place to comment because they did not have first-hand experiences or were not affected by the topic. We do not have items that capture disinterest or an intentional ethical boundary, so we plan to capture this new area with the item: "I don't have first-hand experience with the topic and/or it isn't relevant to me."
 
 ```{r}
 #| label: tbl-prof-consequences-free-response
-#| echo: false
+#| include: false
 #| fig-cap: Table of example free responses that were concerned with professional/workplace consequences that might follow from participating in a conversation about a controversial topic
 
 
@@ -1051,29 +1065,11 @@ kable(fr_prof, "html") %>%
 
 ```
 
-Professional consequences: According to ChatGPT, some participants reported avoiding conversations because they could have consequences in the workplace such as employment/HR problems, damaged professional standing, or workplace drama. We originally anticipated that workplace-related concerns would be captured by our social evaluation items; however, because the social risks in a workplace can engender consequences to one's livelihood/career that go beyond the typical repercussions in other social contexts, perhaps professional consequences should be a new item. This could be captured by an item like: "I could experience significant repercussions at work or in other spaces beyond my personal social network." \# potential items to add on:
-
-```{r}
-#| label: tbl-boundary-free-response
-#| echo: false
-#| fig-cap: Table of example free responses that were concerned with personal/family boundaries and the relational contexts of the conversation.
-
-
-fr_family <- free_response_df %>%
-  filter(prolific_subject_id == "63469e0a9552017beb3cfb82" | prolific_subject_id == "66c1c5cb4b460dacc8290b9e" | prolific_subject_id == "58fa3437f718c900016ea5e4") %>%
-  select("Free response", "Focus topic")
-
-kable(fr_family, "html") %>%
-  kable_styling() %>%
-  column_spec(2, width = "5em")
-
-```
-
-Context/setting constraints: ChatGPT reported that some participants identified situational appropriateness as the cause of their reluctance to engage. While situational willingness is indeed a very important addition to dispositional willingness in real-life contexts, we are not tackling situational awareness in this study. Also, it could be argued that situational willingness ultimately goes back to concerns such as straining relationships, not having a productive conversation, and other concerns that we have already included.
+Professional consequences: Some participants reported avoiding conversations because they could have consequences in the workplace such as employment/HR problems, damaged professional standing, or workplace drama. We originally anticipated that workplace-related concerns would be captured by our social evaluation items; however, it is clear that consequences in the workplace can extend beyond the typical repercussions in other social contexts. We plan to capture this concern with the item: "I could experience significant repercussions at work or in other spaces beyond my personal social network."
 
 ```{r}
 #| label: tbl-bandwith-free-response
-#| echo: false
+#| include: false
 #| fig-cap: Table of example free responses that were concerned with emotional and cognitive fatigue that might follow from participating in a conversation about a controversial topic
 
 
@@ -1087,37 +1083,65 @@ kable(fr_energy, "html") %>%
 
 ```
 
-Emotional/cognitive bandwith: According to ChatGPT-5, many participants reported that it was not worth their energy to engage in these conversations. We originally excluded this concern because we anticipated that lacking the energy for these types of conversations and/or not wanting to expend energy on them is a product of the concerns that we included. For example, in the free response "It's not worth my energy to try to push my ideas or beliefs onto someone else. They will believe what they want," the participant does not want to expend energy because they don't think the others will listen to them. However, many of our nineteen items have the potential to be products of each other (e.g., "I might feel disempowered, unheard, or invalidated" and "The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)"), so the potential inter-relatedness of emotional/cognitive fatigue and our other reasons shouldn't prevent inclusion of this concern. Also, it is very possible that some participants who identify with the concern about emotional/cognitive energy might not identify with the related reasons that we have written, and thus we would not capture their concerns properly without including the energy concern itself. This concern could be captured by an item like "It wouldn't be worth the emotional and/or mental energy."
+Emotional/cognitive bandwith: Many participants reported that it was not worth their energy to engage in these conversations. We originally excluded this concern because we anticipated that not wanting to expend energy is a product of other concerns that we may be able to more adequately target with our future intervention. However, the prevalence of this concern warrants its own item. We plan to capture this with the item: "It wouldn't be worth the emotional and/or mental energy."
 
-Through manual review and searching for representative examples of the uncaptured concerns identified by the LLMs, it also became evident that hurting personal relationships, or upsetting people with whom the participant is close, is a large concern for many individuals. This concern was often discussed in a personal or intimate sense, distinguishing it from the more abstract or broad concept of social reprecussions. Because of this, perhaps we should have hurting personal relationships be separate from our item "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)." We could have one item be "I would not want to hurt my relationship(s) with others or upset them" and another be "I could incur social reprecussions (e.g., being excluded by others in the future, negative changes to my reputation, feeling ostracized)."
+Others' views not changing: Some participants expressed that the conversation would be a waste of time because others' views wouldn't change. We have items about productivity, but this concern seems to be a more specific and commonly anticipated reason for why a conversation may be unproductive, so it may be worth turning this concern into its own item. We plan to capture it with the item: "It would be a waste of time because the others' views wouldn't change."
 
-Another reason for not engaging that many people expressed was that the conversation would be a waste of time because others' views wouldn't change. This could be considered a subset of the concern that the others wouldn't keep the conversation productive; however, perhaps it should be its own concern because so many people specifically phrased their thoughts in this way. This is probably also a concern that MOCA can't help with; however, for the sake of capturing people's reasons for unwillingness, perhaps it is worth including.
+Additionally, while we nested the concern about damaging personal relationships within an item about social repercussions, this concern was often discussed in a personal or intimate sense, distinguishing it from the more abstract or broad concept of social repercussions. Because of this, we plan to separate damaging personal relationships from our item about social repercussions. We will have one item be "I would not want to hurt my relationship(s) with others or upset them" and another be "I could incur social repercussions (e.g., being excluded by others in the future, negative changes to my reputation, feeling ostracized)."
 
-A final item that we could consider adding is "I would be scared for my safety if I expressed my thoughts." This concern probably would not be chosen by many, if any, participants; however, if can be a real concern in various contexts and is a very significant reason for not engaging when it is a factor at play. This is also something that MOCA wouldn't be able to target, though.
+In sum, we plan to add six news items to our questionnaire: "I would feel like the topic is too complex or requires more knowledge than I have," "I don't have first-hand experience with the topic and/or it isn't relevant to me," "I could experience significant repercussions at work or in other spaces beyond my personal social network," "It wouldn't be worth the emotional and/or mental energy," "I would not want to hurt my relationship(s) with others or upset them", "I could incur social repercussions (e.g., being excluded by others in the future, negative changes to my reputation, feeling ostracized)."
 
 ```{r}
-#| label: tbl-free-response-tally-plot
+#| label: fig-unwillingness-reason-likert-bar-plot
 #| echo: false
-#| tbl-cap: Table showing subjects' responses to free response question. [insert the question here for real data analysis]
+#| fig-cap: Likert bar plot displaying subjects' ratings of how much certain concerns contribute to their unwillingness to converse. The nineteen potential concerns were derived from existing literature and pretested in a pilot experiment. On a scale from 0 to 7, where a rating of 0 meant participant's willingness is not at all impacted by the concern and a rating of 7 meant participant's willingness is strongly impacted by the concern, participants rated the potential concerns' effects on their willingness to converse.
 
-# CHANGE THIS CODE AS NEEDED BASED ON HOW THE DF IS STRUCTURED 
+# only works though if all "1" to "7" ratings are in the df
 
-### NEED TO CREATE A DF WITH ADDITIONAL REASONS FOUND IN THE FREE RESPONSE BEFORE I CAN DO THIS
-# 
-# free_response_bar_plot <- ggplot(INSERT_DF_NAME_HERE, aes(x = count, y = reorder(statement, count))) +
-#   geom_col(fill = "cornflowerblue") +
-#   labs(
-#     x = "Number of Participants",
-#     y = NULL,
-#     title = "Number of Participants Endorsing Each Statement"
-#   ) +
-#   theme_minimal(base_size = 13)
-# 
-# print(free_response_bar_plot)
+wide_unwill_reasons_df_1 <- surveys_df %>%
+  filter(grepl("unwillingness-reason", question)) %>%
+  filter(phase == "follow-up-unwillingness-concerns-survey") %>%
+  select(question, answer, prolific_subject_id) %>%
+  group_by(prolific_subject_id) %>%
+  mutate(answer = as.numeric(answer)) %>%
+  pivot_wider(id_cols = prolific_subject_id, names_from = question, values_from = answer) %>%
+  ungroup() %>%
+  rename("Might experience negative feelings about self" = "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)", "Might be offended" = "unwillingness-reason-I might take offense to what someone says",
+  "Opinion is unpopular amongst group" = "unwillingness-reason-I would feel like my opinion is unpopular amongst the group.",
+  "Doesn't participate in these conversations often" = "unwillingness-reason-I don’t often participate in conversations like these",
+  "Might struggle to explain views or seem uninformed" = "unwillingness-reason-I might struggle to explain my views to the others and/or come across as uninformed",
+  "Others might be unproductive or disrespectful" = "unwillingness-reason-I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)",
+  "Views wouldn't change" = "unwillingness-reason-It would be a waste of time because my views wouldn't change",
+  "Doesn't want to listen to others" = "unwillingness-reason-I would not want to listen to the others discuss their views",
+  "Might be criticized" = "unwillingness-reason-Someone could criticize or show disapproval of my views",
+  "Experience negative feelings about the world" = "unwillingness-reason-The conversation could negatively affect how I feel about the world during and/or afterward",
+  "Conversation might be awkward or tense" = "unwillingness-reason-The conversation could become awkward or tense",
+  "Might feel embarrassed" = "unwillingness-reason-I could feel humiliated or embarrassed in the conversation",
+  "Might offend someone" = "unwillingness-reason-Someone might take offense to what I say",
+  "Might struggle to remain productive and respectful" = "unwillingness-reason-I might struggle to remain productive and respectful",
+  "Others won't make effort to listen" = "unwillingness-reason-The others might not make a full effort to hear and understand me",
+  "Identity might be challenged" = "unwillingness-reason-Someone could challenge ideas or beliefs that play an important role in making me who I am",
+  "Might feel invalidated" = "unwillingness-reason-I might feel disempowered, unheard, or invalidated",
+  "Might incur social reprecussions" = "unwillingness-reason-I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)",
+  "Opinion is unpopular in general" = "unwillingness-reason-My opinion is unpopular in general."
+) %>%
+  mutate(across(everything(), ~ replace_na(.x, 1))) # making the concerns that participants weren't even worried about into a 1 so that they can be represented in the likert graph as "not at all"
+
+
+wide_unwill_reasons_df_2 <- wide_unwill_reasons_df_1 %>%
+  select(-prolific_subject_id) %>%
+  mutate(across(everything(), ~ factor(.x, levels = 1:7,
+     labels = c("Not at all", "Slightly", "Somewhat",
+                "Moderately", "Quite a bit", "Very much", "Extremely"),
+     ordered = TRUE))) 
+
+unwillingness_reason_likert <- likert(as.data.frame(wide_unwill_reasons_df_2))
+
+# for the future when comparing pre and post, might want to use this example line: df1_likert <- likert(items=df1[,3:4], grouping=df1[,2])
+
+suppressWarnings(plot(unwillingness_reason_likert, legend.position="right"))
 
 ```
-
-### Factor analysis
 
 ```{r}
 #| label: Wrangle data for factor analysis
@@ -1133,20 +1157,29 @@ question_key_for_fa <- surveys_df %>%
   mutate(short_label = paste0("Q0", row_number()))
 
 # join short labels back to the main data
-surveys_df_labeled_questions <- surveys_df %>%
+surveys_df <- surveys_df %>%
   filter(phase == "follow-up-unwillingness-concerns-survey") %>%
-  left_join(question_key_for_fa, by = "question") %>%
-  select(prolific_subject_id, question, short_label, answer)
+  full_join(question_key_for_fa, by = "question") 
 
-concerns_labeled_wide <- surveys_df_labeled_questions %>%
+concerns_labeled_wide <- surveys_df %>%
   select(prolific_subject_id, short_label, answer) %>%
   pivot_wider(names_from = short_label, values_from = answer) %>%
   mutate(across(starts_with("Q0"), ~ as.numeric(as.character(.)))) %>%
-  ungroup() %>%
- mutate(across(everything(), ~ replace_na(.x, 1))) # making the concerns that participants weren't even worried about into a 1 so that they can be represented in the likert graph as "not at all"
+  ungroup() 
+
+concerns_labeled_wide_na_replaced <- concerns_labeled_wide %>%
+   mutate(across(everything(), ~ replace_na(.x, 1))) # making the concerns that participants weren't even worried about into a 1 so that they can be represented in the likert graph as "not at all"
+
+concerns_wide_na_replaced <- concerns_labeled_wide_na_replaced %>%
+  select(-prolific_subject_id)
 
 concerns_wide <- concerns_labeled_wide %>%
   select(-prolific_subject_id)
+
+row_na_counts <- rowSums(is.na(concerns_labeled_wide))
+total_na <- sum(row_na_counts)
+avg_na_per_row <- mean(row_na_counts)
+
 ```
 
 ```{r}
@@ -1154,7 +1187,7 @@ concerns_wide <- concerns_labeled_wide %>%
 #| echo: false
 #| tbl-cap: Correlation matrix of reasons for unwillingness
 
-cor_matrix <- cor(concerns_wide, use = "pairwise.complete.obs")
+cor_matrix <- cor(concerns_wide_na_replaced, use = "pairwise.complete.obs")
 
 library(corrplot)
 corrplot <- corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
@@ -1167,15 +1200,15 @@ corrplot <- corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
 #| include: false 
 
 # KMO and Bartlett’s test
-kmo <- KMO(concerns_wide)
-cortest_bartlett <- cortest.bartlett(cor(concerns_wide), n = nrow(concerns_wide))
+kmo <- KMO(concerns_wide_na_replaced)
+cortest_bartlett <- cortest.bartlett(cor(concerns_wide_na_replaced), n = nrow(concerns_wide_na_replaced))
 
 #kmo is above 0.8 so our data is well-suited for factor analysis!  
 
 #cortest_bartlett shows that the p-value is VERY small, so correlations are statistically significant 
 
 #check internal consistency
-rit.vals <- alpha(concerns_wide)
+rit.vals <- alpha(concerns_wide_na_replaced)
 
 #raw alpha is 0.88 which is pretty good 
 #all the r.cor values are pretty good 
@@ -1189,14 +1222,14 @@ rit.vals <- alpha(concerns_wide)
 #| include: false
 
 # determine number of factors with parallel analysis. this will output a suggested number of factors and a scree plot 
-fa_parallel_results <- fa.parallel(concerns_wide, fa = "fa")
+fa_parallel_results <- fa.parallel(concerns_wide_na_replaced, fa = "fa")
 
 # the results of parallel analysis suggest 3 factors 
 
 # run factor analysis with 3 factors 
 ## we use oblimin because the factors are probably correlated 
 fa_result <- fa(
-    concerns_wide,
+    concerns_wide_na_replaced,
     nfactors = 3,
     rotate = "oblimin"
     )
@@ -1264,68 +1297,209 @@ print(fa_heat_map)
 
 ```
 
-```{r}
-#| label: Interpreting the factors
-#| echo: false 
+### Factor Analysis on Concerns
 
+We examined the initial binary endorsement ratings of our nineteen items where each participant simply indicated whether an item concerned them at all, as well as the Likert-scale ratings of how much each of the endorsed items impact the participant's willingness. The top five most frequently endorsed concerns (answered "Yes") were: `r paste0(shQuote(top_5_concerns[1:5]), collapse=", ")`. The top five concerns most severely impacting willingness were `r paste0(shQuote(top_5_severe[1:5]), collapse=", ")`. The full distribution of severity ratings can be observed in Figure \@ref(fig:fig-unwillingness-reason-likert-bar-plot).
 
-```
+We conducted an exploratory factor analysis (EFA) on the 19 concern items using oblimin rotation to identify latent factors that could reflect correlated concerns. Parallel analysis suggested a three-factor solution, which accounted for `r total_var_explained_percent`% of the total variance. The factors were moderately correlated ($r$ = `r cor_min`–`r cor_max`) as shown in Figure \@ref(fig:tbl-correlation-matrix). Many cross-loadings were present, suggesting some conceptual overlap among factors. We retained all nineteen items to allow full examination of the emerging structure.
 
-We conducted an exploratory factor analysis on the 19 items using oblimin rotation to explore potential latent factors reflecting correlated concerns. This analysis yielded a three-factor solution explaining `r total_var_explained_percent`% of the total variance. The factors were moderately correlated (r = `r cor_min`–`r cor_max`) as shown in Figure \@ref(fig:tbl-correlation-matrix). Items tended to load cleanly on one factor, though several cross-loadings were present, suggesting some conceptual overlap among factors. Because the analysis was exploratory, all items were retained to allow full examination of the emerging structure.
+We interpret the the three factors, which are visualized in Figure @ref(fig:tbl-fa-heat-map-df), as:
 
-The first factor seems to reflect emotional vulnerability or threat to self-concept. This factor consists of: "I might take offense to what someone says," "Someone could challenge ideas or beliefs that play an important role in making me who I am," "I might feel disempowered, unheard, or invalidated," "The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)," "Someone could criticize or show disapproval of my views," and "The conversation could negatively affect how I feel about the world during and/or afterward."
+Emotional Vulnerability/Identity Threat (Factor 1): This first factor consists of items focusing on internal psychological distress and threats to the participant's self-concept or core beliefs. The items in this factor are: "I might take offense to what someone says," "Someone could challenge ideas or beliefs that play an important role in making me who I am," "I might feel disempowered, unheard, or invalidated," "The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)," "Someone could criticize or show disapproval of my views," and "The conversation could negatively affect how I feel about the world during and/or afterward."
 
-The second factor appears to capture concerns about conversational efficacy and engagement. The focus here is on whether the conversation will be respectful, worthwhile, or productive. This factor consists of: "I might struggle to remain productive and respectful," "I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)", "I would not want to listen to the others discuss their views", and "It would be a waste of time because my views wouldn't change."
+Conversational Efficacy/Unproductive Process (Factor 2): This factor captures concerns about the quality, utility, and worth of the interaction. The focus here is on whether the conversation will be respectful, worthwhile, or productive. This factor consists of: "I might struggle to remain productive and respectful," "I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)", "I would not want to listen to the others discuss their views", and "It would be a waste of time because my views wouldn't change."
 
-The third factor seems to represent social evaluation or social risk concerns. It emphasizes concern about how others perceive the participants, including fear of embarrassment, judgment, or negative social consequences. This factor consists of: "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)", "I would feel like my opinion is unpopular amongst the group," "I could feel humiliated or embarrassed in the conversation," "I might struggle to explain my views to the others and/or come across as uninformed," "My opinion is unpopular in general."
+Social Evaluation/Reputation Risk (Factor 3): This factor emphasizes fear of external perception and broader social consequences. It emphasizes concern about how others perceive the participants, including fear of embarrassment, judgment, or negative social consequences. This factor consists of: "I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)", "I would feel like my opinion is unpopular amongst the group," "I could feel humiliated or embarrassed in the conversation," "I might struggle to explain my views to the others and/or come across as uninformed," "My opinion is unpopular in general."
 
-Four items did not load above 0.32 on any factor in the 3-factor solution nor in an additional exploratory 4-factor solution. These items were: "Someone might take offense to what I say," "The conversation could become awkward or tense," "The others might not make a full effort to hear and understand me," and "I don’t often participate in conversations like these". It would be expected that these items represent idiosyncratic concerns or situational/contextual items that don't fit neatly into emotional vulnerability, process, or social evaluation; however, these items seem as though they would fit within the social evaluation factor.
+Four items did not load above 0.32 on any factor in the 3-factor solution nor in an additional exploratory 4-factor solution. These items were: "Someone might take offense to what I say," "The conversation could become awkward or tense," "The others might not make a full effort to hear and understand me," and "I don’t often participate in conversations like these". It would be expected that these items represent idiosyncratic concerns or situational/contextual items that don't fit neatly into emotional vulnerability, process, or social evaluation; however, these items seem as though they would fit within the social evaluation factor \[not sure what to make of this...\].
 
 It is also interesting that factors 1 and 3 are distinct from each other, as most of the items within these factors seem as though they could very well be interchangeable in the factors. For example, "I could feel humiliated or embarrassed in the conversation" fell within factor 3 with a loading of `r loadings_df$MR3[loadings_df$short_label == "Q01"]`, but conceptually could very well fit within the emotional vulnerability concepts of factor 1 even though it had a loading within factor 1 of `r loadings_df$MR1[loadings_df$short_label == "Q01"]`.
 
 ### Correlations
 
 ```{r}
-#| label: Correlations open-mindedness average vs. willingness concerns 
+#| label: Function for printing correlation results
+#| echo: false
+
+print_significant_correlations <- function(df) {
+  formatted_items <- df %>%
+    filter(significance != "ns") %>%
+    mutate(
+      formatted = paste0(
+       '"', question, '"',
+        " ($r$ = ", estimate_rounded,
+        ", $p$ = ", significance, ")"
+      )
+    ) %>%
+    pull(formatted)
+  
+  n <- length(formatted_items)
+  
+  if (n == 0) {
+    return("No significant correlations found.")
+  } else if (n == 1) {
+    return(formatted_items)
+  } else if (n == 2) {
+    return(paste(formatted_items, collapse = " and "))
+  } else {
+    return(paste(
+      paste(formatted_items[-n], collapse = ", "),
+      "and", formatted_items[n]
+    ))
+  }
+}
+
+
+```
+
+```{r}
+#| label: fig-EDA-correlation-openminded-relationships 
+#| echo: false 
+#| fig-cap: Relationships between each willingness concern and average open-mindedness. Using a 7-pt Likert-scale, participants rated the impact of each willingness concern on their overall willingness. Also using a 7-pt Likert-scale, participants rated 5 statements about their open-mindedness, which we averaged to find each participant's average open-mindedness.  
+
+library(gridExtra) # so we can print the plots in columns 
+
+cor_openmindedness_mean_vs_concerns <- concerns_wide_na_replaced %>% map_dfr(~ tidy(cor.test(.x, openmindedness_df_mean$mean_openmindedness)), .id = "concern")
+
+concerns_and_avg_openmindedness_df <- openmindedness_df_mean %>%
+  select(mean_openmindedness, prolific_subject_id) %>%
+  full_join(concerns_labeled_wide_na_replaced, by = "prolific_subject_id") %>%
+  select(-"prolific_subject_id")
+
+# see the average number of concerns that people indicated as affecting them 
+
+# Create all the individual plots
+p1.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q01, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p2.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q02, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p3.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q03, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p4.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q04, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p5.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q05, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p6.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q06, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p7.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q07, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p8.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q08, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p9.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q09, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p10.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q010, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p11.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q011, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p12.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q012, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p13.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q013, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p14.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q014, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p15.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q015, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p16.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q016, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p17.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q017, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p18.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q018, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p19.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q019, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+
+# arrange the plots in a grid
+suppressWarnings(grid.arrange(p1.o, p2.o, p3.o, p4.o, p5.o, p6.o, p7.o, p8.o, p9.o, p10.o, p11.o, p12.o, p13.o, p14.o, p15.o, p16.o, p17.o, p18.o, p19.o, ncol = 2))
+
+
+### the results seem to pretty much show no relationship, but if you squint your eyes, there is vaguely a linear relationship in some of the variables. i'm going to stick with pearson because, to my knowledge, the data doesn't meet the standards for any non-parametric methods 
+
+```
+
+```{r}
+#| label: Correlations open-mindedness average vs. willingness concerns (NA is not replaced)
 #| echo: false
 #| tbl-cap: Correlation matrix of average open-mindedness vs. willingness concerns 
 
 # look at correlation relationship between mean open-mindedness score and each willingness concern
 library(broom)
 
-cor_openmindedness_mean_vs_concerns <- concerns_wide %>% map_dfr(~ tidy(cor.test(.x, openmindedness_df_mean$mean_openmindedness)), .id = "concern")
+cor_openmindedness_mean_vs_concerns <- concerns_wide_na_replaced %>% map_dfr(~ tidy(cor.test(.x, openmindedness_df_mean$mean_openmindedness)), .id = "concern")
 
 # view results
 cor_openmindedness_mean_vs_concerns_simplified <- cor_openmindedness_mean_vs_concerns %>%
   select(concern, estimate, p.value) %>%
-  arrange(p.value)
-
-# extract the relevant correlations and p-values
-q05_r <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q05") |> pull(estimate)
-q05_p <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q05") |> pull(p.value)
-
-q06_r <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q06") |> pull(estimate)
-q06_p <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q06") |> pull(p.value)
-
-q016_r <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q016") |> pull(estimate)
-q016_p <- cor_openmindedness_mean_vs_concerns |> filter(concern == "Q016") |> pull(p.value)
+  arrange(p.value) %>% 
+  full_join(question_key_for_fa, by = c("concern" = "short_label"))
 ```
 
-A correlation matrix of average open-mindedness vs. each willingness concern found statistically significant relationships between three concerns and average open-mindedness. These concerns were "I might struggle to explain my views to the others and/or come across as uninformed" (*r* = `r round(q06_r, 3)`, *p* = `r signif(q06_p, 3)`), "I might struggle to remain productive and respectful" (*r* = `r round(q05_r, 3)`, *p* = `r signif(q05_p, 3)`), and "The conversation could become awkward or tense" (*r* = `r round(q016_r, 3)`, *p* = `r signif(q016_p, 3)`). These three concerns showed inverse associations with open-mindedness, meaning people with higher open-mindedness scores tended to express less concern for those specific items. This is very interesting but I'm not sure what to draw from it.
+```{r}
+#| label: Correlations open-mindedness average vs. willingness concerns NA replaced
+#| echo: false
+
+
+# using the df that replaced empty entries with "not at all" because this is conceptually correct
+cor_openmindedness_mean_vs_concerns_na_replaced <- concerns_wide_na_replaced %>% map_dfr(~ tidy(cor.test(.x, openmindedness_df_mean$mean_openmindedness)), .id = "concern") 
+
+# view results
+cor_openmindedness_mean_vs_concerns_simplified_na_replaced <- cor_openmindedness_mean_vs_concerns_na_replaced %>% 
+    mutate(
+    significance = case_when(
+      p.value < 0.001 ~ "< 0.001",
+      p.value < 0.01  ~ "< 0.01",
+      p.value < 0.05  ~ "< 0.05",
+      TRUE            ~ "ns"  # not significant
+    ),
+    direction = if_else(estimate < 0, "negative", "positive"),
+    estimate_rounded = round(estimate, 3),
+    pvalue_rounded = signif(p.value, 3)
+  ) %>%
+  select(concern, estimate_rounded, pvalue_rounded, direction, significance) %>%
+  full_join(question_key_for_fa, by = c("concern" = "short_label")) %>%
+    mutate(across(everything(), ~ gsub('unwillingness-reason-', '', .))) 
+
+```
+
+Accounting for the concerns that participants did not endorse as "not at all" impacting participants' willingness, we found correlations between most willingness concerns and average open-mindedness. These relationships suggests that, for most willingness concerns, a greater impact of the concern on an American's willingness is associated with a decrease in willingness to converse.
+
+These concerns were `r print_significant_correlations(cor_openmindedness_mean_vs_concerns_simplified_na_replaced)`.
 
 ```{r}
-#| label: Correlations willingness slider average vs. willingness concerns
+#| label: fig-EDA-correlation-relationships 
+#| echo: false 
+#| fig-cap: Relationships between each willingness concern and average willingness to converse. Using a 7-pt Likert-scale, participants rated the impact of each willingness concern on their overall willingness. Using a slider from 0 to 100, participants rated 2 statements about their willingness to converse, which we averaged to find each participant's average willingness to converse about their focus topic. 
+
+library(gridExtra) # so we can print the plots in columns 
+
+concerns_and_avg_willingness_df <- concerns_labeled_wide %>%
+  full_join(avg_willingness_df, by = "prolific_subject_id")
+
+# see the average number of concerns that people indicated as affecting them 
+
+# Create all the individual plots
+p1 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q01, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p2 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q02, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p3 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q03, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p4 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q04, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p5 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q05, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p6 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q06, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p7 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q07, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p8 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q08, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p9 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q09, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p10 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q010, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p11 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q011, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p12 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q012, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p13 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q013, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p14 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q014, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p15 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q015, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p16 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q016, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p17 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q017, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p18 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q018, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+p19 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q019, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
+
+# arrange the plots in a 2x8 grid
+suppressWarnings(grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, ncol = 2))
+
+
+### the results seem to pretty much show no relationship, but if you squint your eyes, there is vaguely a linear relationship in some of the variables. i'm going to stick with pearson because, to my knowledge, the data doesn't meet the standards for any non-parametric methods 
+
+```
+
+```{r}
+#| label: Correlations willingness slider average vs. willingness concerns (NA is not replaced) 
 #| echo: false
 
 #prepping data
-reasons_and_willingness_merged_df <- merge(wide_unwill_reasons_df_1, sliders_df, by = 'prolific_subject_id') %>%
+reasons_and_willingness_merged_df <- merge(concerns_labeled_wide, avg_willingness_df, by = 'prolific_subject_id') %>%
   ungroup() %>%
-  select(-prolific_subject_id)
+  select(-prolific_subject_id, -topicChoiceAsString)
 
 #run cor test
-cor_willingness_slider_vs_concerns <- map_dfr(reasons_and_willingness_merged_df[-20], ~
-  tidy(cor.test(.x, reasons_and_willingness_merged_df$mean_willingness, use = "pairwise.complete.obs")),
-  .id = "reason_item")
+cor_willingness_slider_vs_concerns <- reasons_and_willingness_merged_df %>% select(-avg_willingness) %>%
+  map_dfr( ~ tidy(cor.test(.x, reasons_and_willingness_merged_df$avg_willingness)),
+  .id = "reason_item"
+)
 
 #process results 
 cor_willingness_slider_vs_concerns <- cor_willingness_slider_vs_concerns %>%
@@ -1344,9 +1518,43 @@ cor_willingness_slider_vs_concerns <- cor_willingness_slider_vs_concerns %>%
 
 ```
 
-Next, we looked for correlations between willingness concerns and overall willingness as indicated by the slider questions. Most concerns were significantly negatively associated with willingness. The strongest negative associations were observed for "Doesn't participate in these conversations often" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Doesn't participate in these conversations often"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Doesn't participate in these conversations often"]`), "Conversation might be awkward or tense" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Conversation might be awkward or tense"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Conversation might be awkward or tense"]`), "Might be offended" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might be offended"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might be offended"]`), "Others might be unproductive or disrespectful" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Others might be unproductive or disrespectful"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Others might be unproductive or disrespectful"]`), "Doesn't want to listen to others" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Doesn't want to listen to others"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Doesn't want to listen to others"]`), "Views wouldn't change" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Views wouldn't change"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Views wouldn't change"]`), and "Might feel invalidated" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might feel invalidated"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might feel invalidated"]`).
+```{r}
+#| label: Correlations willingness slider average vs. willingness concerns NA replaced 
+#| echo: false
 
-Other significant negative associations were observed for "Might offend someone" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might offend someone"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might offend someone"]`), "Experience negative feelings about the world" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Experience negative feelings about the world"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Experience negative feelings about the world"]`), "Might struggle to explain views or seem uninformed" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might struggle to explain views or seem uninformed"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might struggle to explain views or seem uninformed"]`), "Might struggle to remain productive and respectful" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might struggle to remain productive and respectful"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might struggle to remain productive and respectful"]`), "Opinion is unpopular amongst group" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Opinion is unpopular amongst group"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Opinion is unpopular amongst group"]`), "Might be criticized" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might be criticized"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might be criticized"]`), "Others won't make effort to listen" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Others won't make effort to listen"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Others won't make effort to listen"]`), and "Might experience negative feelings about self" (`r cor_willingness_slider_vs_concerns$estimate_rounded[cor_willingness_slider_vs_concerns$reason_item == "Might experience negative feelings about self"]`, p `r cor_willingness_slider_vs_concerns$significance[cor_willingness_slider_vs_concerns$reason_item == "Might experience negative feelings about self"]`).
+#prepping data
+reasons_and_willingness_merged_df_na_replaced <- merge(concerns_labeled_wide_na_replaced, avg_willingness_df, by = 'prolific_subject_id') %>%
+  ungroup() %>%
+  select(-prolific_subject_id, -topicChoiceAsString)
+
+#run cor test
+cor_willingness_slider_vs_concerns_na_replaced_d <- reasons_and_willingness_merged_df_na_replaced %>% select(-avg_willingness) %>%
+  map_dfr( ~ tidy(cor.test(.x, reasons_and_willingness_merged_df_na_replaced$avg_willingness)),
+  .id = "reason_item"
+)
+
+#process results  ### LEFT OFF PRINTING THE SIGNIFICANT ONES 
+cor_willingness_slider_vs_concerns_na_replaced <- cor_willingness_slider_vs_concerns_na_replaced_d %>%
+  mutate(
+    significance = case_when(
+      p.value < 0.001 ~ "< 0.001",
+      p.value < 0.01  ~ "< 0.01",
+      p.value < 0.05  ~ "< 0.05",
+      TRUE            ~ "ns"  # not significant
+    ),
+    direction = if_else(estimate < 0, "negative", "positive"),
+    estimate_rounded = round(estimate, 3),
+    pvalue_rounded = signif(p.value, 3)
+  ) %>%
+  select(reason_item, estimate_rounded, pvalue_rounded, direction, significance) %>%
+  full_join(question_key_for_fa, by = c("reason_item" = "short_label")) %>%
+    mutate(across(everything(), ~ gsub('unwillingness-reason-', '', .))) 
+
+```
+
+Next, we looked for correlations between each willingness concerns and average willingness as indicated by the two slider questions. Most concerns were negatively associated with willingness, suggesting that, for most of the willingness concerns, a greater impact of the concern on an American's willingness is associated with lower willingness to engage.
+
+These concerns were `r print_significant_correlations(cor_willingness_slider_vs_concerns_na_replaced)`.
 
 ### Cluster analysis
 
@@ -1354,22 +1562,18 @@ Other significant negative associations were observed for "Might offend someone"
 #| label: Cluster analysis
 #| echo: false
 
-# fill in the not at alls
-concerns_wide <- concerns_wide %>%
-  mutate(across(everything(), ~ replace_na(.x, 1))) 
- 
 # scale 
-concerns_wide_scaled <- scale(concerns_wide) 
+concerns_wide_na_replaced_scaled <- scale(concerns_wide_na_replaced) 
 
 # determine optimal number of clusters using wss 
-optimal_n_clusters <- fviz_nbclust(concerns_wide_scaled, kmeans, method = "wss")
+optimal_n_clusters <- fviz_nbclust(concerns_wide_na_replaced_scaled, kmeans, method = "wss")
 
 # K-means with k = 3 (example)
 set.seed(1)
-kmeans_result <- kmeans(concerns_wide_scaled, centers = 3)
+kmeans_result <- kmeans(concerns_wide_na_replaced_scaled, centers = 3)
 
 # merge back with subject id df so we can see sub id, cluster, and the questions w ratings
-cluster_labeled <- concerns_labeled_wide %>%
+cluster_labeled <- concerns_labeled_wide_na_replaced %>%
   mutate(cluster = factor(kmeans_result$cluster))
 
 # extract cluster info to add to surveys_df becuase the df is structured differently so i'm not sure how to merge otherwise 
@@ -1393,7 +1597,7 @@ cluster_percentages <- cluster_info %>%
 #| fig-cap: PCA plot with clusters to visualize the three clusters
 
 # visualize clusters with PCA
-cluster_visualization <- autoplot(prcomp(concerns_wide_scaled), data = cluster_labeled, colour = 'cluster')
+cluster_visualization <- autoplot(prcomp(concerns_wide_na_replaced_scaled), data = cluster_labeled, colour = 'cluster')
 
 print(cluster_visualization)
 
@@ -1406,9 +1610,9 @@ print(cluster_visualization)
 
 # figure out the average score on each question of a cluster so we can see if certain clusters generally scored higher on certain questions 
 
-cluster_concerns <- cluster_labeled %>%
+suppressWarnings(cluster_concerns <- cluster_labeled %>%
   group_by(cluster) %>%
-  summarise(across(starts_with("Q"), mean, na.rm = TRUE))
+  summarise(across(starts_with("Q"), mean, na.rm = TRUE)))
 
 #heat map
 
@@ -1492,6 +1696,16 @@ cluster3_top <- top_by_cluster_full %>%
 
 ```
 
+We also conducted cluster analysis on the 19 concerns to determine whether participants generally fell into certain categories. The analysis suggested that participants generally fell into one of three clusters, with `r cluster_percentages$percent[cluster_percentages$cluster == 1]`% of participants falling into Cluster 1, `r cluster_percentages$percent[cluster_percentages$cluster == 2]`% of participants falling into Cluster 2, and `r cluster_percentages$percent[cluster_percentages$cluster == 3]`% of participants falling into Cluster 3.
+
+As shown in Figure \@ref(fig:heat-map-clusters-willingness-concerns), the clusters appear to arrange participants by the overall impact of the concerns on willingness. Cluster 2 is the low impact group, Cluster 1 is the moderate impact group, and Cluster 3 is the high impact group. It is notable that half of our sample fell into low impact group, meaning about half of our sample felt that most to all of the concerns did not strongly impact their willingness. This could reflect weakness of our questionnaire or it could mean that half of our participants are simply not as concerned as the other half of our sample. The latter would be consistent with Cluster 2's greater average willingness and open-mindedness; although, recalling that willingness and open-mindedness were also self-reported, the trio might also reflect an overall weakness of gathering this data through self reports.
+
+Cluster 1's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 1]`. On average, Cluster 1 rated the following concerns the highest: `r paste(shQuote(cluster1_top), collapse = "; ")`.
+
+Cluster 2's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 2]`. On average, cluster 2's top concerns were `r paste(shQuote(cluster2_top), collapse = "; ")`.
+
+Cluster 3's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 3]`. On average, cluster 3's top concerns were `r paste(shQuote(cluster3_top), collapse = "; ")`.
+
 ```{r}
 #| label: fig-clusters-avg-willingness   
 #| echo: false 
@@ -1522,63 +1736,58 @@ ggplot(open_mindedness_w_clusters, aes(x = factor(cluster), y = mean_openmindedn
 
 ```
 
-We also conducted cluster analysis on the 19 concerns to determine whether participants generally fell into certain categories. The analysis suggested that participants generally fell into one of three clusters, with `r cluster_percentages$percent[cluster_percentages$cluster == 1]`% of participants falling into Cluster 1, `r cluster_percentages$percent[cluster_percentages$cluster == 2]`% of participants falling into Cluster 2, and `r cluster_percentages$percent[cluster_percentages$cluster == 3]`% of participants falling into Cluster 3.
-
-Consistent with Figure \@ref(fig:heat-map-clusters-willingness-concerns), Cluster 1 and Cluster 3, on average, indicated that the 19 concerns overall impact their willingness much more compared to Cluster 3. Cluster 1's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 1]`, Cluster 2's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 2]`, and Cluster 3's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 3]`.
-
-On average, Cluster 1 rated the following concerns the highest: `r paste(cluster1_top, collapse = "; ")`.
-
-Cluster 2 did not rate any concern higher, on average, than the other clusters.
-
-On average, cluster 3's top concerns were `r paste(cluster3_top, collapse = "; ")`.
-
-These patterns suggest that Cluster 3 participants were the most concerned across the set of items, Cluster 1 participants were slightly less concerned, and Cluster 2 participants were much less concerned, which is particularly interesting since Cluster 2 participants made up half of the sample.
-
-This appears to be consistent with the average willingness of each cluster: as shown in Figure \@ref(fig:fig-clusters-avg-willingness), Cluster 2 appears to be more willing to converse than the other two clusters. Interestingly, as shown in Figure \@ref(fig:fig-clusters-avg-openmindedness), Cluster 2 also appears to be more open-minded than the other two clusters. These interpretations have not been rigorously assessed and it should be recalled that these data were self-reported.
+As shown in Figure \@ref(fig:fig-clusters-avg-willingness), the willingness of each cluster aligns with the impact of concerns, with Cluster 2 reporting the greatest willingness and Cluster 3 reporting the least willingness. Similarly, as shown in Figure \@ref(fig:fig-clusters-avg-openmindedness), Cluster 2 reported the highest open-mindedness and Cluster 3 reported the least open-mindedness. These interpretations have not been rigorously assessed and, again, it should be recalled that these data were self-reported.
 
 ```{r}
 #| label: fig-demographics-clusters
 #| echo: false 
 #| fig-cap: Plots of demographics by cluster helps us explore whether the clusters may have significantly different demographics.
 
-ggplot(surveys_df, aes(x = cluster, fill = Sex)) +
+sex_cluster_plot <- ggplot(surveys_df, aes(x = cluster, fill = Sex)) +
   geom_bar(position = "fill") +
   labs(y = "Proportion", title = "Gender composition by cluster")
 
-ggplot(surveys_df, aes(x = cluster, fill = topicChoiceAsString)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proportion", title = "Topic choice by cluster")
-
-ggplot(surveys_df, aes(x = cluster, fill = `Highest education level completed`)) +
+education_cluster_plot <- ggplot(surveys_df, aes(x = cluster, fill = `Highest education level completed`)) +
   geom_bar(position = "fill") +
   labs(y = "Proportion", title = "Education level by cluster") # idk why this isn't working
 
-ggplot(surveys_df, aes(x = cluster, fill = Ethnicity)) +
+ethnicity_cluster_plot <- ggplot(surveys_df, aes(x = cluster, fill = Ethnicity)) +
   geom_bar(position = "fill") +
   labs(y = "Proportion", title = "Ethnicity by cluster")
 
-ggplot(surveys_df, aes(x = cluster, fill = `U.s. political affiliation`)) +
+polaffiliation_cluster_plot <- ggplot(surveys_df, aes(x = cluster, fill = `U.s. political affiliation`)) +
   geom_bar(position = "fill") +
   labs(y = "Proportion", title = "U.s. political affiliation")
 
-ggplot(surveys_df, aes(x = cluster, fill = `Political spectrum (us)`)) +
+polspectrum_cluster_plot <- ggplot(surveys_df, aes(x = cluster, fill = `Political spectrum (us)`)) +
   geom_bar(position = "fill") +
   labs(y = "Proportion", title = "Political spectrum (us) by cluster")
 
-ggplot(surveys_df, aes(x = cluster, fill = `Religious affiliation`)) +
+surveys_df_recoded_religion <- surveys_df %>%
+  mutate(`Religious affiliation` = fct_recode(`Religious affiliation`, "Christianity" = "Christianity (e.g. Baptist, Church of England, Roman Catholic, Methodist, Jehovah Witness,  etc.)", "Non religious" = "Non Religious (e.g. Agnostic, Atheist, No Religion)")) 
+  
+
+religion_cluster_plot <- ggplot(surveys_df_recoded_religion, aes(x = cluster, fill = `Religious affiliation`)) +
   geom_bar(position = "fill") +
   labs(y = "Proportion", title = "Religious affiliation by cluster")
 
-ggplot(surveys_df, aes(x = cluster, y = as.numeric(Age))) +
+age_cluster_plot <- ggplot(surveys_df, aes(x = cluster, y = as.numeric(Age))) +
   geom_boxplot() +
   labs(title = "Age by cluster")
 
+sex_cluster_plot
+age_cluster_plot
+ethnicity_cluster_plot
+religion_cluster_plot
+polaffiliation_cluster_plot
+polspectrum_cluster_plot
+education_cluster_plot
 ```
 
 ```{r}
 #| label: fig-topic-choice-clusters
 #| echo: false 
-#| fig-cap: Plots of topic choice by cluster helps us explore whether the clusters may have significant differences in which topics they focused on. Cluster 2 appears to have had more participants focused on human euthanasia and had fewer participants focused on the role of the U.S. in the Israeli-Palestinian conflict, but the differences are not immense and further analyses should verify whether these differences are significant before drawing conclusions.
+#| fig-cap: Plots of topic choice by cluster helps us explore whether the clusters may have significant differences in which topics they focused on.
 
 # within each cluster, finding percent of subjects on each topic. i tried to do this in one df but kept getting an error that i couldn't figure out 
 cluster1_topic_percent <- surveys_df %>%
@@ -1613,6 +1822,249 @@ ggplot(surveys_df, aes(x = cluster, fill = topicChoiceAsString)) +
 
 ```
 
-There may be significant differences in the demographic profiles of the clusters as shown in Figure \@ref(fig:fig-demographics-clusters); however, further analyses would need to assess statistical significance. As observed in Figure \@ref(fig:fig-topic-choice-clusters), there may also be some notable differences in the topic choices of each cluster. Particularly, `r round(cluster_topic_percent$percent2[cluster_topic_percent$topicChoiceAsString == "human euthanasia in the U.S."], 2)`% of participants in cluster 2 focused on human euthanasia in the U.S., compared to `r round(cluster_topic_percent$percent1[cluster_topic_percent$topicChoiceAsString == "human euthanasia in the U.S."], 2)`% of participants in cluster 1 and `r round(cluster_topic_percent$percent3[cluster_topic_percent$topicChoiceAsString == "human euthanasia in the U.S."], 2)`% of participants in cluster 3. Also, `r round(cluster_topic_percent$percent2[cluster_topic_percent$topicChoiceAsString == "the role of the U.S. in the Israeli-Palestinian conflict"], 2)`% of participants in cluster 2 focused on the role of the U.S. in the Israeli-Palestinian conflict, compared to `r round(cluster_topic_percent$percent1[cluster_topic_percent$topicChoiceAsString == "the role of the U.S. in the Israeli-Palestinian conflict"], 2)`% of participants in cluster 1 and `r round(cluster_topic_percent$percent3[cluster_topic_percent$topicChoiceAsString == "the role of the U.S. in the Israeli-Palestinian conflict"], 2)`% of participants in cluster 3. These differences have also not been assessed for statistical significance.
+```{r}
+#| label: Diff in religion btwn clusters?
+#| include: false
+
+# looking for statistical significance 
+
+# create a contingency table
+table_cluster_religion <- table(surveys_df$cluster, surveys_df$`Religious affiliation`)
+
+# View the table
+table_cluster_religion 
+
+# Chi-square test of independence
+res_religion <- chisq.test(table_cluster_religion) 
+
+res_df_religion <- tibble(
+  statistic = unname(res_religion$statistic),
+  df = unname(res_religion$parameter),
+  p_value = res_religion$p.value
+) %>%
+  mutate(
+    significance = case_when(
+      p_value < 0.001 ~ "< 0.001",
+      p_value < 0.01  ~ "< 0.01",
+      p_value < 0.05  ~ "< 0.05",
+      TRUE            ~ "ns"  # not significant
+    )
+  )
+
+residuals_religion <- res_religion$stdres
+residuals_religion
+
+library(corrplot)
+corrplot(residuals_religion, is.cor = FALSE)
+
+```
+
+```{r}
+#| label: Diff in political affiliation btwn clusters?
+#| include: false
+
+# looking for statistical significance 
+
+# create a contingency table
+table_cluster_polaffiliation <- table(surveys_df$cluster, surveys_df$`U.s. political affiliation`)
+
+# View the table
+table_cluster_polaffiliation 
+
+# Chi-square test of independence
+res_polaffiliation <- chisq.test(table_cluster_polaffiliation) 
+
+res_df_polaffiliation <- tibble(
+  statistic = unname(res_polaffiliation$statistic),
+  df = unname(res_polaffiliation$parameter),
+  p_value = res_polaffiliation$p.value
+) %>%
+  mutate(
+    significance = case_when(
+      p_value < 0.001 ~ "< 0.001",
+      p_value < 0.01  ~ "< 0.01",
+      p_value < 0.05  ~ "< 0.05",
+      TRUE            ~ "ns"  # not significant
+    )
+  )
+
+residuals_polaffiliation <- res_polaffiliation$stdres
+residuals_polaffiliation
+
+library(corrplot)
+corrplot(residuals_polaffiliation, is.cor = FALSE)
+
+```
+
+```{r}
+#| label: Diff in political spectrum btwn clusters?
+#| include: false
+
+# looking for statistical significance 
+
+# create a contingency table
+table_cluster_polspectrum <- table(surveys_df$cluster, surveys_df$`Political spectrum (us)`)
+
+# View the table
+table_cluster_polspectrum
+
+# Chi-square test of independence
+res_polspectrum <- chisq.test(table_cluster_polspectrum) 
+
+res_df_polspectrum <- tibble(
+  statistic = unname(res_polspectrum$statistic),
+  df = unname(res_polspectrum$parameter),
+  p_value = res_polspectrum$p.value
+) %>%
+  mutate(
+    significance = case_when(
+      p_value < 0.001 ~ "< 0.001",
+      p_value < 0.01  ~ "< 0.01",
+      p_value < 0.05  ~ "< 0.05",
+      TRUE            ~ "ns"  # not significant
+    )
+  )
+
+residuals_polspectrum <- res_polspectrum$stdres
+residuals_polspectrum
+
+library(corrplot)
+corrplot(residuals_polspectrum, is.cor = FALSE)
+
+```
+
+```{r}
+#| label: Diff in sex btwn clusters?
+#| include: false
+
+# looking for statistical significance 
+
+# create a contingency table
+table_cluster_sex <- table(surveys_df$cluster, surveys_df$Sex)
+
+# View the table
+table_cluster_sex
+
+# Chi-square test of independence
+res_sex <- chisq.test(table_cluster_sex) 
+
+res_df_sex <- tibble(
+  statistic = unname(res_sex$statistic),
+  df = unname(res_sex$parameter),
+  p_value = res_sex$p.value
+) %>%
+  mutate(
+    significance = case_when(
+      p_value < 0.001 ~ "< 0.001",
+      p_value < 0.01  ~ "< 0.01",
+      p_value < 0.05  ~ "< 0.05",
+      TRUE            ~ "ns"  # not significant
+    )
+  )
+
+residuals_sex <- res_sex$stdres
+residuals_sex
+
+library(corrplot)
+corrplot(residuals_sex, is.cor = FALSE)
+
+```
+
+```{r}
+#| label: Diff in topic choice btwn clusters?
+#| include: false
+
+# looking for statistical significance 
+
+# create a contingency table
+table_cluster_topic <- table(surveys_df$cluster, surveys_df$topicChoiceAsString)
+
+# View the table
+table_cluster_topic 
+
+# Chi-square test of independence
+chisq.test(table_cluster_religion)
+
+res <- chisq.test(table_cluster_religion) 
+
+res_df <- tibble(
+  statistic = unname(res$statistic),
+  df = unname(res$parameter),
+  p_value = res$p.value
+) %>%
+  mutate(
+    significance = case_when(
+      p_value < 0.001 ~ "< 0.001",
+      p_value < 0.01  ~ "< 0.01",
+      p_value < 0.05  ~ "< 0.05",
+      TRUE            ~ "ns"  # not significant
+    )
+  )
+
+residuals <- res$stdres
+residuals
+
+library(corrplot)
+corrplot(residuals, is.cor = FALSE)
+
+```
+
+There may be significant differences in the demographic profiles of the clusters as shown in Figure \@ref(fig:fig-demographics-clusters); however, further analyses would need to assess statistical significance. \[i ran some out of curiosity but didn't bother to report here because it's probably not useful enough to be worth digesting the extra information\]
+
+Consistent with Figure @ref(fig: fig-topic-choice-clusters), a chi-square test of cluster and focus topic revealed a significant association, χ²(`r res$parameter`, `r total_num_clean_subjects_in_data`) = `r res$statistic`, p \< `r res_df$significance`.
+
+Standardized residuals indicated that participants in Cluster 1 disproportionately focused on human euthanasia, healthcare, police conduct, A.I., and mandating vaccines. These participants were significantly less likely to focus on deportation policies, capitalism, transgender athletes in sports, climate change, or the Israeli-Palestinian conflict. Cluster 2 disproportionately focused on transgender athletes in sports, climate change, capitalism, and deportation policies. These participants were significantly less likely to focus on human euthanasia, healthcare, police conduct, A.I., or mandating vaccines. Participants in Cluster 3 disproportionately focused on capitalism, deportation policies, and the role of the U.S. in the Israeli-Palestinian conflict. These participants were significantly less likely to focus on human euthanasia, healthcare, transgender athletes in sports, police conduct, or climate change.
 
 ## Discussion
+
+This pretest study aimed to assess the comprehensiveness and underlying structure of a newly developed 19-item questionnaire designed to capture the core concerns contributing to Americans' unwillingness to engage in open, productive discussions on divisive topics. Our findings validate the instrument's relevance and offer a preliminary structural framework, while also highlighting key areas for refinement.
+
+### Comprehensiveness of Concerns
+
+Our first objective was to determine if the 19-item inventory comprehensively captured the reasons for reluctance to engage. Through a qualitative analysis of participants' free-response explanations for avoiding difficult conversations, we found that our items captured the majority of concerns but failed to capture pragmatic barriers and concerns about energy and relevance.
+
+Specifically, participants frequently cited topic complexity/lack of knowledge as a barrier, not just fearing embarrassment, but a practical inability to engage due to insufficient information. We also found concerns about the perceived lack of relevance of the topic to the participant's personal life or ethical boundaries against speaking on issues outside of their firsthand experience. Furthermore, many expressed that it simply wouldn't be worth their emotional and/or mental energy.
+
+In addition to these new constructs, our analysis revealed that two existing concepts warranted separation from the items in which they had been nested due to their high prevalence and distinct nature in the free responses. The first, damaging personal relationships, was often discussed in an intimate, personal sense that distinguished it from the broader concept of "social repercussions". The second, others' views not changing, was common  enough to be separated from the general item about others causing the conversation to not be productive.
+
+Based on these results, we plan to add six new items to enhance the questionnaire's comprehensiveness and construct validity. These items are 
+
+### Structure of Concerns
+
+Our second objective was to explore the latent structure of the 19 concerns. An Exploratory Factor Analysis (EFA) suggested a three-factor solution, which accounted for `r total_var_explained_percent`% of the total variance. These factors were conceptually labeled as:
+
+Emotional Vulnerability/Identity Threat (Factor 1): Concerns centered on internal psychological distress, such as negative feelings about the self or the world, and direct challenges to core beliefs or identity.
+
+Conversational Efficacy/Unproductive Process (Factor 2): Concerns focusing on the quality, respectfulness, and utility of the interaction, particularly whether the process would be a waste of time or devolve into disrespect.
+
+Social Evaluation/Reputation Risk (Factor 3): Concerns emphasizing external social perception, fear of embarrassment, public disapproval, and broader social consequences.
+
+The factors were moderately correlated ($r$ = 0.17–0.60) and exhibited some cross-loadings, suggesting conceptual overlap and the utility of an oblique rotation (oblimin). Importantly, four items failed to load strongly on any factor, indicating they may represent highly idiosyncratic or situational concerns, though some conceptually belong to the Social Evaluation factor (e.g., "The conversation could become awkward or tense").
+
+The structural distinction between Factor 1 (internal, emotional threat) and Factor 3 (external, social risk) is noteworthy, as many items seem conceptually close (e.g., "I could feel humiliated or embarrassed in the conversation" loaded on Factor 3 but relates to emotional vulnerability).
+
+### Relationships to Willingness and Open-Mindedness
+
+Our correlation analyses provide initial construct validation for our survey. A greater impact of most concerns was significantly associated with lower self-reported willingness to converse about the chosen topic, as measured by our slider questions.
+
+Furthermore, most concerns were also negatively correlated with participants' open-mindedness. This suggests that individuals who feel more impacted by the various barriers to engagement also tend to rate themselves as less open-minded, which aligns with the literature suggesting that psychological and social anxieties inhibit constructive discourse.
+
+### Cluster Analysis 
+
+Our $k$-means cluster analysis suggested that participants' willingness concerns generally fell into one of three distinct clusters that were differentiated by the strength of the concerns' impacts on their willingness.
+
+Cluster 2, the low impact group, comprised `r cluster_percentages$percent[cluster_percentages$cluster == 2]`% of our sample. Correspondingly, they also reported the highest average willingness and open-mindedness. Cluster 1, the moderate impact group, comprised `r cluster_percentages$percent[cluster_percentages$cluster == 1]`% of our sample. Cluster 3, the high impact group, comprised `r cluster_percentages$percent[cluster_percentages$cluster == 3]`% of our sample and reported the lowest average willingness and open-mindedness.
+
+This clear differentiation by willingness and open-mindedness provides further evidence of the questionnaire's ability to segment individuals based on their barriers to engagement.
+
+A particularly interesting finding is the significant association between cluster membership and the participant's chosen focus topic. For example, Cluster 2 (Low Impact) was disproportionately focused on topics like transgender athletes in sports and climate change, whereas Cluster 3 (High Impact) disproportionately focused on issues like capitalism, deportation policies, and the Israeli-Palestinian conflict. This suggests that the topic itself may be linked to the level of perceived threat and concern, which should be taken under consideration in the development of interventions for increasing willingness.
+
+### Limitations and Future Directions 
+
+The primary limitation of this study is the reliance on self-report measures for all key variables (concerns, willingness, and open-mindedness). The discrepancy between the Likert-scale comfort ratings and the slider-based willingness ratings (both asked about the focus topic), for example, highlights the inherent difficulties in measuring these constructs. Future work should integrate behavioral or implicit measures to provide a more objective assessment.
+
+The EFA, while providing a clear structure, did not result in perfectly clean factors, as evidenced by cross-loadings and items that failed to load strongly. The six new items proposed for inclusion must be validated through a second factor analysis to confirm the underlying structure and assess the potential for developing subscales from the resulting factors.
+
+In conclusion, this pretest confirms that the 19-item questionnaire, particularly with the proposed additions, is a valuable tool for measuring the multifaceted barriers to productive discourse on divisive topics. The identified factor structure and participant clusters will be crucial for tailoring our individual-level intervention to specifically address the emotional, efficacy, and social concerns that drive an American's unwillingness to engage.
+
+## References
