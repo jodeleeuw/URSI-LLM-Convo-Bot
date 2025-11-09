@@ -21,6 +21,58 @@ var open_survey_json = {
       ],
     },
     {
+      type: "checkbox",
+      name: "class-year",
+      title: "What is your class year?",
+      isRequired: true,
+      choices: [
+        {
+          value: "2026",
+          text: "2026",
+        },
+        {
+          value: "2027",
+          text: "2027",
+        },
+        {
+          value: "2028",
+          text: "2028",
+        },
+        {
+          value: "2029",
+          text: "2029",
+        },
+      ],
+    },
+    {
+type: "checkbox",
+name: "major-division",
+title: "What division is your major in? If you are a double major in two divisions, select both. If you are undeclared, indicate your prospective major's divison.",
+isRequired: true,
+choices: [
+{ 
+  value: "arts",
+  text: "Arts (Art, Dance, Drama, English, Film, Music)",
+},
+{
+  value: "foreign languages and literature",
+  text: "Foreign Languages/Literature (Arabic, Chinese, French and Francophone Studies, German Studies,  Greek and Roman Studies, Hebrew, Hispanic Studies, Italian, Japanese, Russian Studies)",
+},
+{
+value: "social sciences",
+text: "Social Sciences (Anthropology, Economics, Education, Geography, History, Philosophy, Political Science, Religion, Sociology)",
+},
+{
+  value: "natural sciences",
+  text: "Natural Sciences (Astronomy, Biology, Chemistry, Cognitive Science, Computer Science, Earth Science, Mathematics/Statistics, Physics, Psychological Science)",
+},
+{
+  value: "multidisciplinary",
+  text: "Interdepartmental and Multidisciplinary Programs"
+},
+],
+    },
+    {
       type: "matrix",
       name: "topic",
       title: "Imagine you are about to engage in a conversation with a small group of people where differing opinions exist. For each of the following potential conversation topics, rate how willing you would be to engage in the conversation.",
@@ -65,24 +117,12 @@ var open_survey_json = {
           text: "Transgender athletes in U.S. sports",
         },
         {
-          value: "the role of the U.S. government in healthcare",
-          text: "The role of the U.S. government in healthcare",
-        },
-        {
           value: "mandating vaccines in the U.S.",
           text: "Mandating vaccines in the U.S.",
         },
         {
           value: "deportation policies for undocumented immigrants in the U.S.",
           text: "Deportation policies for undocumented immigrants in the U.S.",
-        },
-        {
-          value: "U.S. public policy on climate change",
-          text: "U.S. public policy on climate change",
-        },
-        {
-          value: "the use of A.I. in traditionally human-run spaces (e.g., medicine, art, driving)",
-          text: "The use of A.I. in traditionally human-run spaces (e.g., medicine, art, driving)",
         },
         {
           value: "the role of capitalism in the U.S. economy",
