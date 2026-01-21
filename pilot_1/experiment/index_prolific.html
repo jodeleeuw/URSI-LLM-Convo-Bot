@@ -9,7 +9,6 @@
 
   <!-- loading jsPsych plug-ins -->
   <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.1"></script> <!-- for data pipe -->
-  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@latest"></script>
   <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script> <!-- condition assignment using data pipe -->
   <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
   <script src="chat-plugin/index.browser.js"></script> <!--- local chat plug-in access-->
@@ -50,21 +49,26 @@
 <body>
   <script>
 
-    //Initialize jsPsych
+    //Initialize jsPsych, redirect to prolific page upon completing experiment
     var jsPsych = initJsPsych({
       on_finish: function () {
-        // jsPsych.data.displayData();
-        const displayElement = document.getElementById('jspsych-content') || document.body;
-        displayElement.innerHTML = `
-        <p style="font-size: 1.25rem; color: #555;">
-        </p>
-Thank you for your contribution to our research! Feel free to exit the page.  
-    </p>
-      </div>
-    `;
+        jsPsych.data.displayData();
+        //jsPsych.data.get().localSave("csv", "llm_trial.csv"); //save chatbot conversation to local for when testing bot on computer.
+        window.location = "https://app.prolific.com/submissions/complete?cc=CVWBBA5S";
       },
-    }
-    );
+    });
+
+    // capture info from Prolific
+    var prolific_subject_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
+    var study_id = jsPsych.data.getURLVariable('STUDY_ID');
+    var session_id = jsPsych.data.getURLVariable('SESSION_ID');
+
+    //add captured info into jsPsych data
+    jsPsych.data.addProperties({
+      prolific_subject_id: prolific_subject_id,
+      study_id: study_id,
+      session_id: session_id
+    });
 
     // disable right-click to prevent accesing browser console (to prevent user from seeing chat-bot prompt)
     document.addEventListener('contextmenu', function (e) {
@@ -109,9 +113,8 @@ Thank you for your contribution to our research! Feel free to exit the page.
       data: {
         phase: "welcome-message",
       },
-      type: jsPsychHtmlButtonResponse,
-      stimulus: "Welcome! In this study, you will fill out a questionnaire.",
-      choices: ['Tap to Start'],
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: "Welcome! In this study, you will fill out a questionnaire. Press any key to get started.",
     };
 
     /* pre-chat survey with different topic options implemented via SurveyJS */
@@ -358,7 +361,12 @@ Thank you for your contribution to our research! Feel free to exit the page.
       {
         value: "unwillingness-reason-I would not want to hurt my relationship(s) with others or upset them",
         text: "I would not want to hurt my relationship(s) with others or upset them",
-      }
+      },
+      {
+        value: "unwillingness-reason-",
+        text: "",
+      },
+
     ];
 
     // define some stuff first so we can extract from gen_willingness_openmindedness_survey and use in follow up survey 
@@ -611,16 +619,22 @@ Thank you for your contribution to our research! Feel free to exit the page.
     };
 
 
-    //goodbye message and brief explanation to user about our experiment motive
+    //goodbye message and brief explanation to user about our experimentation motive
     var goodbye = {
       data: {
         phase: "goodbye",
       },
-      type: jsPsychHtmlButtonResponse,
+      type: jsPsychHtmlKeyboardResponse,
       stimulus: `
-        <p> You have completed the survey! Please save your data before closing the page. <p>
+        <p> You have completed the experiment! Thank you for your contribution to our research. </p>
+        <div style='width: 700px;'>
+        </div>
+        <p>We are investigating how conversations can increase Americans' willingness to discuss highly disputed topics, but we first need to identify the main causes for unwillingness. </p>
+        <p> By participating in our experiment, you have helped us reach this goal. </p>
+        <div style='width: 700px;'>
+        </div>
+        <p> Press any key to save your data and return to Prolific!  <p>
       `,
-      choices: ['Save data'],
       post_trial_gap: 1000,
     };
 
