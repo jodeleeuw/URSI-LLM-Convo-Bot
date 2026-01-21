@@ -46,6 +46,20 @@
     }
 
     /* increase font size everywhere for mobile use */
+    /* Target all survey elements more specifically */
+.sd-table__cell,
+.sd-table__header,
+.sd-matrix__cell,
+.sd-item__control-label,
+.sd-checkbox__label,
+.sd-radio__label,
+.sd-selectbase__label,
+.sv-string-viewer,
+label {
+  font-size: 21px !important;
+}
+
+    
     .jspsych-display-element {
       font-size: 25px;
     }
@@ -618,7 +632,7 @@ Thank you for your contribution to our research! Feel free to exit the page.
               type: "comment",
               name: "willingness-free-response",
               title:
-                `Think back to the last time you chose to not participate in a conversation about ${topic} or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns.`,
+                `Finally, think back to the last time you chose to not participate in a conversation about ${topic} or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns.`,
               isRequired: true,
             },
           ]
