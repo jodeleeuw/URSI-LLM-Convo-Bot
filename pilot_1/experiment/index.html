@@ -186,7 +186,7 @@
     /* pushing survey in timeline with both slider and non-slider questions */
     const survey_trial = {
       type: jsPsychSurvey,
-      survey_json: open_survey_json,
+      survey_json: open_survey_prolific_json,
       survey_function: initializePreSlider,
       data: {
         phase: "pre-convo-survey-initial",
@@ -249,8 +249,6 @@
       return relevantPolarizationRow;
 
     }
-
-    // TOPIC SPECIFIC PRE-CONVERSATION SURVEYS 
 
 
     // store the unwillingness-reason rows in a var to help us use them in the next survey part 
