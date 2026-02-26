@@ -414,17 +414,10 @@ Participants were first asked to rate their comfort level with 10 controversial 
 ### Basic results
 
 ```{r}
-#| label: fig-topic-ratings
+#| label: Make short topic labels
 #| echo: false
-#| fig-cap: Each subject used a 7-pt scale (where 1 meant strongly uncomfortable and 7 meant strongly comfortable) to rate how comfortable they would be discussing each of the depicted controversial topics. The topic that a subject rated lowest, meaning most uncomfortable, became the subject's focus topic for the remainder of the survey. This ridgeline plot depicts the distributions of all topic ratings. 
 
-# create figure/table showing distribution of ratings on topics
-topic_ratings_df <- surveys_df %>%
-  filter(phase == "pre-convo-survey-initial") %>%
-  filter(question != "commitment-check") %>%
-  mutate(answer = as.numeric(answer)) %>%
-  select(prolific_subject_id, question, answer, topicChoiceAsString)
-
+# shortened topic labels for use in figures
 topic_labels <- c( 
   "mandating vaccines in the U.S." = 
     "Vaccine Mandates",
@@ -448,7 +441,7 @@ topic_labels <- c(
     "Police conduct and accountability"
 )
 
-
+# really short labels. should only use if necessary 
 really_short_topic_labels <- c( 
   "mandating vaccines in the U.S." = 
     "Vaccines",
@@ -472,6 +465,53 @@ really_short_topic_labels <- c(
     "Police"
 )
 
+
+# make into dfs and add to surveys_df for ease of use  
+short_topic_labels_lookup <- tibble(
+  short_topic_labels = unlist(topic_labels),
+  topicChoiceAsString = rep(names(topic_labels), lengths(topic_labels))
+)
+
+really_short_topic_labels_lookup <- tibble(
+  really_short_short_topic_labels = unlist(really_short_topic_labels),
+  topicChoiceAsString = rep(names(really_short_topic_labels), lengths(really_short_topic_labels))
+)
+
+surveys_df <- surveys_df %>%
+  merge(short_topic_labels_lookup, by = "topicChoiceAsString") %>%
+  merge(really_short_topic_labels_lookup, by = "topicChoiceAsString")
+
+```
+
+```{r}
+#| label: Make focus topic dfs and grab counts for each topic
+#| echo: false
+
+# ratings of all topics
+topic_ratings_df <- surveys_df %>%
+  filter(phase == "pre-convo-survey-initial") %>%
+  filter(question != "commitment-check") %>%
+  mutate(answer = as.numeric(answer)) %>%
+  select(prolific_subject_id, question, answer, topicChoiceAsString)
+
+# ratings of just focus topic
+topic_choice_rating <- topic_ratings_df %>%
+  group_by(prolific_subject_id) %>%
+  filter(question == topicChoiceAsString)
+
+# counts and add short labels for ease of use later
+topic_frequency_counts <- topic_choice_rating %>%
+  group_by(question) %>%
+  count() %>%
+  rename(topicChoiceAsString = question) %>%
+  merge(short_topic_labels_lookup, by = "topicChoiceAsString")
+```
+  
+```{r}
+#| label: fig-topic-ratings
+#| echo: false
+#| fig-cap: Each subject used a 7-pt scale (where 1 meant strongly uncomfortable and 7 meant strongly comfortable) to rate how comfortable they would be discussing each of the depicted controversial topics. The topic that a subject rated lowest, meaning most uncomfortable, became the subject's focus topic for the remainder of the survey. This ridgeline plot depicts the distributions of all topic ratings. 
+
 topic_ratings_plot <- ggplot(topic_ratings_df, aes(x = answer, y = question, fill = question)) +
   geom_density_ridges(bandwidth = 0.931) + # using the bandwidth that it automatically picks 
   # give the qualitative meanings of 1-7
@@ -493,20 +533,10 @@ print(topic_ratings_plot)
 #| echo: false
 #| fig-cap: Each subject used a 7-pt scale (where 1 meant strongly uncomfortable and 7 meant strongly comfortable) to rate how comfortable they would be discussing each of the depicted controversial topics. The topic that a subject rated lowest, meaning most uncomfortable, became the subject's focus topic for the remainder of the survey. This ridgeline plot depicts the distributions of focus topic ratings. 
 
-# create figure/table showing distribution of ratings on chosen topics only
-topic_choice_rating <- topic_ratings_df %>%
-  group_by(prolific_subject_id) %>%
-  filter(question == topicChoiceAsString)
-
-# get counts of number of participants in each topic
-topic_counts_df <- topic_choice_rating %>%
-  ungroup() %>%
-  count(topicChoiceAsString, name = "n")
-
 # reorder the factor levels based on n so it is easier to interpret in the graph version
 topic_choice_rating <- topic_choice_rating %>%
   mutate(topicChoiceAsString = factor(topicChoiceAsString, 
-                                      levels = topic_counts_df %>% 
+                                      levels = topic_frequency_counts %>% 
                                         arrange(n) %>%  
                                         pull(topicChoiceAsString)))
 
@@ -521,7 +551,7 @@ topic_choice_ratings_plot <- ggplot(topic_choice_rating, aes(x = answer, y = top
        x = "Rating (1 = Strongly uncomfortable, 7 = Strongly comfortable)",
        y = "Contentious Topic") +
   geom_text(
-    data = topic_counts_df,
+    data = topic_frequency_counts,
     aes(
       x = Inf,
       y = as.factor(topicChoiceAsString),
@@ -547,6 +577,7 @@ topic_votes_plot <- ggplot(topic_choice_rating, aes(x = answer, fill = topicChoi
   xlab("Willingness (1 = Strongly Unwilling, 7 = Strongly Willing)") +
   ylab("Number of participants")
 
+
 topic_votes_plot
 ```
 
@@ -561,9 +592,6 @@ n_subs_4_plus <- length(topic_choice_rating_4_plus$prolific_subject_id)
 
 ```
 
-Our topic assignment method successfully generated a sample for whom engaging with their focus topic felt less than strongly comfortable, although not as uncomfortable as we were aiming for. More specifically, only `r round(100*(total_num_clean_subjects_in_data - n_subs_4_plus)/total_num_clean_subjects_in_data, 0)`% of subjects rated their focus topic with a rating from 1 ("Strongly uncomfortable") to 3 ("Slightly uncomfortable"), whereas `r round(100*(n_subs_4_plus/total_num_clean_subjects_in_data), 0)`% of subjects rated their focus topic with a rating from 4 ("Neutral") to 6 ("Moderately comfortable"). At a minimum, though, no participant rated their focus topic willingness at a 7 ("Strongly comfortable"), implying that every participant still experienced some level of discomfort when discussing their focus topic. \[for discussion: this could imply that people are being dishonest, that we asked the question badly, and/or that willingness is too situational and it doesn't work to ask about it in a general way\]
-
-The participants with higher willingness ratings were not evenly distributed amongst the topics. As shown in @fig-topic-ratings-only-chosen-topics, four of the ten topics---police conduct and accountability, vaccine mandates, capitalism in economy, and climate change policy---proportionally garnered many more willingness ratings at 4 ("Neutral") or greater than the other topics. These topics were of the less popular topics (@fig-bar-topic-counts, but they still had a considerable number participants, especially capitalism in the economy and climate change policies.
 
 ```{r}
 #| label: fig-bar-topic-counts
@@ -574,11 +602,16 @@ topic_hist <- ggplot(topic_choice_rating, aes(x = topicChoiceAsString)) +
   geom_bar() + 
   xlab("Focus topic") +
   scale_x_discrete(labels = really_short_topic_labels) +
-  ylab("Number of participants") #+ 
-  #theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  ylab("Number of participants")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
 
 topic_hist
 ```
+
+Our topic assignment method successfully generated a sample for whom engaging with their focus topic felt less than strongly comfortable, although not as uncomfortable as we were aiming for. Only `r round(100*(total_num_clean_subjects_in_data - n_subs_4_plus)/total_num_clean_subjects_in_data, 0)`% of subjects rated their focus topic with a rating from 1 ("Strongly uncomfortable") to 3 ("Slightly uncomfortable"), whereas `r round(100*(n_subs_4_plus/total_num_clean_subjects_in_data), 0)`% of subjects rated their focus topic with a rating from 4 ("Neutral") to 6 ("Moderately comfortable"). At a minimum, though, no participant rated their focus topic willingness at a 7 ("Strongly comfortable"), implying that every participant still experienced some level of discomfort when discussing their focus topic. \[for discussion: this could imply that people are being dishonest, that we asked the question badly, and/or that willingness is too situational and it doesn't work to ask about it in a general way\]
+
+The participants with higher willingness ratings were not evenly distributed amongst the topics. As shown in @fig-topic-ratings-only-chosen-topics, four of the ten topics---police conduct and accountability, vaccine mandates, capitalism in economy, and climate change policy---proportionally garnered many more willingness ratings at 4 ("Neutral") or greater than the other topics. These topics were of the less popular topics (@fig-bar-topic-counts), but they still had a considerable number participants, especially capitalism in the economy and climate change policies.
+
 
 As shown in @fig-bar-topic-counts, the majority of participants were least willing to discuss the role of the U.S. in the Israeli-Palestinian conflict, human euthanasia in the U.S., and transgender athletes in U.S. sports. Additionally, while deportation policy was not a popular focus topic, the ratings for this topic were lower (less willing), on average, than for the other focus topics.
 
@@ -586,7 +619,7 @@ As shown in @fig-bar-topic-counts, the majority of participants were least willi
 #| label: extra text i removed
 #| include: false
 
-# Specifically, `r topic_counts_df$n[topic_counts_df$topicChoiceAsString == "police conduct and accountability in the U.S."]` participants were least willing to discuss police conduct and accountability but still rated themselves as slightly to strongly comfortable discussing the topic, `r topic_counts_df$n[topic_counts_df$topicChoiceAsString == "mandating vaccines in the U.S."]` participants were least willing to discuss vaccine mandates but still rated themselves as slightly to strongly comfortable discussing the topic, `r topic_counts_df$n[topic_counts_df$topicChoiceAsString == "the role of capitalism in the U.S. economy"]` participants were least willing to discuss capitalism in economy but still rated themselves as slightly to strongly comfortable discussing the topic, and topic_counts_df$n[topic_counts_df$topicChoiceAsString == "U.S. public policy on climate change"] participants were least willing to discuss climate change but still rated themselves as slightly to stronly comfortable discussing the topic.
+# Specifically, `r topic_frequency_counts$n[topic_frequency_counts$topicChoiceAsString == "police conduct and accountability in the U.S."]` participants were least willing to discuss police conduct and accountability but still rated themselves as slightly to strongly comfortable discussing the topic, `r topic_frequency_counts$n[topic_frequency_counts$topicChoiceAsString == "mandating vaccines in the U.S."]` participants were least willing to discuss vaccine mandates but still rated themselves as slightly to strongly comfortable discussing the topic, `r topic_frequency_counts$n[topic_frequency_counts$topicChoiceAsString == "the role of capitalism in the U.S. economy"]` participants were least willing to discuss capitalism in economy but still rated themselves as slightly to strongly comfortable discussing the topic, and topic_frequency_counts$n[topic_frequency_counts$topicChoiceAsString == "U.S. public policy on climate change"] participants were least willing to discuss climate change but still rated themselves as slightly to stronly comfortable discussing the topic.
 ```
 
 ```{r}
@@ -602,7 +635,7 @@ avg_willingness_df <- surveys_df %>%
   summarise(avg_willingness = mean(as.numeric(answer), na.rm = TRUE)) %>%
   ungroup() %>%
   mutate(topicChoiceAsString = factor(topicChoiceAsString, 
-                                      levels = topic_counts_df %>% 
+                                      levels = topic_frequency_counts %>% 
                                         arrange(n) %>%  # Use arrange(desc(n)) for descending
                                         pull(topicChoiceAsString)))
 
@@ -643,7 +676,7 @@ avg_willingness_box_plot <- ggplot(
 ) +
   geom_boxplot() +
   geom_text(
-    data = topic_counts_df,
+    data = topic_frequency_counts,
     aes(
       x = Inf,
       y = as.factor(topicChoiceAsString),
@@ -786,7 +819,6 @@ ggplot(quality_ind_willingness, aes(x = n_endorsed, y = interval)) +
 
 ```
 
-
 ```{r}
 #| label: fig-avg-willingness-diff
 #| echo: false
@@ -848,7 +880,7 @@ print(sliders_density)
 ```
 
 ```{r}
-#| label: Most frequently endorsed concerns 
+#| label: Make various short labels for concern items 
 #| echo: false
 
 concern_map <- c("Might experience negative feelings about self" = "unwillingness-reason-The conversation could negatively affect how I feel about myself during and/or afterward (e.g.,  fear, sadness, anger, vulnerability)", 
@@ -877,6 +909,31 @@ concern_map <- c("Might experience negative feelings about self" = "unwillingnes
   "Others' views won't change" = "unwillingness-reason-It would be a waste of time because the others' views wouldn't change",
   "Might damage relationships" = "unwillingness-reason-I would not want to hurt my relationship(s) with others or upset them"
 )
+
+# make tibble using these 
+concern_lookup <- tibble(
+  question = unlist(concern_map),
+  short_concern_label = rep(names(concern_map), lengths(concern_map))
+)
+
+# create short labels for each question
+question_key_for_fa <- surveys_df %>%
+  filter(phase == "follow-up-unwillingness-concerns-survey") %>%
+  ungroup() %>%
+  select(question) %>%
+  distinct(question) %>%
+  arrange(question) %>%  # ensure consistent order
+  mutate(short_label = paste0("Q0", row_number())) %>%
+  merge(concern_lookup, by = "question")
+
+question_key_for_printing <- question_key_for_fa %>%
+  mutate(across(everything(), ~ gsub('unwillingness-reason-', '', .))) 
+
+```
+
+```{r}
+#| label: Most frequently endorsed concerns
+#| echo: false 
 
 percent_concerned_df <- surveys_df %>%
   filter(phase == "willingness-concerns-first-survey") %>%
@@ -956,6 +1013,8 @@ top_5_severe <- percent_severe_df %>%
 ```{r}
 #| label: fig-openmindedness-density
 #| include: false
+#| message: false
+#| warning: false
 #| fig-cap: Scatterplot with line of equality of pre- and post-conversation mean ratings of subjects' open-mindedness when discussing their topic. Subjects rated their open-mindedness on a scale from 0 to 7, where a rating of 0 meant subject was not open-minded and a rating of 7 meant subject was open-minded.
 
 openmindedness_df <- surveys_df %>%
@@ -1001,6 +1060,8 @@ print(openmindedness_density)
 ```{r}
 #| label: fig-openmindedness-likert-bar-plot
 #| echo: false
+#| warning: false
+#| message: false 
 #| fig-cap: Likert bar plot displaying subjects' ratings of five questions about their open-mindedness. The five questions were derived from @elnakouri2024 and modified for application to this experiment. On a scale from 1 to 7, where a rating of 1 meant subject strongly disagreed and a rating of 7 meant strongly agree, subjects rated how true the five statements were for them. Three of the statements were negatively worded in the survey but have been worded positively and reverse-coded in this plot for clarity.
 
 # only works though if all "1" to "7" ratings are in the df
@@ -1047,7 +1108,7 @@ openmindedness_likert <- likert(as.data.frame(wide_for_likert_openmindedness_df)
 plot(openmindedness_likert, legend.position="right")
 ```
 
-On average, subjects rated their open-mindedness at `r mean_openmindedness` out of 7 (Range: `r min_openmindedness`-`r max_openmindedness`), where 1 is less open-minded and 7 is more open-minded, as observed in @fig-openmindedness-likert-bar-plot.
+On average, subjects rated their open-mindedness at `r mean_openmindedness` out of 7 (Range: `r min_openmindedness`-`r max_openmindedness`), where 1 is less open-minded and 7 is more open-minded, as observed in @fig-openmindedness-likert-bar-plot. Given later findings on the top concerns that people have, it is notable here that "Does not avoid opposing messages" has the lowest open-mindedness ratings from participants. 
 
 ```{r}
 #| label: Making free response csv for chat analysis 
@@ -1157,31 +1218,6 @@ free_response_manual_df <- free_response_df %>%
 
 ### Comprehensiveness of Concerns
 
-On average, subjects endorsed `r sum_stats_concerns_endorsed$mean` concerns as impacting their willingness at all (Min = `r sum_stats_concerns_endorsed$min`, LQ = `r sum_stats_concerns_endorsed$lower_quantile`, UQ = `r sum_stats_concerns_endorsed$upper_quantile`, Max = `r sum_stats_concerns_endorsed$max`). 
-
-The top five most frequently endorsed concerns (answered "Yes") were: `r paste0(shQuote(top_5_concerns[1:5]), collapse=", ")`.
-
-The top five concerns most severely impacting willingness were `r paste0(shQuote(top_5_severe[1:5]), collapse=", ")`. The full distribution of severity ratings can be observed in @fig-unwillingness-reason-likert-bar-plot.
-
-### Factor Analysis on Concerns
-
-We examined the initial binary endorsement ratings of our concern items where each participant simply indicated whether an item concerned them at all, as well as the Likert-scale ratings of how much each of the endorsed items impact the participant's willingness.
-
-```{r}
-#| label: tbl-free-response
-#| include: false
-#| fig-cap: Table of example free responses in which participants expressed avoidance of conversations because they felt that the topic was too complex or that they did not know enough about the topic to engage in a conversation about it.
-
-
-# fr_knowledge <- free_response_df %>%
-#   filter(prolific_subject_id == "67ac21373a76570ef0a5c0d3" | prolific_subject_id == "66b979589d208d3ec691d89b" | prolific_subject_id == "5d3695969749cc00165c222f") %>%
-#   select("Free response", "Focus topic")
-
-# kable(fr_knowledge, "html") %>%
-#   kable_styling() %>%
-#   column_spec(2, width = "5em")
-
-```
 
 ```{r}
 #| label: fig-unwillingness-reason-likert-bar-plot
@@ -1238,7 +1274,17 @@ unwillingness_reason_likert <- likert(as.data.frame(wide_unwill_reasons_df_2))
 
 # for the future when comparing pre and post, might want to use this example line: df1_likert <- likert(items=df1[,3:4], grouping=df1[,2])
 
-suppressWarnings(plot(unwillingness_reason_likert, legend.position="right"))
+plot(
+  unwillingness_reason_likert, 
+  legend.position="right",
+  colors = c("#63666A", "#9A9B9C", "#D0D0CE", "#FFF8EF", "#F2D4D7", "#B2182B", "#641A2B")) +
+  labs(title = "What Concerns Deter Americans from Engaging in Difficult Conversations?") +
+  theme(
+    plot.title = element_text(
+      hjust = 0.5,      # center
+      size = 10         # font size
+    )
+  ) 
 
 ```
 
@@ -1259,21 +1305,37 @@ suppressWarnings(plot(unwillingness_reason_only_endorsed_likert, legend.position
 
 ```
 
+On average, subjects endorsed `r round(sum_stats_concerns_endorsed$mean, 0)` concerns as impacting their willingness at all (Min = `r sum_stats_concerns_endorsed$min`, LQ = `r sum_stats_concerns_endorsed$lower_quartile`, UQ = `r sum_stats_concerns_endorsed$upper_quartile`, Max = `r sum_stats_concerns_endorsed$max`).
+
+The top five most frequently endorsed concerns (answered "Yes") were: `r paste0(shQuote(top_5_concerns[1:5]), collapse=", ")`.
+
+The top five concerns most severely impacting willingness were `r paste0(shQuote(top_5_severe[1:5]), collapse=", ")`. The full distribution of severity ratings can be observed in @fig-unwillingness-reason-likert-bar-plot.
+
+### Factor Analysis on Concerns
+
+We examined the initial binary endorsement ratings of our concern items where each participant simply indicated whether an item concerned them at all, as well as the Likert-scale ratings of how much each of the endorsed items impact the participant's willingness.
+
+```{r}
+#| label: tbl-free-response
+#| include: false
+#| fig-cap: Table of example free responses in which participants expressed avoidance of conversations because they felt that the topic was too complex or that they did not know enough about the topic to engage in a conversation about it.
+
+
+# fr_knowledge <- free_response_df %>%
+#   filter(prolific_subject_id == "67ac21373a76570ef0a5c0d3" | prolific_subject_id == "66b979589d208d3ec691d89b" | prolific_subject_id == "5d3695969749cc00165c222f") %>%
+#   select("Free response", "Focus topic")
+
+# kable(fr_knowledge, "html") %>%
+#   kable_styling() %>%
+#   column_spec(2, width = "5em")
+
+```
+
 ```{r}
 #| label: Wrangle data for factor analysis
+#| warning: false
+#| message: false
 #| echo: false
-
-# create short labels for each question
-question_key_for_fa <- surveys_df %>%
-  filter(phase == "follow-up-unwillingness-concerns-survey") %>%
-  ungroup() %>%
-  select(question) %>%
-  distinct(question) %>%
-  arrange(question) %>%  # ensure consistent order
-  mutate(short_label = paste0("Q0", row_number()))
-
-question_key_for_printing <- question_key_for_fa %>%
-  mutate(across(everything(), ~ gsub('unwillingness-reason-', '', .))) 
 
 # join short labels back to the main data
 surveys_df <- surveys_df %>%
@@ -1309,7 +1371,7 @@ avg_na_per_row <- mean(row_na_counts)
 cor_matrix <- cor(concerns_wide_na_replaced, use = "pairwise.complete.obs")
 
 library(corrplot)
-#corrplot <- corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
+corrplot <- corrplot(cor_matrix, method = "color", type = "upper", tl.cex = 0.7)
 
 # the items all seem to show low to moderate correlations. pretty solid
 ```
@@ -1348,7 +1410,7 @@ fa_result <- fa(
     concerns_wide_na_replaced,
     nfactors = 4,
     rotate = "oblimin"
-    )
+    ) 
 
 #get explained variance for report 
 total_var_explained_percent <- round(sum(fa_result$Vaccounted["Proportion Var", ]) * 100, 1)
@@ -1371,18 +1433,17 @@ library(tidyverse)
 
 # visualize factor loadings
 #prepping dfs
-loadings_full_df <- as.data.frame(fa_result$loadings[1:25, ])
+loadings_full_df <- as.data.frame(fa_result$loadings[1:25, ]) %>%
+  rename("1" = "MR1",
+         "2" = "MR2",
+         "3" = "MR3",
+         "4" = "MR4")
+
 loadings_full_df$short_label <- rownames(loadings_full_df)
 
 #pivot for readability
 loadings_full_long <- loadings_full_df %>% 
   pivot_longer(-short_label, names_to = "factor", values_to = "loading")
-
-#turn short labels into a df so i can merge with the loadings df
-concern_lookup <- tibble(
-  question = unlist(concern_map),
-  short_concern_label = rep(names(concern_map), lengths(concern_map))
-)
 
 # make digestible df with only the top loading items so we can see which concerns are in each factor
 loadings_max_df <- loadings_full_long %>%
@@ -1390,13 +1451,11 @@ loadings_max_df <- loadings_full_long %>%
   slice_max(order_by = abs(loading), n = 1, with_ties = FALSE) %>%
   ungroup() %>%
   merge(question_key_for_fa, by = "short_label") %>%
-  left_join(concern_lookup, by = "question") %>%
   arrange(factor)
 
 #make plot for visualization 
 loadings_full_long <- loadings_full_long %>%
-  merge(question_key_for_fa, by = "short_label") %>%
-  merge(concern_lookup, by = "question")
+  merge(question_key_for_fa, by = "short_label")
 
 factor_loadings_plot <- ggplot(loadings_full_long, aes(x = reorder(short_concern_label, loading), y = loading, fill = factor)) +
   geom_col(position = "dodge") +
@@ -1411,19 +1470,19 @@ factor_loadings_plot <- ggplot(loadings_full_long, aes(x = reorder(short_concern
 
 #pull items for printing later
 factor_1_items <- loadings_max_df %>%
-  filter(factor == "MR1") %>%
+  filter(factor == "1") %>%
  pull(short_concern_label)  
 
 factor_2_items <- loadings_max_df %>%
-  filter(factor == "MR2") %>%
+  filter(factor == "2") %>%
  pull(short_concern_label)  
 
 factor_3_items <- loadings_max_df %>%
-  filter(factor == "MR3") %>%
+  filter(factor == "3") %>%
  pull(short_concern_label)  
 
 factor_4_items <- loadings_max_df %>%
-  filter(factor == "MR4") %>%
+  filter(factor == "4") %>%
  pull(short_concern_label)  
 
 #make item order for printing
@@ -1460,7 +1519,7 @@ factor_scores_df <- as.data.frame(fa_result$scores) %>%
   mutate(prolific_subject_id = concerns_labeled_wide_na_replaced$prolific_subject_id)
 
 # now summarize factor scores across sample
-standardized_summary_factor_scores_df %>%
+standardized_summary_factor_scores_df <- factor_scores_df %>%
   summarise(across(starts_with("MR"), list(mean = mean, sd = sd), na.rm = TRUE))
 
 super_summary_factor_scores_df <- factor_scores_df %>%
@@ -1505,10 +1564,10 @@ factor_endorsement_summary <- endorsements %>%
     mean_items_endorsed = mean(n_endorsed)
   ) %>%
   mutate(n_items_in_factor = case_when(
-    factor == "MR1" ~ length(factor_1_items),
-    factor == "MR2" ~ length(factor_2_items),
-    factor == "MR3" ~ length(factor_3_items),
-    factor == "MR4" ~ length(factor_4_items),
+    factor == "1" ~ length(factor_1_items),
+    factor == "2" ~ length(factor_2_items),
+    factor == "3" ~ length(factor_3_items),
+    factor == "4" ~ length(factor_4_items),
     .default = NA
   ))
 
@@ -1552,9 +1611,511 @@ Distrust of Conversational Process (Factor 3): This factor captures doubts of co
 
 Personal Vulnerability & Identity Threat (Factor 4): This first factor consists of items focusing on internal psychological distress and threats to the participant's self-concept or core beliefs. The items in this factor are: `r paste0(shQuote(factor_4_items), collapse=", ")`.
 
-`r round(100*(factor_endorsement_summary$pct_subjects_endorsing_any[factor_endorsement_summary$factor == "MR1"]), 0)` percent of subjects endorsed at least one concern in factor 1. Of the `r factor_endorsement_summary$n_items_in_factor[factor_endorsement_summary$factor == "MR1"]` items in factor 1, subjects endorsed an average of `r factor_endorsement_summary$mean_items_endorsed[factor_endorsement_summary$factor == "MR1"]` items. Similarly, `r round(100*(factor_endorsement_summary$pct_subjects_endorsing_any[factor_endorsement_summary$factor == "MR2"]), 0)` percent endorsed at least one concern in factor 2. Of the `r factor_endorsement_summary$n_items_in_factor[factor_endorsement_summary$factor == "MR2"]` items in factor 1, subjects endorsed an average of `r factor_endorsement_summary$mean_items_endorsed[factor_endorsement_summary$factor == "MR2"]` items. `r round(100*(factor_endorsement_summary$pct_subjects_endorsing_any[factor_endorsement_summary$factor == "MR3"]), 0)` endorsed at least one concern in factor 3. Of the `r factor_endorsement_summary$n_items_in_factor[factor_endorsement_summary$factor == "MR3"]` items in factor 1, subjects endorsed an average of `r factor_endorsement_summary$mean_items_endorsed[factor_endorsement_summary$factor == "MR3"]` items. Finally, `r round(100*(factor_endorsement_summary$pct_subjects_endorsing_any[factor_endorsement_summary$factor == "MR4"]), 0)` endorsed at least one concern in factor 4. Of the `r factor_endorsement_summary$n_items_in_factor[factor_endorsement_summary$factor == "MR4"]` items in factor 1, subjects endorsed an average of `r factor_endorsement_summary$mean_items_endorsed[factor_endorsement_summary$factor == "MR4"]` items. 
+`r round(100*(factor_endorsement_summary$pct_subjects_endorsing_any[factor_endorsement_summary$factor == "1"]), 0)` percent of subjects endorsed at least one concern in factor 1. Of the `r factor_endorsement_summary$n_items_in_factor[factor_endorsement_summary$factor == "1"]` items in factor 1, subjects endorsed an average of `r factor_endorsement_summary$mean_items_endorsed[factor_endorsement_summary$factor == "1"]` items. Similarly, `r round(100*(factor_endorsement_summary$pct_subjects_endorsing_any[factor_endorsement_summary$factor == "2"]), 0)` percent endorsed at least one concern in factor 2. Of the `r factor_endorsement_summary$n_items_in_factor[factor_endorsement_summary$factor == "2"]` items in factor 1, subjects endorsed an average of `r factor_endorsement_summary$mean_items_endorsed[factor_endorsement_summary$factor == "2"]` items. `r round(100*(factor_endorsement_summary$pct_subjects_endorsing_any[factor_endorsement_summary$factor == "3"]), 0)` endorsed at least one concern in factor 3. Of the `r factor_endorsement_summary$n_items_in_factor[factor_endorsement_summary$factor == "3"]` items in factor 1, subjects endorsed an average of `r factor_endorsement_summary$mean_items_endorsed[factor_endorsement_summary$factor == "3"]` items. Finally, `r round(100*(factor_endorsement_summary$pct_subjects_endorsing_any[factor_endorsement_summary$factor == "4"]), 0)` endorsed at least one concern in factor 4. Of the `r factor_endorsement_summary$n_items_in_factor[factor_endorsement_summary$factor == "4"]` items in factor 1, subjects endorsed an average of `r factor_endorsement_summary$mean_items_endorsed[factor_endorsement_summary$factor == "4"]` items.
 
-Factor scores were computed using the regression method. Factor 1 was the dominant concern domain for `r round(100*(super_summary_factor_scores_df$pct[super_summary_factor_scores_df$factor == "MR1]), 0)` percent of participants. Factor 2 was the dominant concern domain for `r round(100*(super_summary_factor_scores_df$pct[super_summary_factor_scores_df$factor == "MR2]), 0)` percent of participants. Factor 3 was the dominant concern domain for `r round(100*(super_summary_factor_scores_df$pct[super_summary_factor_scores_df$factor == "MR3]), 0)` percent of participants. Factor 4 was the dominant concern domain for `r round(100*(super_summary_factor_scores_df$pct[super_summary_factor_scores_df$factor == "MR4]), 0)` percent of participants. 
+Factor scores were computed using the regression method. Factor 1 was the dominant concern domain for `r round(100*(super_summary_factor_scores_df$pct[super_summary_factor_scores_df$factor == "1"]), 0)` percent of participants. Factor 2 was the dominant concern domain for `r round(100*(super_summary_factor_scores_df$pct[super_summary_factor_scores_df$factor == "2"]), 0)` percent of participants. Factor 3 was the dominant concern domain for `r round(100*(super_summary_factor_scores_df$pct[super_summary_factor_scores_df$factor == "3"]), 0)` percent of participants. Factor 4 was the dominant concern domain for `r round(100*(super_summary_factor_scores_df$pct[super_summary_factor_scores_df$factor == "4"]), 0)` percent of participants.
+
+
+### Participant concern profiles (PCA and cluster analysis)
+
+```{r}
+#| label: PCA for profiling participants
+#| include: false
+
+# run pca on participants 
+pca_result <- prcomp(concerns_wide_na_replaced, scale. = TRUE)
+summary(pca_result)
+
+#screeplot helps search for an elbow that indicates where the number of principal components should be cut off
+screeplot(pca_result, type = "lines")
+
+#biplot is hard to gain info from with this many observations and vectors 
+biplot(pca_result, scale = 0)
+
+## look at proportions of variance explained by each principal component 
+pve <- summary(pca_result)[["importance"]]["Proportion of Variance",]
+#plot
+plot(1:length(pve), pve, ylim = c(0,1), xlab = "PC", 
+     ylab = "Prop Variance Explained", type = "b", pch = 20)
+
+## i find cumulative more helpful:
+cumpve <- summary(pca_result)[["importance"]]["Cumulative Proportion",]
+cumpve
+#plot
+plot(1:length(cumpve), cumpve, ylim = c(0,1), xlab = "PC", 
+     ylab = "Cum Prop Variance Explained", type = "b", pch = 20)
+
+# add pca_results to the og concerns df
+concerns_labeled_wide_na_replaced <- data.frame(concerns_labeled_wide_na_replaced, pca_result$x)
+
+```
+
+```{r}
+#| label: fig-pca-scree-plot
+#| fig-cap: Scree plot indicating some structure in the principal components--- meaningful drop from PC1 to PC2, and more notable elbow from PC4 to PC5. Then all components are relatively negligible contributors. Suggests we should use 4 PCs.
+#| echo: false 
+
+screeplot(pca_result, type = "lines")
+```
+
+```{r}
+#| label: look at pca loadings
+#| echo: false
+
+# grab four pc loadings 
+four_pca_loadings <- as.data.frame(round(pca_result$rotation[, 1:4], 2)) %>%
+  arrange(desc(PC2)) %>%
+  mutate(PC1 = as.numeric(PC1),
+         PC2 = as.numeric(PC2),
+         PC3 = as.numeric(PC3),
+         PC4 = as.numeric(PC4))
+
+#switch out labels for the shortened text labels 
+rownames(four_pca_loadings) <- question_key_for_fa$short_concern_label[match(rownames(four_pca_loadings), question_key_for_fa$short_label)]
+
+# highlight the extreme loadings so i can pay closer attention 
+extreme_pc1_loadings <- four_pca_loadings %>%
+  filter(abs(PC1) > 0.27) %>%
+  select(PC1)
+
+extreme_pc2_loadings <- four_pca_loadings %>%
+  filter(abs(PC2) > 0.27) %>%
+  select(PC2)
+
+extreme_pc3_loadings <- four_pca_loadings %>%
+  filter(abs(PC3) > 0.27) %>%
+  select(PC3)
+
+extreme_pc4_loadings <- four_pca_loadings %>%
+  filter(abs(PC4) > 0.27) %>%
+  select(PC4)
+```
+
+We conducted a principal component analysis (PCA) on participants' concern rating profiles to examine the dimensionality of their responses. The scree plot (@fig-pca-scree-plot) indicated that four principal components captured the majority of explainable variance, and we focus our interpretation on these.
+
+The first principal component, accounting for `r round(100*(pve[1]), 0)`% of variance, showed uniformly positive loadings across all items (range: 0.10–0.27). This pattern is consistent with a general response factor: participants who score high on PC1 rate all concerns highly, reflecting an overall tendency toward greater reluctance rather than concern about any particular aspect of conversation.
+
+```{r}
+#| label: tbl-pca-two-loadings 
+#| fig-cap: Table displaying the concern items with loadings greater than 0.27 or less than -0.27 for the second principal component
+
+kable(extreme_pc2_loadings, caption = "Concern items with extreme PC2 loadings")
+```
+
+The second principal component accounted for `r round(100*(pve[2]), 0)`% of variance. Its highest-loading items reflect concerns about the futility of engagement and the anticipated emotional or mental costs outweighing potential benefits. This pattern is consistent with the broader sentiment observed in @fig-unwillingness-reason-likert-bar-plot.
+
+```{r}
+#| label: tbl-pca-three-loadings 
+#| fig-cap: Table displaying the concern items with loadings greater than 0.27 or less than -0.27 for the third principal component
+
+kable(extreme_pc3_loadings, caption = "Concern items with extreme PC3 loadings")
+```
+
+The third principal component accounted for `r round(100*pve[3], 0)`% of variance and contrasted two distinct sources of reluctance. Negatively loading items reflected concern about holding an unpopular opinion and the social consequences that might follow from expressing it. Positively loading items reflected a sense of being ill-equipped to engage due to topic complexity, limited first-hand experience, or difficulty articulating one's views.
+
+```{r}
+#| label: tbl-pca-four-loadings 
+#| fig-cap: Table displaying the concern items with loadings greater than 0.27 or less than -0.27 for the fourth principal component
+
+kable(extreme_pc4_loadings, caption = "Concern items with extreme PC4 loadings")
+```
+
+The fourth principal component accounted for `r round(100*pve[4], 0)`% of variance and captured a similar but distinct contrast. Negatively loading items reflected reluctance stemming from unfamiliarity with the topic and with navigating disagreement. Positively loading items reflected avoidance motivated by anticipated negative affect, both self-directed and directed toward others.
+
+```{r}
+#| label: Hierarchical cluster analysis
+#| include: false
+
+#calculate distances
+concern_dists <- concerns_wide_na_replaced %>%
+  dist()
+
+#perform the clustering with average and complete linkage 
+hclustmodaverage <- concern_dists %>% hclust(method = "average")
+hclustmodcomplete <- concern_dists %>% hclust(method = "complete")
+
+#plot full dendrograms
+plot(hclustmodaverage)
+plot(hclustmodcomplete)
+
+#moving forward with complete linkage tree because it is more distributed than average linkage
+
+plot(hclustmodcomplete) %>%
+abline(h = 24, col = "blue", lty = 2)
+
+# cutting at 3 because it is as even as i can get the clusters to be
+completecut4 <- cutree(hclustmodcomplete, k = 4)
+table(completecut4)
+
+# add cluster id back to the df 
+concerns_with_cluster_df <- concerns_labeled_wide_na_replaced %>% mutate(clusterID = completecut4) 
+
+#get percentages to see the distribution amongst the clusters 
+hierarchical_cluster_percentages <- concerns_with_cluster_df %>%
+  group_by(clusterID) %>%                       # group by cluster
+  summarise(n = n()) %>%  # count unique subjects
+  mutate(percent = round(n / sum(n) * 100, 1))       # calculate percentage
+
+# add to surveys_df
+hierarchical_cluster_info <- concerns_with_cluster_df %>%
+  select(prolific_subject_id, clusterID)
+
+surveys_df <- surveys_df %>%
+  left_join(hierarchical_cluster_info, by = "prolific_subject_id")
+
+```
+
+```{r}
+#| label: fig-dendrogram-hierarchical-clustering
+#| echo: false
+#| fig-cap: A dendrogram cut at four clusters shows the results of hierarchical cluster analysis using complete linkage and Euclidean distance to look for common concern profiles amongst participants. 
+
+# print the dendrogram with the cut that i selected in previous code chunk 
+plot(hclustmodcomplete) %>%
+abline(h = 22, col = "blue", lty = 2)
+
+```
+
+```{r}
+#| label: heat-map-hierarchical-clustering-on-items
+#| echo: false
+#| fig-cap: Heat map of each cluster's average rating of each potential concern per hierarchical cluster analysis
+
+#make df for heatmap 
+hierarchical_for_heatmap_df <- concerns_with_cluster_df %>%
+  group_by(clusterID) %>%
+  summarise(across(starts_with("Q"), mean, na.rm = TRUE)) %>%
+  pivot_longer(cols = c(Q01,Q02,Q03,Q04,Q05,Q06,Q07,Q08,Q09,Q010,Q011,Q012,Q013,Q014,Q015,Q016,Q017,Q018,Q019,Q020,Q021,Q022,Q023,Q024,Q025), names_to = "short_label", values_to = "mean_rating") %>%
+  merge(question_key_for_fa, by = "short_label")
+
+#get pc1 order to sort clusters in heatmap 
+heat_map_concern_order <- hierarchical_for_heatmap_df %>%
+  filter(clusterID == 4) %>%
+  arrange(mean_rating) %>%
+  pull(short_concern_label)
+
+#make heat map to see what the cluster profiles actually look like  
+hierarchical_clustering_heatmap <- ggplot(hierarchical_for_heatmap_df, 
+    aes(x = factor(clusterID), y = factor(short_concern_label, levels = heat_map_concern_order), fill = mean_rating)) +
+  geom_tile() +
+  scale_fill_gradient(low = "#FFFFFF", high = "#A6192E") + 
+  labs(x = "Participant Profile", y = "Concern", fill = "Mean Rating", title = "Four Distinct Profiles of Conversational Reluctance") +
+  theme(axis.text.y = element_text(size = 8))  # no more angle needed
+
+#print heat map and the question key for richer understanding. if i actually include these in the final print, i'll need to add some gridExtra packaging here to make them be side by side
+hierarchical_clustering_heatmap
+
+# look at pc scores by cluster
+ pc_scores <- as.data.frame(pca_result$x[, 1:4])
+ pc_scores$clusterID <- concerns_with_cluster_df$clusterID
+ 
+ # this is printable
+pc_scores_by_cluster <- pc_scores %>%
+   group_by(clusterID) %>%
+   summarise(across(everything(), mean))
+
+```
+
+
+```{r}
+#| label: fig-pca-cluster-scatterplot
+#| echo: false
+#| fig-cap: Plot displaying participant clusters by their scores on the first and second principal components found through principal component analysis (PCA). We used hierarchical cluster analysis with Euclidean distance and complete linkage to create four clusters of participants based on their concern profile. The first principal component is likely a general factor, where participants score higher on this component if they generally rated the 25 concern items higher. The second principal component appears to differentiate between high scorers who are concerned about the futility of engagement and the anticipated emotional or mental costs outweighing potential benefits, and others who scored moderately.
+
+pc_scores_df <- as.data.frame(pca_result$x[, 1:2])
+pc_scores_df$clusterID <- factor(concerns_with_cluster_df$clusterID)
+
+ggplot(pc_scores_df, aes(x = PC1, y = PC2, color = clusterID)) +
+  geom_point(alpha = 0.6, size = 2) +
+  scale_color_brewer(palette = "Set2", name = "Cluster") +
+  labs(
+    title = "Participant Concern Profiles in PC Space",
+    x = "PC1 (Overall Concern Level)",
+    y = "PC2 (Futility vs. Social Concerns)"
+  ) +
+  theme_minimal()
+
+```
+
+We also conducted hierarchical clustering (euclidean distance, complete linkage), on participants' ratings of concerns to determine whether there are trends in participants ratings that could form general participant concern profiles. Analysis identified four distinct participant profiles based on their concern ratings.
+
+The majority of participants, `r hierarchical_cluster_percentages$percent[hierarchical_cluster_percentages$clusterID == 1]`%, fell into Cluster 1, reporting uniformly low concern across all items. This suggests that most participants in the sample self-reported as being broadly willing to engage in difficult conversations without meaningful reluctance toward any particular aspect. A further `r hierarchical_cluster_percentages$percent[hierarchical_cluster_percentages$clusterID == 2]`% fell into Cluster 2, meaning that nearly nine in ten participants reported relatively low overall concern. Cluster 2 participants did show a relative elevation on items related to holding an unpopular opinion, suggesting that even among the less-reluctant majority, social image concerns represent the most salient source of hesitation when it does arise.
+
+Cluster 3 participants, `r hierarchical_cluster_percentages$percent[hierarchical_cluster_percentages$clusterID == 3]`% of the sample, reported moderate-to-high concern broadly with particular elevation on items reflecting a sense of being ill-equipped to engage. This included struggling to explain their views, feeling invalidated, and finding the topic too complex. Their reluctance appears driven primarily by perceived competence and capacity constraints rather than anticipated social consequences.
+
+Cluster 4 participants reported the highest concern overall, with especially strong ratings on items reflecting anticipated futility: that the conversation would be too mentally draining, that others would not make an effort to listen, and that neither their own nor others' views would change as a result. Unlike Cluster 3, whose reluctance is self-directed, Cluster 4's reluctance is directed outward toward skepticism about the value and likely outcome of engagement itself. Just `r hierarchical_cluster_percentages$percent[hierarchical_cluster_percentages$clusterID == 4]`% of participants fell into Cluster 4.
+
+Taken together, the four clusters suggest a structure organized along two dimensions: overall level of reluctance, and, among those with higher reluctance, whether that reluctance is rooted in concerns about one's own capacity to engage or in doubts about whether engagement would be worthwhile.
+
+These findings should be interpreted in light of the methodological consideration that although participants rated all 25 concern items, on average, only `r round(sum_stats_concerns_endorsed$mean, 0)` concerns actually affected a given participant's willingness to engage. Rating concerns that were personally irrelevant may have deflated mean ratings across the board [not sure whether this is actually valid for me to say, but i feel like all the 1 ratings brought everything down], potentially pushing participants toward the lower-concern clusters (??). The low ratings in Clusters 1 and 2 may therefore reflect not an absence of reluctance per se, but rather that most participants' reluctance is relatively selective. Cluster 2's relative elevation on unpopular opinion items is consistent with this interpretation: even among the less-reluctant majority, social image concerns represent the most salient source of hesitation when it does arise.
+
+
+```{r}
+#| label: extra text 
+#| include: false
+
+#Cluster 1's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 1]`. On average, Cluster 1 rated the following concerns the highest: `r paste(shQuote(cluster1_top), collapse = "; ")`.
+
+#Cluster 2's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 2]`. On average, cluster 2's top concerns were `r paste(shQuote(cluster2_top), collapse = "; ")`.
+
+#Cluster 3's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 3]`. On average, cluster 3's top concerns were `r paste(shQuote(cluster3_top), collapse = "; ")`.
+
+```
+
+```{r}
+#| label: hierarchical-fig-clusters-avg-willingness   
+#| echo: false 
+#| fig-cap: Box plot of average willingness to converse about topic by cluster per hierarchical cluster analysis.
+
+avg_willingness_cluster_hierarchical_df <- avg_willingness_df %>%
+  merge(concerns_with_cluster_df, by = "prolific_subject_id")
+
+cluster_willingness_boxplot <-
+ggplot(avg_willingness_cluster_hierarchical_df, aes(x = factor(clusterID), y = avg_willingness, fill = factor(clusterID))) +
+  geom_boxplot() +
+  labs(x = "Participant Concern Profile (4 Clusters)", y = "Average Willingness to Converse (0-100)", title = "Willingness to Engage in Conversation by Concern Profile") +
+  theme_minimal() +
+  geom_text(
+    data = hierarchical_cluster_percentages,
+    aes(
+      y = Inf,
+      x = as.factor(clusterID),
+      label = paste0("n = ", n)
+    ),
+    inherit.aes = FALSE,
+    hjust = 0.5,
+    vjust = 1,
+    size = 3
+  ) +
+  scale_fill_manual(values = c("1" = "#951829", "2" = "#951829", "3" = "#951829", "4" = "#951829")) +
+    guides(fill = "none")
+
+cluster_willingness_boxplot
+
+```
+
+```{r}
+#| label: fig-hierarchical-clusters-avg-openmindedness
+#| echo: false 
+#| fig-cap: Box plot of average open-mindedness about topic by cluster per hierarchical analysis. 
+
+open_mindedness_w_clusters_hierarchical <- openmindedness_summary_by_subject_df %>%
+  merge(concerns_with_cluster_df, by = "prolific_subject_id")
+
+ggplot(open_mindedness_w_clusters_hierarchical, aes(x = factor(clusterID), y = mean_openmindedness, fill = factor(clusterID))) +
+  geom_boxplot() +
+  labs(x = "Participant Concern Profile (Clusters)", y = "Average Open-Mindedness (1-7)", title = "Average Open-mindedness by Participant Concern Profiles") +
+  theme_minimal() + 
+  scale_fill_manual(values = c("1" = "#951829", "2" = "#951829", "3" = "#951829", "4" = "#951829")) +
+    guides(fill = "none")
+
+
+```
+
+```{r}
+#| label: fig-demographics-clusters-hierarchical
+#| echo: false 
+#| fig-cap: Plots of demographics by hierarchical cluster helps us explore whether the clusters may have significantly different demographics.
+
+sex_cluster_plot <- ggplot(surveys_df, aes(x = clusterID, fill = Sex)) +
+  geom_bar(position = "fill") +
+  labs(x = "Participant Concern Profile (Cluster)", y = "Proportion of Male and Female Participants", title = "Sex Composition by Participant Concern Profile") + 
+  scale_fill_manual(values = c("Male" = "#951829", "Female" = "#63666A"))
+
+  
+
+ethnicity_cluster_plot <- ggplot(surveys_df, aes(x = clusterID, fill = `Ethnicity simplified`)) +
+   geom_bar(position = "fill") +
+   labs(x = "Participant Concern Profiles (Clusters)", y = "Proportion", title = "Ethnicities Within Participant Concern Profiles") +
+  scale_fill_manual(values = c("White" = "#951829", "Other" = "#63666A", Mixed = "#ED1C24", "Black" = "#D0D0CE", "Asian" = "#F2D4D7"))
+
+age_cluster_plot <- ggplot(
+  surveys_df,
+  aes(x = factor(clusterID), y = as.numeric(Age), fill = factor(clusterID))
+) +
+  geom_boxplot() +
+  labs(
+    title = "Age Distributions Within Participant Concern Profiles",
+    x = "Participant Concern Profiles (Clusters)",
+    y = "Age (Years)"
+  ) + 
+  scale_fill_manual(values = c("1" = "#951829", "2" = "#951829", "3" = "#951829", "4" = "#951829")) +
+    guides(fill = "none")
+
+sex_cluster_plot
+age_cluster_plot
+ethnicity_cluster_plot
+```
+
+```{r}
+#| label: fig-topic-choice-clusters-hierarchical
+#| echo: false 
+#| fig-cap: Plots of topic choice by hierarchical cluster helps us explore whether the clusters may have significant differences in which topics they focused on.
+
+# within each cluster, finding percent of subjects on each topic. i tried to do this in one df but kept getting an error that i couldn't figure out 
+hierarchical_cluster1_topic_percent <- surveys_df %>%
+  filter(clusterID == 1) %>%
+  distinct(prolific_subject_id, .keep_all = TRUE) %>%
+  group_by(topicChoiceAsString) %>%
+  summarise(n_cluster_1 = n(), .groups = "drop") %>%
+  mutate(percent_cluster_1 = n_cluster_1 / sum(n_cluster_1))
+
+hierarchical_cluster2_topic_percent <- surveys_df %>%
+  filter(clusterID == 2) %>%
+  distinct(prolific_subject_id, .keep_all = TRUE) %>%
+  group_by(topicChoiceAsString) %>%
+  summarise(n_cluster_2 = n(), .groups = "drop") %>%
+  mutate(percent_cluster_2 = n_cluster_2 / sum(n_cluster_2))
+
+hierarchical_cluster3_topic_percent <- surveys_df %>%
+  filter(clusterID == 3) %>%
+  distinct(prolific_subject_id, .keep_all = TRUE) %>%
+  group_by(topicChoiceAsString) %>%
+  summarise(n_cluster_3 = n(), .groups = "drop") %>%
+  mutate(percent_cluster_3 = n_cluster_3 / sum(n_cluster_3))
+
+hierarchical_cluster4_topic_percent <- surveys_df %>%
+  filter(clusterID == 4) %>%
+  distinct(prolific_subject_id, .keep_all = TRUE) %>%
+  group_by(topicChoiceAsString) %>%
+  summarise(n_cluster_4 = n(), .groups = "drop") %>%
+  mutate(percent_cluster_4 = n_cluster_4 / sum(n_cluster_4))
+
+#join together
+hierarchical_cluster_topic_percent <- hierarchical_cluster1_topic_percent %>%
+  full_join(hierarchical_cluster2_topic_percent, by = "topicChoiceAsString") %>% 
+  full_join(hierarchical_cluster3_topic_percent, by = "topicChoiceAsString") %>%
+ full_join(hierarchical_cluster4_topic_percent, by = "topicChoiceAsString") 
+
+library(forcats)
+
+surveys_df$short_topic_labels <- fct_infreq(surveys_df$short_topic_labels)
+
+ggplot(surveys_df, aes(x = clusterID, fill = short_topic_labels)) +
+  geom_bar(position = "fill") +
+  scale_fill_manual(values = c(
+"U.S. in Israeli-Palestinian conflict" = "#641A2B",                              "Transgender athletes in sports" = "#951829",
+"Human euthanasia" = "#ED1C24",
+"Capitalism in economy" = "#F2D4D7",
+"Climate change policies" = "#FFF8EF",
+"Deportation policies" = "#D0D0CE",
+"A.I. in human-run spaces" = "#808080",
+"Vaccine Mandates" = "#63666A",
+"Police conduct and accountability" = "#C6AA76",
+"Government in healthcare" = "#000080"
+)) +
+  labs(x = "Participant Concern Profiles (Clusters)", y = "Proportion", title = "Focus Topic Distributions Within Participant Concern Profiles", fill = "Focus topic")
+
+```
+
+```{r}
+#| label: Look for sign diffs in sex btwn clusters
+#| echo: false
+
+# make a df that only has one row per subject
+sig_dif_df <- surveys_df %>%
+  distinct(prolific_subject_id, .keep_all = TRUE) %>%
+  mutate(Age = as.numeric(Age))
+
+sex_table <- table(sig_dif_df$clusterID, sig_dif_df$Sex)
+chisq_sex <- chisq.test(sex_table)
+# p value isn't significant 
+
+```
+
+```{r}
+#| label: Look for sign diffs in ethnicity btwn clusters
+#| echo: false
+#| warning: false
+#| message: false 
+
+eth_table <- table(sig_dif_df$clusterID, sig_dif_df$`Ethnicity simplified`)
+
+#there are too few people in the third and fourth cluster, so i am going to group minority ethnicities together. the oversimplification is not ideal but at least it's something 
+eth_chisq_df <- sig_dif_df %>%
+  mutate(
+    ethnicity_collapsed = case_when(
+      `Ethnicity simplified` %in% c("Black", "Mixed", "Other", "Asian") ~ "Minority",
+      `Ethnicity simplified` == "White" ~ "White"
+    )
+  )
+
+eth_simplified_table <- table(eth_chisq_df$clusterID, eth_chisq_df$ethnicity_collapsed)
+chisq_ethnicity <- chisq.test(eth_simplified_table)
+# not significant
+
+
+# gonna look at collapsing cluster similar (by concern profile) clusters instead of race  
+eth_chisq_2_df <- sig_dif_df %>%
+  mutate(collapsed_clusterID = case_when(
+    clusterID == 1 ~ "one_and_two",
+    clusterID == 2 ~ "one_and_two",
+    clusterID == 3 ~ "three_and_four",
+    clusterID == 4 ~ "three_and_four",
+    .default = NA
+  ))
+
+eth_simplified_table_2 <- table(eth_chisq_2_df$collapsed_clusterID, eth_chisq_2_df$`Ethnicity simplified`)
+chisq_ethnicity_2 <- chisq.test(eth_simplified_table_2)
+# still too few obs. could do more extensive methods, but i don't think it's worth it here
+
+```
+
+```{r}
+#| label: Look for sign diffs in focus topic btwn clusters
+#| echo: false
+#| warning: false
+#| message: false 
+
+# topic choice
+topic_table <- table(sig_dif_df$clusterID, sig_dif_df$short_topic_labels)
+#there are too few obs in a lot of entries, so i'm going to collapse the less common topics together 
+
+# identify rare topics dynamically
+rare_topics <- topic_frequency_counts %>%
+  filter(n < 30) %>% # min count topics 
+  pull(short_topic_labels)
+
+# collapse clusters 3 and 4 and collapse low count topics because there are too few counts to run chi sq test
+topic_chisq_df <- sig_dif_df %>%
+  mutate(collapsed_clusterID = case_when(
+    clusterID == 1 ~ "one",
+    clusterID == 2 ~ "two",
+    clusterID == 3 ~ "three_and_four",
+    clusterID == 4 ~ "three_and_four",
+    .default = NA
+  )) %>%
+  mutate(topic_collapsed = ifelse(short_topic_labels %in% rare_topics, 
+                             "Other", 
+                             short_topic_labels)) 
+topic_table_coll <- table(topic_chisq_df$collapsed_clusterID, topic_chisq_df$topic_collapsed)
+
+chisq_topic_coll <- chisq.test(topic_table_coll)
+#insignificant p value. the data has become so simplified anyway
+```
+
+```{r}
+#| label: Look for sig diffs in age btwn clusters
+#| echo: false
+
+# do anova and nonparametric just in case 
+anova_age <- aov(Age ~ factor(clusterID), data = sig_dif_df)
+
+summary_anova_age <- summary(anova_age)
+
+nonpara_age <- kruskal.test(Age ~ factor(clusterID), data = sig_dif_df)
+
+#neither significant 
+
+library(car)
+leveneTest(Age ~ factor(clusterID), data = sig_dif_df)
+```
+
+A chi-square test of independence indicated that sex did not significantly differ across clusters, χ²(`r chisq_sex$parameter`, N = `r sum(sex_table)`) = `r round(chisq_sex$statistic, 2)`, p = `r round(chisq_sex$p.value, 3)`.
+
+A chi-square test of independence indicated that ethnicity did not significantly differ across clusters, χ²(`r chisq_ethnicity$parameter`, N = `r sum(eth_simplified_table)`) = `r round(chisq_ethnicity$statistic, 2)`, p = `r round(chisq_ethnicity$p.value, 3)`.
+
+A one-way ANOVA indicated that age did not significantly differ across clusters, F(`r summary_anova_age[[1]]$Df[1]`, `r summary_anova_age[[1]]$Df[2]`) = `r round(summary_anova_age[[1]]$"F value"[1], 2)`, p `r ifelse(summary_anova_age[[1]]$"Pr(>F)"[1] < .001, "< .001", paste0("= ", sub("^0", "", format(round(summary_anova_age[[1]]$"Pr(>F)"[1], 3), nsmall = 3))))`.
 
 ### Correlations
 
@@ -1589,7 +2150,6 @@ print_significant_correlations <- function(df) {
     ))
   }
 }
-
 
 ```
 
@@ -1638,10 +2198,14 @@ p25.o <- ggplot(concerns_and_avg_openmindedness_df, aes(x = Q025, y = mean_openm
 
 
 # arrange the plots in a grid
-suppressWarnings(grid.arrange(p1.o, p2.o, p3.o, p4.o, p5.o, p6.o, p7.o, p8.o, p9.o, p10.o, p11.o, p12.o, p13.o, p14.o, p15.o, p16.o, p17.o, p18.o, p19.o, p20.o, p21.o, p22.o, p23.o, p24.o, p25.o, ncol = 4))
+#suppressWarnings(grid.arrange(p1.o, p2.o, p3.o, p4.o, p5.o, p6.o, p7.o, p8.o, p9.o, p10.o, p11.o, p12.o, p13.o, p14.o, p15.o, p16.o, p17.o, p18.o, p19.o, p20.o, p21.o, p22.o, p23.o, p24.o, p25.o, ncol = 4))
 
 
 ### the results seem to pretty much show no relationship, but if you squint your eyes, there is vaguely a linear relationship in some of the variables. i'm going to stick with pearson because, to my knowledge, the data doesn't meet the standards for any non-parametric methods 
+
+#print example plot since printing all of them is way too much
+ggplot(concerns_and_avg_openmindedness_df, aes(x = Q011, y = mean_openmindedness)) + geom_point() + geom_jitter(width = 0.2, height = 0) + 
+  labs(x = "Rating of concern item's affect on willingness", y = "Open-mindedness rating", title = "Open-mindedness vs. severity of concern's effect on willingness")
 
 ```
 
@@ -1689,11 +2253,13 @@ cor_openmindedness_mean_vs_concerns_simplified_na_replaced <- cor_openmindedness
 
 ```
 
-Accounting for the concerns that participants did not endorse as "not at all" impacting participants' willingness, we found some significant correlations between willingness concerns and average open-mindedness. These significant concerns were `r print_significant_correlations(cor_openmindedness_mean_vs_concerns_simplified_na_replaced)`.
+Accounting for the concerns that participants did not endorse as "not at all" impacting participants' willingness, we found some significant correlations between willingness concerns and average open-mindedness. 
+
+These significant concerns were `r print_significant_correlations(cor_openmindedness_mean_vs_concerns_simplified_na_replaced)`.
 
 ```{r}
 #| label: fig-EDA-correlation-relationships 
-#| include: false 
+#| echo: false 
 #| fig-cap: Relationships between each willingness concern and average willingness to converse. Using a 7-pt Likert-scale, participants rated the impact of each willingness concern on their overall willingness. Using a slider from 0 to 100, participants rated 2 statements about their willingness to converse, which we averaged to find each participant's average willingness to converse about their focus topic. 
 
 library(gridExtra) # so we can print the plots in columns 
@@ -1731,11 +2297,14 @@ p24 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q024, y = avg_willingness
 p25 <- ggplot(concerns_and_avg_willingness_df, aes(x = Q025, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0)
 
 # arrange the plots in a 2x8 grid
-suppressWarnings(grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23, p24, p25, ncol = 2))
+#suppressWarnings(grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22, p23, p24, p25, ncol = 2))
 
 
 ### the results seem to pretty much show no relationship, but if you squint your eyes, there is vaguely a linear relationship in some of the variables. i'm going to stick with pearson because, to my knowledge, the data doesn't meet the standards for any non-parametric methods 
 
+
+# print an example plot
+ggplot(concerns_and_avg_willingness_df, aes(x = Q04, y = avg_willingness)) + geom_point() + geom_jitter(width = 0.2, height = 0) + labs(x = "Rating of concern item's effect on willingness", y = "Open-mindedness", title = "Open-mindedness vs. severity of concern item effect on willingness")
 ```
 
 ```{r}
@@ -1808,543 +2377,9 @@ Next, we looked for correlations between each willingness concern and average wi
 
 These concerns were `r print_significant_correlations(cor_willingness_slider_vs_concerns_na_replaced)`.
 
-### Cluster analysis
+### Free response
 
-```{r}
-#| label: Hierarchical cluster analysis on concerns (recommended by Prof. An)
-#| include: false
-
-#calculate distances
-concern_dists <- concerns_wide_na_replaced %>%
-  dist()
-
-#perform the clustering with average linkage 
-hclustmodaverage <- concern_dists %>% hclust(method = "average")
-
-#plot full dendrogram
-plot(hclustmodaverage)
-
-# now try complete linkage to see if the distribution is better
-hclustmodcomplete <- concern_dists %>% hclust(method = "complete")
-
-plot(hclustmodcomplete)
-
-#moving forward with complete linkage tree because it is more distributed than average linkage
-
-plot(hclustmodcomplete) %>%
-abline(h = 24, col = "blue", lty = 2)
-
-# cutting at 3 because it is as even as i can get the clusters to be
-completecut3 <- cutree(hclustmodcomplete, k = 3)
-table(completecut3)
-
-#sil_hc <- silhouette(completecut3, dist(concerns_wide_na_replaced))
-#sil_hc_result <- mean(sil_hc[, 3]) 
-
-# add cluster id back to the df 
-concerns_with_cluster_df <- concerns_labeled_wide_na_replaced %>% mutate(clusterID = completecut3) 
-
-#get percentages to see the distribution amongst the clusters 
-hierarchical_cluster_percentages <- concerns_with_cluster_df %>%
-  group_by(clusterID) %>%                       # group by cluster
-  summarise(n = n()) %>%  # count unique subjects
-  mutate(percent = round(n / sum(n) * 100, 1))       # calculate percentage
-
-# print question key for easy reference
-kbl(question_key_for_printing, booktabs = T, caption = "Full list of concerns. Participants rated how much each concern impacts their willingness to engage in conversations about their controversial topic on a Likert-scale from 1 (Not at all) to 7 (Extremely).") %>%
-  kable_styling(latex_options = c("striped", "hold_position", "scale_down")) %>%
-  column_spec(2, width = "30em") # Forces the second column (Concern item) to wrap text
-
-# add to surveys_df
-hierarchical_cluster_info <- concerns_with_cluster_df %>%
-  select(prolific_subject_id, clusterID)
-
-surveys_df <- surveys_df %>%
-  left_join(hierarchical_cluster_info, by = "prolific_subject_id")
-
-
-##| label: fig-dendrogram-hierarchical-clustering
-##| include: false
-##| fig-cap: A dendrogram cut at four clusters shows the results of hierarchical cluster analysis using complete linkage and Euclidean distance to look for profiles amongst the concern items. A key for the concern labels is included for clarity. 
-
-# print the dendrogram with the cut that i selected in previous code chunk 
-plot(hclustmodcomplete) %>%
-abline(h = 24, col = "blue", lty = 2)
-
-question_key_for_printing %>% rename("Concern" = "question") %>% rename("Label" = "short_label")
-
-```
-
-```{r}
-#| label: k-means cluster analysis on concern items 
-#| include: false
-
-# determine optimal number of clusters using wss 
-optimal_n_clusters <- fviz_nbclust(concerns_wide_na_replaced, kmeans, method = "wss")
-
-# K-means 
-set.seed(1)
-kmeans_result <- kmeans(concerns_wide_na_replaced, centers = 4)
-
-# merge back with subject id df so we can see sub id, cluster, and the questions w ratings
-cluster_labeled <- concerns_labeled_wide_na_replaced %>%
-  mutate(cluster = factor(kmeans_result$cluster))
-
-# extract cluster info to add to surveys_df becuase the df is structured differently so i'm not sure how to merge otherwise 
-cluster_info <- cluster_labeled %>%
-  select(prolific_subject_id, cluster)
-
-surveys_df <- surveys_df %>%
-  left_join(cluster_info, by = "prolific_subject_id")
-
-#extract the percent of participants in each cluster so i can report
-cluster_percentages <- cluster_info %>%
-  group_by(cluster) %>%                       # group by cluster
-  summarise(n = n_distinct(prolific_subject_id)) %>%  # count unique subjects
-  mutate(percent = round(n / sum(n) * 100, 1))       # calculate percentage
-
-library(cluster)
-# find silhouette score
-sil_kmeans <- silhouette(kmeans_result$cluster, dist(concerns_wide_na_replaced))
-
-sil_kmeans_result <- mean(sil_kmeans[, 3]) 
-# this is really bad
-```
-
-```{r}
-#| label: tbl-cluster-analysis-pca-items
-#| include: false
-#| fig-cap: PCA plot with clusters to visualize the three clusters
-
-# visualize k-means clusters with PCA
-cluster_visualization <- autoplot(prcomp(concerns_wide_na_replaced), data = cluster_labeled, colour = 'cluster')
-
-print(cluster_visualization)
-
-```
-
-```{r}
-#| label: fig-heat-map-clusters-willingness-concerns
-#| include: false 
-#| fig-cap: Heat map of each cluster's average rating of each potential concern per k-means cluster analysis
-
-# this is for k-means cluster analysis 
-
-# figure out the average score on each question of a cluster so we can see if certain clusters generally scored higher on certain questions 
-
-suppressWarnings(cluster_concerns <- cluster_labeled %>%
-  group_by(cluster) %>%
-  summarise(across(starts_with("Q"), mean, na.rm = TRUE)))
-
-#heat map
-
-cluster_long <- cluster_concerns %>%
-  pivot_longer(cols = starts_with("Q"), names_to = "question", values_to = "mean_rating")
-
-ggplot(cluster_long, aes(x = question, y = factor(cluster), fill = mean_rating)) +
-  geom_tile() +
-  scale_fill_gradient(low = "white", high = "blue") +
-  labs(y = "Cluster", x = "Concern", fill = "Mean Rating") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
-
-```{r}
-#| label: heat-map-hierarchical-clustering-on-items
-#| echo: false
-#| fig-cap: Heat map of each cluster's average rating of each potential concern per hierarchical cluster analysis
-
-#make df for heatmap 
-hierarchical_for_heatmap_df <- concerns_with_cluster_df %>%
-  group_by(clusterID) %>%
-  summarise(across(starts_with("Q"), mean, na.rm = TRUE)) %>%
-  pivot_longer(cols = c(Q01,Q02,Q03,Q04,Q05,Q06,Q07,Q08,Q09,Q010,Q011,Q012,Q013,Q014,Q015,Q016,Q017,Q018,Q019,Q020,Q021,Q022,Q023,Q024,Q025), names_to = "short_label", values_to = "mean_rating") 
-
-#make heat map to see what the cluster profiles actually look like  
-hierarchical_clustering_heatmap <- ggplot(hierarchical_for_heatmap_df, aes(x = short_label, y = factor(clusterID), fill = mean_rating)) +
-  geom_tile() +
-  scale_fill_gradient(low = "white", high = "blue") +
-  labs(y = "Cluster", x = "Concern", fill = "Mean Rating") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-#print heat map and the question key for richer understanding. if i actually include these in the final print, i'll need to add some gridExtra packaging here to make them be side by side
-hierarchical_clustering_heatmap
-
-kbl(question_key_for_printing, booktabs = T, caption = "Full list of concerns. Participants rated how much each concern impacts their willingness to engage in conversations about their controversial topic on a Likert-scale from 1 (Not at all) to 7 (Extremely).") %>%
-  kable_styling(latex_options = c("striped", "hold_position", "scale_down")) %>%
-  column_spec(2, width = "30em") # Forces the second column (Concern item) to wrap text
-
-
-```
-
-```{r}
-#| label: Interpreting k-means clusters and concerns 
-#| echo: false 
-
-# find each cluster's overall mean rating to see if any clusters generally rate things significantly higher 
-cluster_means <- cluster_concerns %>%
-  rowwise() %>%
-  mutate(overall_mean = round(mean(c_across(Q01:Q025)), 1)) %>%
-  select(cluster, overall_mean)
-
-# find which questions had the greatest range in average responses from clusters to see which differ most between clusters 
-
-top_questions <- cluster_concerns %>%
-  pivot_longer(cols = c(Q01,Q02,Q03,Q04,Q05,Q06,Q07,Q08,Q09,Q010,Q011,Q012,Q013,Q014,Q015,Q016,Q017,Q018,Q019,Q020,Q021,Q022,Q023,Q024,Q025), names_to = "question", values_to = "mean_rating") %>%
-  group_by(question) %>%
-  summarize(range = max(mean_rating) - min(mean_rating)) %>%
-  arrange(desc(range)) %>%
-  slice_head(n = 25) %>%   # top 25 questions with largest differences
-  pull(question)
-
-# create a table of clusters × top questions
-table_concerns <- cluster_concerns %>%
-  select(cluster, all_of(top_questions)) %>%
-  pivot_longer(cols = -cluster, names_to = "question", values_to = "mean_rating") %>%
-  arrange(question, desc(mean_rating)) %>%
-  group_by(question) %>%
-  mutate(rank = row_number()) %>%
-  select(question, cluster, mean_rating, rank)
-
-
-### cluster-focused
-
-cluster_long <- cluster_concerns %>%
-  pivot_longer(cols = c(Q01,Q02,Q03,Q04,Q05,Q06,Q07,Q08,Q09,Q010,Q011,Q012,Q013,Q014,Q015,Q016,Q017,Q018,Q019,Q020,Q021,Q022,Q023,Q024,Q025), names_to = "question", values_to = "mean_rating")
-
-# for each question, find which cluster had the highest mean
-top_by_cluster <- cluster_long %>%
-  group_by(question) %>%
-  mutate(max_cluster = mean_rating == max(mean_rating)) %>%
-  ungroup() %>%
-  filter(max_cluster) %>%
-  select(cluster, question, mean_rating) %>%
-  arrange(cluster, desc(mean_rating))
-
-# join top_by_cluster with questions_key_fa to get full question text
-top_by_cluster_full <- top_by_cluster %>%
-  left_join(question_key_for_fa, by = c("question" = "short_label")) %>%
-  mutate(across(everything(), ~ gsub('unwillingness-reason-', '', .))) 
-
-## for inline report: 
-# cluster 1 top questions
-cluster1_top <- top_by_cluster_full %>%
-  filter(cluster == 1) %>%
-  arrange(desc(mean_rating)) %>%
-  pull(question.y)
-
-# cluster 2 top questions
-cluster2_top <- top_by_cluster_full %>%
-  filter(cluster == 2) %>%
-  arrange(desc(mean_rating)) %>%
-  pull(question.y)
-
-# cluster 3 top questions
-cluster3_top <- top_by_cluster_full %>%
-  filter(cluster == 3) %>%
-  arrange(desc(mean_rating)) %>%
-  pull(question.y)
-
-cluster4_top <- top_by_cluster_full %>%
-  filter(cluster == 4) %>%
-  arrange(desc(mean_rating)) %>%
-  pull(question.y)
-
-cluster5_top <- top_by_cluster_full %>%
-  filter(cluster == 5) %>%
-  arrange(desc(mean_rating)) %>%
-  pull(question.y)
-```
-
-We also conducted both $k$-means cluster analysis and hierarchical clustering (euclidean distance, complete linkage), on participants' ratings of concerns to determine whether participants generally fell into certain categories. The $k$-means analysis suggested that participants generally fell into one of five clusters, with `r cluster_percentages$percent[cluster_percentages$cluster == 1]`% of participants falling into Cluster 1, `r cluster_percentages$percent[cluster_percentages$cluster == 2]`% of participants falling into Cluster 2, `r cluster_percentages$percent[cluster_percentages$cluster == 3]`% of participants falling into Cluster 3, `r cluster_percentages$percent[cluster_percentages$cluster == 4]`% of participants falling into Cluster 4, and `r cluster_percentages$percent[cluster_percentages$cluster == 5]`% of participants falling into Cluster 5. The hierarchical analysis suggested that participants generally fell into one of three clusters, with `r hierarchical_cluster_percentages$percent[hierarchical_cluster_percentages$clusterID == 1]`% of participants falling into Cluster 1, `r hierarchical_cluster_percentages$percent[hierarchical_cluster_percentages$clusterID == 2]`% of participants falling into Cluster 2, and `r hierarchical_cluster_percentages$percent[hierarchical_cluster_percentages$clusterID == 3]`% of participants falling into Cluster 3.
-
-```{r}
-#| label: extra text 
-#| include: false
-
-#Cluster 1's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 1]`. On average, Cluster 1 rated the following concerns the highest: `r paste(shQuote(cluster1_top), collapse = "; ")`.
-
-#Cluster 2's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 2]`. On average, cluster 2's top concerns were `r paste(shQuote(cluster2_top), collapse = "; ")`.
-
-#Cluster 3's average rating of a given concern was `r cluster_means$overall_mean[cluster_means$cluster == 3]`. On average, cluster 3's top concerns were `r paste(shQuote(cluster3_top), collapse = "; ")`.
-
-```
-
-```{r}
-#| label: k-means fig-clusters-avg-willingness   
-#| echo: false 
-#| fig-cap: Box plot of average willingness to converse about topic by cluster per k-means analysis. On average, clusters 2 and 4 appear to be more willing to converse than the other clusters.
-
-avg_willingness_cluster_df <- avg_willingness_df %>%
-  merge(cluster_info, by = "prolific_subject_id")
-
-ggplot(avg_willingness_cluster_df, aes(x = factor(cluster), y = avg_willingness)) +
-  geom_boxplot() +
-  labs(x = "Cluster", y = "Average Willingness") +
-  theme_minimal()
-
-```
-
-```{r}
-#| label: hierarchical-fig-clusters-avg-willingness   
-#| echo: false 
-#| fig-cap: Box plot of average willingness to converse about topic by cluster per hierarchical cluster analysis. On average, cluster 3 appears to be less willing to converse than the other clusters.
-
-avg_willingness_cluster_hierarchical_df <- avg_willingness_df %>%
-  merge(concerns_with_cluster_df, by = "prolific_subject_id")
-
-ggplot(avg_willingness_cluster_hierarchical_df, aes(x = factor(clusterID), y = avg_willingness)) +
-  geom_boxplot() +
-  labs(x = "Cluster", y = "Average Willingness") +
-  theme_minimal()
-
-```
-
-```{r}
-#| label: fig-clusters-avg-openmindedness 
-#| echo: false 
-#| fig-cap: Box plot of average open-mindedness about topic by cluster per k-means analysis. 
-
-open_mindedness_w_clusters <- openmindedness_summary_by_subject_df %>%
-  merge(cluster_info, by = "prolific_subject_id")
-
-ggplot(open_mindedness_w_clusters, aes(x = factor(cluster), y = mean_openmindedness)) +
-  geom_boxplot() +
-  labs(x = "Cluster", y = "Average Open-Mindedness") +
-  theme_minimal()
-
-```
-
-```{r}
-#| label: fig-hierarchical-clusters-avg-openmindedness
-#| echo: false 
-#| fig-cap: Box plot of average open-mindedness about topic by cluster per hierarchical analysis. 
-
-open_mindedness_w_clusters_hierarchical <- openmindedness_summary_by_subject_df %>%
-  merge(concerns_with_cluster_df, by = "prolific_subject_id")
-
-ggplot(open_mindedness_w_clusters_hierarchical, aes(x = factor(clusterID), y = mean_openmindedness)) +
-  geom_boxplot() +
-  labs(x = "Cluster", y = "Average Open-Mindedness") +
-  theme_minimal()
-
-```
-
-```{r}
-#| label: fig-demographics-clusters-k-means
-#| echo: false 
-#| fig-cap: Plots of demographics by k-means cluster helps us explore whether the clusters may have significantly different demographics.
-
-sex_cluster_plot <- ggplot(surveys_df, aes(x = cluster, fill = Sex)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proportion", title = "Gender composition by k-means cluster")
-
-ethnicity_cluster_plot <- ggplot(surveys_df, aes(x = cluster, fill = `Ethnicity simplified`)) +
-   geom_bar(position = "fill") +
-   labs(y = "Proportion", title = "Ethnicity by k-means cluster")
-
-age_cluster_plot <- ggplot(surveys_df, aes(x = cluster, y = as.numeric(Age))) +
-  geom_boxplot() +
-  labs(title = "Age by k-means cluster")
-
-sex_cluster_plot
-age_cluster_plot
-ethnicity_cluster_plot
-```
-
-```{r}
-#| label: fig-demographics-clusters-hierarchical
-#| echo: false 
-#| fig-cap: Plots of demographics by hierarchical cluster helps us explore whether the clusters may have significantly different demographics.
-
-sex_cluster_plot <- ggplot(surveys_df, aes(x = clusterID, fill = Sex)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proportion", title = "Gender composition by hierarchical cluster")
-
-ethnicity_cluster_plot <- ggplot(surveys_df, aes(x = clusterID, fill = `Ethnicity simplified`)) +
-   geom_bar(position = "fill") +
-   labs(y = "Proportion", title = "Ethnicity by hierarchical cluster")
-
-age_cluster_plot <- ggplot(
-  surveys_df,
-  aes(x = factor(clusterID), y = as.numeric(Age))
-) +
-  geom_boxplot() +
-  labs(
-    title = "Age by hierarchical cluster",
-    x = "Cluster ID"
-  )
-sex_cluster_plot
-age_cluster_plot
-ethnicity_cluster_plot
-```
-
-```{r}
-#| label: fig-topic-choice-clusters-k-means
-#| echo: false 
-#| fig-cap: Plots of topic choice by k-means cluster helps us explore whether the clusters may have significant differences in which topics they focused on.
-
-# within each cluster, finding percent of subjects on each topic. i tried to do this in one df but kept getting an error that i couldn't figure out 
-cluster1_topic_percent <- surveys_df %>%
-  filter(cluster == 1) %>%
-  distinct(prolific_subject_id, .keep_all = TRUE) %>%
-  group_by(topicChoiceAsString) %>%
-  summarise(n1 = n(), .groups = "drop") %>%
-  mutate(percent1 = n1 / sum(n1))
-
-cluster2_topic_percent <- surveys_df %>%
-  filter(cluster == 2) %>%
-  distinct(prolific_subject_id, .keep_all = TRUE) %>%
-  group_by(topicChoiceAsString) %>%
-  summarise(n2 = n(), .groups = "drop") %>%
-  mutate(percent2 = n2 / sum(n2))
-
-cluster3_topic_percent <- surveys_df %>%
-  filter(cluster == 3) %>%
-  distinct(prolific_subject_id, .keep_all = TRUE) %>%
-  group_by(topicChoiceAsString) %>%
-  summarise(n3 = n(), .groups = "drop") %>%
-  mutate(percent3 = n3 / sum(n3))
-
-cluster4_topic_percent <- surveys_df %>%
-  filter(cluster == 4) %>%
-  distinct(prolific_subject_id, .keep_all = TRUE) %>%
-  group_by(topicChoiceAsString) %>%
-  summarise(n4 = n(), .groups = "drop") %>%
-  mutate(percent3 = n4 / sum(n4))
-
-cluster5_topic_percent <- surveys_df %>%
-  filter(cluster == 5) %>%
-  distinct(prolific_subject_id, .keep_all = TRUE) %>%
-  group_by(topicChoiceAsString) %>%
-  summarise(n5 = n(), .groups = "drop") %>%
-  mutate(percent3 = n5 / sum(n5))
-
-#join together
-cluster_topic_percent <- cluster1_topic_percent %>%
-  full_join(cluster2_topic_percent, by = "topicChoiceAsString") %>% 
-  full_join(cluster3_topic_percent, by = "topicChoiceAsString") %>%
-  full_join(cluster4_topic_percent, by = "topicChoiceAsString") %>% 
-  full_join(cluster5_topic_percent, by = "topicChoiceAsString")
-
-ggplot(surveys_df, aes(x = cluster, fill = topicChoiceAsString)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proportion", title = "Topic choice by k-means cluster")
-
-```
-
-```{r}
-#| label: fig-topic-choice-clusters-hierarchical
-#| echo: false 
-#| fig-cap: Plots of topic choice by hierarchical cluster helps us explore whether the clusters may have significant differences in which topics they focused on.
-
-# within each cluster, finding percent of subjects on each topic. i tried to do this in one df but kept getting an error that i couldn't figure out 
-hierarchical_cluster1_topic_percent <- surveys_df %>%
-  filter(clusterID == 1) %>%
-  distinct(prolific_subject_id, .keep_all = TRUE) %>%
-  group_by(topicChoiceAsString) %>%
-  summarise(n1 = n(), .groups = "drop") %>%
-  mutate(percent1 = n1 / sum(n1))
-
-hierarchical_cluster2_topic_percent <- surveys_df %>%
-  filter(clusterID == 2) %>%
-  distinct(prolific_subject_id, .keep_all = TRUE) %>%
-  group_by(topicChoiceAsString) %>%
-  summarise(n2 = n(), .groups = "drop") %>%
-  mutate(percent2 = n2 / sum(n2))
-
-hierarchical_cluster3_topic_percent <- surveys_df %>%
-  filter(clusterID == 3) %>%
-  distinct(prolific_subject_id, .keep_all = TRUE) %>%
-  group_by(topicChoiceAsString) %>%
-  summarise(n3 = n(), .groups = "drop") %>%
-  mutate(percent3 = n3 / sum(n3))
-
-#join together
-hierarchical_cluster_topic_percent <- hierarchical_cluster1_topic_percent %>%
-  full_join(hierarchical_cluster2_topic_percent, by = "topicChoiceAsString") %>% 
-  full_join(hierarchical_cluster3_topic_percent, by = "topicChoiceAsString") 
-
-ggplot(surveys_df, aes(x = clusterID, fill = topicChoiceAsString)) +
-  geom_bar(position = "fill") +
-  labs(y = "Proportion", title = "Topic choice by hierarchical cluster")
-```
-
-```{r}
-#| label: Diff in sex btwn clusters?
-#| include: false
-
-# looking for statistical significance 
-
-# create a contingency table
-table_cluster_sex <- table(surveys_df$cluster, surveys_df$Sex)
-
-# View the table
-table_cluster_sex
-
-# Chi-square test of independence
-res_sex <- chisq.test(table_cluster_sex) 
-
-res_df_sex <- tibble(
-  statistic = unname(res_sex$statistic),
-  df = unname(res_sex$parameter),
-  p_value = res_sex$p.value
-) %>%
-  mutate(
-    significance = case_when(
-      p_value < 0.001 ~ "< 0.001",
-      p_value < 0.01  ~ "< 0.01",
-      p_value < 0.05  ~ "< 0.05",
-      TRUE            ~ "ns"  # not significant
-    )
-  )
-
-residuals_sex <- res_sex$stdres
-residuals_sex
-
-library(corrplot)
-corrplot(residuals_sex, is.cor = FALSE)
-
-```
-
-```{r}
-#| label: Diff in topic choice btwn clusters?
-#| include: false
-
-# looking for statistical significance 
-
-# create a contingency table
-table_cluster_topic <- table(surveys_df$cluster, surveys_df$topicChoiceAsString)
-
-# View the table
-table_cluster_topic 
-
-# chi-square test of independence
-res <- chisq.test(table_cluster_topic) 
-
-res_df <- tibble(
-  statistic = unname(res$statistic),
-  df = unname(res$parameter),
-  p_value = res$p.value
-) %>%
-  mutate(
-    significance = case_when(
-      p_value < 0.001 ~ "< 0.001",
-      p_value < 0.01  ~ "< 0.01",
-      p_value < 0.05  ~ "< 0.05",
-      TRUE            ~ "ns"  # not significant
-    )
-  )
-
-residuals <- res$stdres
-residuals
-
-library(corrplot)
-corrplot(residuals, is.cor = FALSE)
-
-```
-
-To assess the comprehensiveness of the inventory, we analyzed the free-response data using LLMs with manual review on 10% of the sample for validation. [The LLMs detected some potentially unique concerns, but ultimately we think the questionnaire does sufficently capture concerns. Should expand on what I mean here- how specific about what the LLMs detected?]
+To assess the comprehensiveness of the inventory, we analyzed the free-response data using LLMs with manual review on 10% of the sample for validation. \[The LLMs detected some potentially unique concerns, but ultimately we think the questionnaire does sufficently capture concerns. Should expand on what I mean here- how specific about what the LLMs detected?\]
 
 ## Discussion
 
