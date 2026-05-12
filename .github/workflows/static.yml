@@ -37,7 +37,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload just where index.html is
-          path: 'pilot_1/experiment'
+          path: 'pilot_1'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
