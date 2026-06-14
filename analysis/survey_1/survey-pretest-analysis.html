@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.554">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2024-12-31">
+
+<title>survey-pretest-analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="survey-pretest-analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="survey-pretest-analysis_files/libs/quarto-html/quarto.js"></script>
+<script src="survey-pretest-analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="survey-pretest-analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="survey-pretest-analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="survey-pretest-analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="survey-pretest-analysis_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="survey-pretest-analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="survey-pretest-analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="survey-pretest-analysis_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="survey-pretest-analysis_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="survey-pretest-analysis_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">survey-pretest-analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 31, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>Existing literature indicates that a complex interplay of psychological factors—including fear of social isolation (<span class="citation" data-cites="NoelleNeumann1974">Noelle-Neumann (<a href="#ref-NoelleNeumann1974" role="doc-biblioref">1974</a>)</span>; <span class="citation" data-cites="Chen2018">Chen (<a href="#ref-Chen2018" role="doc-biblioref">2018</a>)</span>; <span class="citation" data-cites="Haug2025">Haug et al. (<a href="#ref-Haug2025" role="doc-biblioref">2025</a>)</span>), identity protection (<span class="citation" data-cites="Tajfel1979">Tajfel and Turner (<a href="#ref-Tajfel1979" role="doc-biblioref">1979</a>)</span>; <span class="citation" data-cites="Hunter1996">Hunter, Platow, and Howard (<a href="#ref-Hunter1996" role="doc-biblioref">1996</a>)</span>), communication anxiety (<span class="citation" data-cites="Beatty1987">Beatty (<a href="#ref-Beatty1987" role="doc-biblioref">1987</a>)</span>; <span class="citation" data-cites="Schulenberg2023">Schulenberg et al. (<a href="#ref-Schulenberg2023" role="doc-biblioref">2023</a>)</span>), and emotional dysregulation (<span class="citation" data-cites="Masters2019">Masters, Zimmer-Gembeck, and Farrell (<a href="#ref-Masters2019" role="doc-biblioref">2019</a>)</span>; <span class="citation" data-cites="Aldao2010">Aldao, Nolen-Hoeksema, and Schweizer (<a href="#ref-Aldao2010" role="doc-biblioref">2010</a>)</span>)—converge with sociocultural influences to deter open dialogue (<span class="citation" data-cites="Haug2025">Haug et al. (<a href="#ref-Haug2025" role="doc-biblioref">2025</a>)</span>; <span class="citation" data-cites="Kahneman2011">Kahneman (<a href="#ref-Kahneman2011" role="doc-biblioref">2011</a>)</span>; <span class="citation" data-cites="Lewandowsky2017">Lewandowsky, Ecker, and Cook (<a href="#ref-Lewandowsky2017" role="doc-biblioref">2017</a>)</span>). This avoidance is a significant barrier to constructive discourse. Understanding this phenomenon is critical for fostering democratic citizenship and cultivating inclusive learning environments.</p>
+<p>We are developing an individual-level intervention to help increase Americans’ willingness to engage in conversations on divisive topics. To properly measure the barriers to engagement and assess the effectiveness of our intervention, we first designed a 19-item questionnaire to capture the core concerns that contribute to an individual’s reluctance to engage in conversations on controversial topics. This pretest study aims to assess the effectiveness of this 19-item questionnaire through addressing two primary preregistered research questions:</p>
+<p>Comprehensiveness: Do the 19 items in our questionnaire capture the primary concerns that contribute to Americans’ unwillingness to engage in productive, open-minded discussions about divisive topics?</p>
+<p>Structure: Are there any distinct, underlying factors that organize these 19 concerns?</p>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<section id="materials" class="level3">
+<h3 class="anchored" data-anchor-id="materials">Materials</h3>
+<p>We used custom software written with the jsPsych framework (<span class="citation" data-cites="jspsychcite">Leeuw, Gilbert, and Luchterhandt (<a href="#ref-jspsychcite" role="doc-biblioref">2023</a>)</span>) to create the study, which participants viewed and responded to via their personal laptops or desktops. The javascript code for the experiment and RStudio code for data analysis can both be found at (<a href="https://github.com/jodeleeuw/URSI-LLM-Convo-Bot/tree/main/pilot_1)." class="uri">https://github.com/jodeleeuw/URSI-LLM-Convo-Bot/tree/main/pilot_1).</a> Pre-registrations and all data for this study and previous pilots are available on the Open Science Framework at <a href="https://osf.io/x32pv." class="uri">https://osf.io/x32pv.</a></p>
+</section>
+<section id="participants-and-procedure" class="level3">
+<h3 class="anchored" data-anchor-id="participants-and-procedure">Participants and Procedure</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div id="ddzwxrwpob" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ddzwxrwpob table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#ddzwxrwpob thead, #ddzwxrwpob tbody, #ddzwxrwpob tfoot, #ddzwxrwpob tr, #ddzwxrwpob td, #ddzwxrwpob th {
+  border-style: none;
+}
+
+#ddzwxrwpob p {
+  margin: 0;
+  padding: 0;
+}
+
+#ddzwxrwpob .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ddzwxrwpob .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ddzwxrwpob .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ddzwxrwpob .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ddzwxrwpob .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ddzwxrwpob .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ddzwxrwpob .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ddzwxrwpob .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ddzwxrwpob .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#ddzwxrwpob .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ddzwxrwpob .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ddzwxrwpob .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ddzwxrwpob .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ddzwxrwpob .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ddzwxrwpob .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddzwxrwpob .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ddzwxrwpob .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ddzwxrwpob .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#ddzwxrwpob .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddzwxrwpob .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ddzwxrwpob .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddzwxrwpob .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ddzwxrwpob .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddzwxrwpob .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ddzwxrwpob .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ddzwxrwpob .gt_left {
+  text-align: left;
+}
+
+#ddzwxrwpob .gt_center {
+  text-align: center;
+}
+
+#ddzwxrwpob .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ddzwxrwpob .gt_font_normal {
+  font-weight: normal;
+}
+
+#ddzwxrwpob .gt_font_bold {
+  font-weight: bold;
+}
+
+#ddzwxrwpob .gt_font_italic {
+  font-style: italic;
+}
+
+#ddzwxrwpob .gt_super {
+  font-size: 65%;
+}
+
+#ddzwxrwpob .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#ddzwxrwpob .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ddzwxrwpob .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ddzwxrwpob .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ddzwxrwpob .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ddzwxrwpob .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ddzwxrwpob .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#ddzwxrwpob .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#ddzwxrwpob div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<caption>Table of basic demographics.</caption>
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header gt_col_headings">
+<th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="stat_0" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>N = 200</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Time taken (minutes)</td>
+<td class="gt_row gt_center" headers="stat_0">7.45 (5.65, 10.00)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">Age (years)</td>
+<td class="gt_row gt_center" headers="stat_0">41.00 (34.00, 54.00)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Sex</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Female</td>
+<td class="gt_row gt_center" headers="stat_0">94 (47%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Male</td>
+<td class="gt_row gt_center" headers="stat_0">106 (53%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">Ethnicity</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Asian</td>
+<td class="gt_row gt_center" headers="stat_0">20 (10%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Black</td>
+<td class="gt_row gt_center" headers="stat_0">21 (11%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Mixed</td>
+<td class="gt_row gt_center" headers="stat_0">12 (6%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Other</td>
+<td class="gt_row gt_center" headers="stat_0">3 (2%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;White</td>
+<td class="gt_row gt_center" headers="stat_0">144 (72%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">Political affiliation</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Republican</td>
+<td class="gt_row gt_center" headers="stat_0">57 (29%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Democrat</td>
+<td class="gt_row gt_center" headers="stat_0">87 (44%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Independent</td>
+<td class="gt_row gt_center" headers="stat_0">51 (26%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;None</td>
+<td class="gt_row gt_center" headers="stat_0">4 (2%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Other</td>
+<td class="gt_row gt_center" headers="stat_0">1 (1%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">Education level</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Undergraduate degree (BA/BSc/other)</td>
+<td class="gt_row gt_center" headers="stat_0">64 (32%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Technical/community college</td>
+<td class="gt_row gt_center" headers="stat_0">40 (20%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Graduate degree (MA/MSc/MPhil/other)</td>
+<td class="gt_row gt_center" headers="stat_0">22 (11%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;High school diploma/A-levels</td>
+<td class="gt_row gt_center" headers="stat_0">65 (33%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Doctorate degree (PhD/other)</td>
+<td class="gt_row gt_center" headers="stat_0">6 (3%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Secondary education (e.g. GED/GCSE)</td>
+<td class="gt_row gt_center" headers="stat_0">3 (2%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Religious affiliation</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Buddhism</td>
+<td class="gt_row gt_center" headers="stat_0">4 (2%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Christianity (e.g. Baptist, Church of England, Roman Catholic, Methodist, Jehovah Witness, etc.)</td>
+<td class="gt_row gt_center" headers="stat_0">99 (50%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Do Not Wish to Answer</td>
+<td class="gt_row gt_center" headers="stat_0">4 (2%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Hinduism</td>
+<td class="gt_row gt_center" headers="stat_0">3 (2%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Islam</td>
+<td class="gt_row gt_center" headers="stat_0">1 (1%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Judaism</td>
+<td class="gt_row gt_center" headers="stat_0">3 (2%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Non Religious (e.g. Agnostic, Atheist, No Religion)</td>
+<td class="gt_row gt_center" headers="stat_0">74 (37%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Other</td>
+<td class="gt_row gt_center" headers="stat_0">5 (3%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Paganism</td>
+<td class="gt_row gt_center" headers="stat_0">1 (1%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Spiritualism</td>
+<td class="gt_row gt_center" headers="stat_0">5 (3%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unitarianism</td>
+<td class="gt_row gt_center" headers="stat_0">1 (1%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">Political ideology</td>
+<td class="gt_row gt_center" headers="stat_0"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Conservative</td>
+<td class="gt_row gt_center" headers="stat_0">62 (31%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Liberal</td>
+<td class="gt_row gt_center" headers="stat_0">96 (48%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Moderate</td>
+<td class="gt_row gt_center" headers="stat_0">39 (20%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Other</td>
+<td class="gt_row gt_center" headers="stat_0">1 (1%)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;N/A</td>
+<td class="gt_row gt_center" headers="stat_0">2 (1%)</td>
+</tr>
+</tbody><tfoot>
+<tr class="odd gt_footnotes">
+<td colspan="2" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Median (Q1, Q3); n (%)</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+</div>
+</div>
+<p>Through Prolific, we initially gathered data from 200 subjects. Participants were restricted to U.S. residents who fluently speak English. We excluded data from 0 subjects for failing the attention check question. The final cleaned sample consisted of 200 subjects. Participants completed the questionnaire in an average of 7.5 minutes (Range: 1.1 – 28.2).</p>
+<p>Participants were first asked to rate their comfort level with 10 controversial topics. The topic that they were least willing to discuss was selected as their focus topic for the remainder of the survey. The full questionnaire included self-reported willingness to converse (via two slider questions from 0-100), self-reported open-mindedness (a 5-item Likert scale from 1-7), the 19-item concern inventory (a Likert scale from 1-7, along with an initial binary “Yes/No” endorsement). The session concluded with a free-response question about participants’ reasons for reluctance, which we will assess for any uncaptured reasons.</p>
+</section>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="basic-results" class="level3">
+<h3 class="anchored" data-anchor-id="basic-results">Basic results</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-topic-ratings-only-chosen-topics" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-topic-ratings-only-chosen-topics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-topic-ratings-only-chosen-topics-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-topic-ratings-only-chosen-topics-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: In the pre-intervention survey, each participant used a 7-pt scale (where 1 = Strongly uncomfortable and 7 = Strongly comfortable) to rate how willing they would be to discuss each of the ten divisive topics. For the remainder of the survey, participants were asked questions about the topic that they rated themselves as least willing to discuss.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-bar-topic-counts" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bar-topic-counts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-bar-topic-counts-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bar-topic-counts-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Bar plot showing the number of participants in each topic.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Our topic assignment method successfully generated a sample for whom engagement with their focus topic was a genuine concern. As shown in Figure @ref(fig: fig-topic-ratings-only-chosen-topics), the distribution of comfort ratings for the chosen topics was generally skewed below the neutral point of 4, validating the selection mechanism. Three of the ten topics—climate change policy, A.I. in human-run spaces, and government in healthcare—garnered many participants who were more willing than we had intended; however, these topics were also less popular (Figure @ref(fig: fig-bar-topic-counts).</p>
+<p>Specifically, 5 participants were least willing to discuss climate change policies but still rated themselves as slightly to strongly comfortable discussing the topic, 8 participants were least willing to discuss human euthanasia but still rated themselves as slightly to strongly comfortable discussing the topic, and 4 participants were least willing to discuss A.I. in human-run spaces but still rated themselves as slightly to strongly comfortable discussing the topic. Overall, most participants focused on a topic that they were slightly to strongly uncomfortable discussing.</p>
+<p>As shown in Figure @ref(fig: fig-bar-topic-counts), the majority of participants were least willing to discuss the role of the U.S. in the Israeli-Palestinian conflict, human euthanasia, and transgender athletes in sports.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-box-plot-willingness" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-box-plot-willingness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-box-plot-willingness-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-box-plot-willingness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Distribution of average willingness ratings by topic from 0 (completely unwilling) to 100 (completely willing), where 50 is neutral.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Separately from assigning focus topics, we asked participants to rate their willingness to discuss their focus topic with someone who strongly disagrees with them and with someone who would push back against their views. Participants used a slider ranging from 0 (absolute unwillingness) to 100 (absolute willingness) to respond, and we averaged the two responses to find participants’ average willingness. This assessment was quite similar to that of the topic selection question; however, we asked these questions separately to ensure quality of data (should probably expand on what I mean by quality data) and to use alternative phrasing that emphasized the potential divisiveness of the discussion.</p>
+<p>Participants’ average willingness, shown in Figure @ref(fig:fig-box-plot-willingness), was widely spread with a notable density of participants reporting scores at or above the neutral point of 50. This is an unexpected contrast from participants’ responses in the earlier Likert-scale question; we had anticipated that the Likert-scale indicator of willingness and the average willingness seen here would indicate similar overall trends.</p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The `size` argument of `element_rect()` is deprecated as of ggplot2 3.4.0.
+ℹ Please use the `linewidth` argument instead.
+ℹ The deprecated feature was likely used in the likert package.
+  Please report the issue at &lt;https://github.com/jbryer/likert/issues&gt;.</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-openmindedness-likert-bar-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-openmindedness-likert-bar-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-openmindedness-likert-bar-plot-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-openmindedness-likert-bar-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Likert bar plot displaying subjects’ ratings of five questions about their open-mindedness. The five questions were derived from <span class="citation" data-cites="elnakouri2024">Elnakouri, Huynh, and Grossmann (<a href="#ref-elnakouri2024" role="doc-biblioref">2024</a>)</span> and modified for application to this experiment. On a scale from 0 to 7, where a rating of 0 meant subject strongly disagreed and a rating of 7 meant strongly agree, subjects rated how true the five statements were for them. Three of the statements were negatively worded in the survey but have been worded positively and reverse-coded in this plot for clarity.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Subjects generally rated their open-mindedness quite high, as observed in Figure <span class="citation" data-cites="ref">(<a href="#ref-ref" role="doc-biblioref"><strong>ref?</strong></a>)</span>(fig-openmindedness-likert-bar-plot).</p>
+<div class="cell">
+<div id="tbl-free-response-examples-table" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-free-response-examples-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Table showing examples of uncaptured concerns in subjects’ responses to free response question, which asked subjects “Think back to the last time you chose to not participate in a conversation about [topic] or another topic you found uncomfortable to discuss. In the space below, please describe why you decided to not engage. Consider whether your reasons align with any of the potential concerns listed in this survey, or if you had different concerns.”
+</figcaption>
+<div aria-describedby="tbl-free-response-examples-table-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div>
+<table class="table do-not-create-environment cell table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Free response</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Focus topic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">It's not worth my energy to try to push my ideas or beliefs onto someone else. They will believe what they want.</td>
+<td style="text-align: left; width: 5em;">the role of the U.S. in the Israeli-Palestinian conflict</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I would say it is not my place to discuss since my knowledge about the subject is only surface level, and I feel it would take more research to really begin to take a side in the conflict.</td>
+<td style="text-align: left; width: 5em;">the role of the U.S. in the Israeli-Palestinian conflict</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">I didn't participate in a conversation at work. My coworkers were talking about if ICE should be taking away people. I stayed out of it. I felt uncomfortable talking about it at work. I didn't want to get in trouble from HR.</td>
+<td style="text-align: left; width: 5em;">deportation policies for undocumented immigrants in the U.S.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Didnt have the energy to focus on it, the conversations tend to not go anywhere.</td>
+<td style="text-align: left; width: 5em;">deportation policies for undocumented immigrants in the U.S.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">I have never had the opportunity or chance to have any conversation with anyone regarding the Israeli-Palestinian conflict in any depth. Frankly, I don't feel at all concerned about it because we have problems here at home that need our attention. If you have time to be worrying about what's going on in another country, that's a privilege at this time. Our focus needs to be on the dystopian hell that our government is inflicting upon us and a never-ending religious conflict that has been going on for centuries that is unsolvable is not my concern.</td>
+<td style="text-align: left; width: 5em;">the role of the U.S. in the Israeli-Palestinian conflict</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I knew that it would start a very heated argument with the person I was discussing it with. They can get pretty angry and are very hard to talk to when you are trying to show other sides besides theirs. I didn't want to draw a wedge in that friendship, so i chose to halt the conversation.</td>
+<td style="text-align: left; width: 5em;">police conduct and accountability in the U.S.</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="comprehensiveness-of-concerns" class="level3">
+<h3 class="anchored" data-anchor-id="comprehensiveness-of-concerns">Comprehensiveness of Concerns</h3>
+<p>To assess the comprehensiveness of the inventory, we analyzed the free-response data using LLMs with manual review on 10% of the sample for validation. We found that topic complexity/lack of knowledge, perceived lack of relevance, professional consequences, and emotional/cognitive bandwidth were not captured by our nineteen items. Additionally, we found that while the concerns that others’ views wouldn’t change or that personal relationships might get damaged were both nested within our items, their prevalence among the data may warrant us turning these concerns into their own items.</p>
+<p>Topic complexity/lack of knowledge: These participants reported that they avoided conversations because they did not know enough about the topic to engage in a conversation about it. We have items that can capture fear or embarrassment about appearing to be uninformed, but not the pragmatic concern that an individual does not know enough. We plan to capture this with the new item: “I would feel like the topic is too complex or requires more knowledge than I have.”</p>
+<p>Perceived lack of relevance: Some participants reported avoiding conversations because they felt that the topic was not personally relevant to them or that it was not their place to comment because they did not have first-hand experiences or were not affected by the topic. We do not have items that capture disinterest or an intentional ethical boundary, so we plan to capture this new area with the item: “I don’t have first-hand experience with the topic and/or it isn’t relevant to me.”</p>
+<p>Professional consequences: Some participants reported avoiding conversations because they could have consequences in the workplace such as employment/HR problems, damaged professional standing, or workplace drama. We originally anticipated that workplace-related concerns would be captured by our social evaluation items; however, it is clear that consequences in the workplace can extend beyond the typical repercussions in other social contexts. We plan to capture this concern with the item: “I could experience significant repercussions at work or in other spaces beyond my personal social network.”</p>
+<p>Emotional/cognitive bandwith: Many participants reported that it was not worth their energy to engage in these conversations. We originally excluded this concern because we anticipated that not wanting to expend energy is a product of other concerns that we may be able to more adequately target with our future intervention. However, the prevalence of this concern warrants its own item. We plan to capture this with the item: “It wouldn’t be worth the emotional and/or mental energy.”</p>
+<p>Others’ views not changing: Some participants expressed that the conversation would be a waste of time because others’ views wouldn’t change. We have items about productivity, but this concern seems to be a more specific and commonly anticipated reason for why a conversation may be unproductive, so it may be worth turning this concern into its own item. We plan to capture it with the item: “It would be a waste of time because the others’ views wouldn’t change.”</p>
+<p>Additionally, while we nested the concern about damaging personal relationships within an item about social repercussions, this concern was often discussed in a personal or intimate sense, distinguishing it from the more abstract or broad concept of social repercussions. Because of this, we plan to separate damaging personal relationships from our item about social repercussions. We will have one item be “I would not want to hurt my relationship(s) with others or upset them” and another be “I could incur social repercussions (e.g., being excluded by others in the future, negative changes to my reputation, feeling ostracized).”</p>
+<p>In sum, we plan to add five new items to our questionnaire: “I would feel like the topic is too complex or requires more knowledge than I have,” “I don’t have first-hand experience with the topic and/or it isn’t relevant to me,” “I could experience significant repercussions at work or in other spaces beyond my personal social network,” “It wouldn’t be worth the emotional and/or mental energy,” and “I would not want to hurt my relationship(s) with others or upset them.”</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-unwillingness-reason-likert-bar-plot" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-unwillingness-reason-likert-bar-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-unwillingness-reason-likert-bar-plot-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-unwillingness-reason-likert-bar-plot-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Likert bar plot displaying subjects’ ratings of how much certain concerns contribute to their unwillingness to converse. The nineteen potential concerns were derived from existing literature and pretested in a pilot experiment. On a scale from 0 to 7, where a rating of 0 meant participant’s willingness is not at all impacted by the concern and a rating of 7 meant participant’s willingness is strongly impacted by the concern, participants rated the potential concerns’ effects on their willingness to converse.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div id="tbl-correlation-matrix" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-correlation-matrix-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Correlation matrix of reasons for unwillingness
+</figcaption>
+<div aria-describedby="tbl-correlation-matrix-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="survey-pretest-analysis_files/figure-html/tbl-correlation-matrix-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div id="tbl-factor-loadings-visual" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-factor-loadings-visual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Table visualizing factor loadings in exploratory factor analysis.
+</figcaption>
+<div aria-describedby="tbl-factor-loadings-visual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+
+</div>
+</figure>
+</div>
+<div class="cell">
+<div id="tbl-fa-heat-map-df" class="cell quarto-float anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-fa-heat-map-df-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Table showing factor analysis heat map.
+</figcaption>
+<div aria-describedby="tbl-fa-heat-map-df-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="survey-pretest-analysis_files/figure-html/tbl-fa-heat-map-df-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="factor-analysis-on-concerns" class="level3">
+<h3 class="anchored" data-anchor-id="factor-analysis-on-concerns">Factor Analysis on Concerns</h3>
+<p>We examined the initial binary endorsement ratings of our nineteen items where each participant simply indicated whether an item concerned them at all, as well as the Likert-scale ratings of how much each of the endorsed items impact the participant’s willingness. The top five most frequently endorsed concerns (answered “Yes”) were: ‘The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)’, ‘I could feel humiliated or embarrassed in the conversation’, ‘My opinion is unpopular in general.’, ‘I would not want to listen to the others discuss their views’, ‘Someone could challenge ideas or beliefs that play an important role in making me who I am’. The top five concerns most severely impacting willingness were “I don’t often participate in conversations like these”, “It would be a waste of time because my views wouldn’t change”, “I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)”, “I would not want to listen to the others discuss their views”, “The conversation could become awkward or tense”. The full distribution of severity ratings can be observed in Figure @ref(fig:fig-unwillingness-reason-likert-bar-plot).</p>
+<p>We conducted an exploratory factor analysis (EFA) on the 19 concern items using oblimin rotation to identify latent factors that could reflect correlated concerns. Parallel analysis suggested a three-factor solution, which accounted for 41.2% of the total variance. The factors were moderately correlated (<span class="math inline">\(r\)</span> = -0.03–0.6) as shown in Figure @ref(fig:tbl-correlation-matrix). Many cross-loadings were present, suggesting some conceptual overlap among factors. We retained all nineteen items to allow full examination of the emerging structure.</p>
+<p>We interpret the the three factors, which are visualized in Figure <span class="citation" data-cites="ref">(<a href="#ref-ref" role="doc-biblioref"><strong>ref?</strong></a>)</span>(fig:tbl-fa-heat-map-df), as:</p>
+<p>Emotional Vulnerability/Identity Threat (Factor 1): This first factor consists of items focusing on internal psychological distress and threats to the participant’s self-concept or core beliefs. The items in this factor are: “I might take offense to what someone says,” “Someone could challenge ideas or beliefs that play an important role in making me who I am,” “I might feel disempowered, unheard, or invalidated,” “The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability),” “Someone could criticize or show disapproval of my views,” and “The conversation could negatively affect how I feel about the world during and/or afterward.”</p>
+<p>Conversational Efficacy/Unproductive Process (Factor 2): This factor captures concerns about the quality, utility, and worth of the interaction. The focus here is on whether the conversation will be respectful, worthwhile, or productive. This factor consists of: “I might struggle to remain productive and respectful,” “I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)”, “I would not want to listen to the others discuss their views”, and “It would be a waste of time because my views wouldn’t change.”</p>
+<p>Social Evaluation/Reputation Risk (Factor 3): This factor emphasizes fear of external perception and broader social consequences. It emphasizes concern about how others perceive the participants, including fear of embarrassment, judgment, or negative social consequences. This factor consists of: “I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)”, “I would feel like my opinion is unpopular amongst the group,” “I could feel humiliated or embarrassed in the conversation,” “I might struggle to explain my views to the others and/or come across as uninformed,” “My opinion is unpopular in general.”</p>
+<p>Four items did not load above 0.32 on any factor in the 3-factor solution nor in an additional exploratory 4-factor solution. These items were: “Someone might take offense to what I say,” “The conversation could become awkward or tense,” “The others might not make a full effort to hear and understand me,” and “I don’t often participate in conversations like these”. It would be expected that these items represent idiosyncratic concerns or situational/contextual items that don’t fit neatly into emotional vulnerability, process, or social evaluation; however, these items seem as though they would fit within the social evaluation factor [not sure what to make of this…].</p>
+<p>It is also interesting that factors 1 and 3 are distinct from each other, as most of the items within these factors seem as though they could very well be interchangeable in the factors. For example, “I could feel humiliated or embarrassed in the conversation” fell within factor 3 with a loading of 0.6122329, but conceptually could very well fit within the emotional vulnerability concepts of factor 1 even though it had a loading within factor 1 of 0.2293928.</p>
+</section>
+<section id="correlations" class="level3">
+<h3 class="anchored" data-anchor-id="correlations">Correlations</h3>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'gridExtra'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dplyr':
+
+    combine</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-EDA-correlation-openminded-relationships" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-EDA-correlation-openminded-relationships-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-EDA-correlation-openminded-relationships-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-EDA-correlation-openminded-relationships-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Relationships between each willingness concern and average open-mindedness. Using a 7-pt Likert-scale, participants rated the impact of each willingness concern on their overall willingness. Also using a 7-pt Likert-scale, participants rated 5 statements about their open-mindedness, which we averaged to find each participant’s average open-mindedness.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Accounting for the concerns that participants did not endorse as “not at all” impacting participants’ willingness, we found correlations between most willingness concerns and average open-mindedness. These relationships suggests that, for most willingness concerns, a greater impact of the concern on an American’s willingness is associated with a decrease in willingness to converse.</p>
+<p>These concerns were “I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)” (<span class="math inline">\(r\)</span> = -0.218, <span class="math inline">\(p\)</span> = &lt; 0.01), “Someone could criticize or show disapproval of my views” (<span class="math inline">\(r\)</span> = -0.233, <span class="math inline">\(p\)</span> = &lt; 0.001), “I would feel like my opinion is unpopular amongst the group.” (<span class="math inline">\(r\)</span> = -0.274, <span class="math inline">\(p\)</span> = &lt; 0.001), “The others might not make a full effort to hear and understand me” (<span class="math inline">\(r\)</span> = -0.248, <span class="math inline">\(p\)</span> = &lt; 0.001), “I don’t often participate in conversations like these” (<span class="math inline">\(r\)</span> = -0.187, <span class="math inline">\(p\)</span> = &lt; 0.01), “The conversation could negatively affect how I feel about the world during and/or afterward” (<span class="math inline">\(r\)</span> = -0.265, <span class="math inline">\(p\)</span> = &lt; 0.001), “Someone might take offense to what I say” (<span class="math inline">\(r\)</span> = -0.155, <span class="math inline">\(p\)</span> = &lt; 0.05), “I might feel disempowered, unheard, or invalidated” (<span class="math inline">\(r\)</span> = -0.286, <span class="math inline">\(p\)</span> = &lt; 0.001), “I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)” (<span class="math inline">\(r\)</span> = -0.296, <span class="math inline">\(p\)</span> = &lt; 0.001), “I would not want to listen to the others discuss their views” (<span class="math inline">\(r\)</span> = -0.598, <span class="math inline">\(p\)</span> = &lt; 0.001), “It would be a waste of time because my views wouldn’t change” (<span class="math inline">\(r\)</span> = -0.495, <span class="math inline">\(p\)</span> = &lt; 0.001), “My opinion is unpopular in general.” (<span class="math inline">\(r\)</span> = -0.202, <span class="math inline">\(p\)</span> = &lt; 0.01), “I could feel humiliated or embarrassed in the conversation” (<span class="math inline">\(r\)</span> = -0.171, <span class="math inline">\(p\)</span> = &lt; 0.05), “I might take offense to what someone says” (<span class="math inline">\(r\)</span> = -0.364, <span class="math inline">\(p\)</span> = &lt; 0.001), “I might struggle to remain productive and respectful” (<span class="math inline">\(r\)</span> = -0.304, <span class="math inline">\(p\)</span> = &lt; 0.001) and “The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)” (<span class="math inline">\(r\)</span> = -0.197, <span class="math inline">\(p\)</span> = &lt; 0.01).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-EDA-correlation-relationships" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-EDA-correlation-relationships-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-EDA-correlation-relationships-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-EDA-correlation-relationships-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Relationships between each willingness concern and average willingness to converse. Using a 7-pt Likert-scale, participants rated the impact of each willingness concern on their overall willingness. Using a slider from 0 to 100, participants rated 2 statements about their willingness to converse, which we averaged to find each participant’s average willingness to converse about their focus topic.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Next, we looked for correlations between each willingness concerns and average willingness as indicated by the two slider questions. Most concerns were negatively associated with willingness, suggesting that, for most of the willingness concerns, a greater impact of the concern on an American’s willingness is associated with lower willingness to engage.</p>
+<p>These concerns were “Someone could criticize or show disapproval of my views” (<span class="math inline">\(r\)</span> = -0.203, <span class="math inline">\(p\)</span> = &lt; 0.01), “I would feel like my opinion is unpopular amongst the group.” (<span class="math inline">\(r\)</span> = -0.211, <span class="math inline">\(p\)</span> = &lt; 0.01), “The others might not make a full effort to hear and understand me” (<span class="math inline">\(r\)</span> = -0.209, <span class="math inline">\(p\)</span> = &lt; 0.01), “The conversation could become awkward or tense” (<span class="math inline">\(r\)</span> = -0.35, <span class="math inline">\(p\)</span> = &lt; 0.001), “I don’t often participate in conversations like these” (<span class="math inline">\(r\)</span> = -0.385, <span class="math inline">\(p\)</span> = &lt; 0.001), “The conversation could negatively affect how I feel about the world during and/or afterward” (<span class="math inline">\(r\)</span> = -0.214, <span class="math inline">\(p\)</span> = &lt; 0.01), “Someone might take offense to what I say” (<span class="math inline">\(r\)</span> = -0.214, <span class="math inline">\(p\)</span> = &lt; 0.01), “I might feel disempowered, unheard, or invalidated” (<span class="math inline">\(r\)</span> = -0.252, <span class="math inline">\(p\)</span> = &lt; 0.001), “I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)” (<span class="math inline">\(r\)</span> = -0.355, <span class="math inline">\(p\)</span> = &lt; 0.001), “I would not want to listen to the others discuss their views” (<span class="math inline">\(r\)</span> = -0.395, <span class="math inline">\(p\)</span> = &lt; 0.001), “It would be a waste of time because my views wouldn’t change” (<span class="math inline">\(r\)</span> = -0.469, <span class="math inline">\(p\)</span> = &lt; 0.001), “I might struggle to explain my views to the others and/or come across as uninformed” (<span class="math inline">\(r\)</span> = -0.218, <span class="math inline">\(p\)</span> = &lt; 0.01), “I might take offense to what someone says” (<span class="math inline">\(r\)</span> = -0.252, <span class="math inline">\(p\)</span> = &lt; 0.001), “I might struggle to remain productive and respectful” (<span class="math inline">\(r\)</span> = -0.206, <span class="math inline">\(p\)</span> = &lt; 0.01) and “The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)” (<span class="math inline">\(r\)</span> = -0.168, <span class="math inline">\(p\)</span> = &lt; 0.05).</p>
+</section>
+<section id="cluster-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="cluster-analysis">Cluster analysis</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-heat-map-clusters-willingness-concerns" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-heat-map-clusters-willingness-concerns-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-heat-map-clusters-willingness-concerns-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-heat-map-clusters-willingness-concerns-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Heat map of each cluster’s average rating of each potential concern
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>We also conducted cluster analysis on the 19 concerns to determine whether participants generally fell into certain categories. The analysis suggested that participants generally fell into one of three clusters, with 52% of participants falling into Cluster 1, 33.5% of participants falling into Cluster 2, and 14.5% of participants falling into Cluster 3.</p>
+<p>As shown in Figure @ref(fig:heat-map-clusters-willingness-concerns), the clusters appear to arrange participants by the overall impact of the concerns on willingness. Cluster 2 is the low impact group, Cluster 1 is the moderate impact group, and Cluster 3 is the high impact group. It is notable that half of our sample fell into low impact group, meaning about half of our sample felt that most to all of the concerns did not strongly impact their willingness. This could reflect weakness of our questionnaire or it could mean that half of our participants are simply not as concerned as the other half of our sample. The latter would be consistent with Cluster 2’s greater average willingness and open-mindedness; although, recalling that willingness and open-mindedness were also self-reported, the trio might also reflect an overall weakness of gathering this data through self reports.</p>
+<p>Cluster 1’s average rating of a given concern was 2. On average, Cluster 1 rated the following concerns the highest: .</p>
+<p>Cluster 2’s average rating of a given concern was 3.2. On average, cluster 2’s top concerns were ‘Someone could challenge ideas or beliefs that play an important role in making me who I am’.</p>
+<p>Cluster 3’s average rating of a given concern was 4.9. On average, cluster 3’s top concerns were “The conversation could become awkward or tense”; “I would not trust the others to keep the conversation productive and respectful (e.g., keeping emotions in check, refraining from making hostile remarks, not dominating the conversation)”; “I might feel disempowered, unheard, or invalidated”; “The others might not make a full effort to hear and understand me”; “Someone could criticize or show disapproval of my views”; “Someone might take offense to what I say”; “It would be a waste of time because my views wouldn’t change”; “I would feel like my opinion is unpopular amongst the group.”; “I might struggle to explain my views to the others and/or come across as uninformed”; “I don’t often participate in conversations like these”; “I could feel humiliated or embarrassed in the conversation”; “My opinion is unpopular in general.”; “The conversation could negatively affect how I feel about the world during and/or afterward”; “I might take offense to what someone says”; “I could incur social repercussions (e.g., being excluded by others in the future, putting a strain on my relationships, negative changes to my reputation)”; “I would not want to listen to the others discuss their views”; “I might struggle to remain productive and respectful”; “The conversation could negatively affect how I feel about myself during and/or afterward (e.g., fear, sadness, anger, vulnerability)”.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-clusters-avg-willingness" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-clusters-avg-willingness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-clusters-avg-willingness-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-clusters-avg-willingness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Box plot of average willingness to converse about topic by cluster. On average, cluster 2 appears to be more willing to converse than the other clusters; this would be consistent with cluster 2’s lower average rating of how much the 19 items impact willingness.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-clusters-avg-openmindedness" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-clusters-avg-openmindedness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-clusters-avg-openmindedness-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-clusters-avg-openmindedness-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Box plot of average open-mindedness about topic by cluster.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>As shown in Figure @ref(fig:fig-clusters-avg-willingness), the willingness of each cluster aligns with the impact of concerns, with Cluster 2 reporting the greatest willingness and Cluster 3 reporting the least willingness. Similarly, as shown in Figure @ref(fig:fig-clusters-avg-openmindedness), Cluster 2 reported the highest open-mindedness and Cluster 3 reported the least open-mindedness. These interpretations have not been rigorously assessed and, again, it should be recalled that these data were self-reported.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-demographics-clusters-1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-demographics-clusters-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-demographics-clusters-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-demographics-clusters-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: Plots of demographics by cluster helps us explore whether the clusters may have significantly different demographics.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-demographics-clusters-2" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-demographics-clusters-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-demographics-clusters-2.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-demographics-clusters-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12: Plots of demographics by cluster helps us explore whether the clusters may have significantly different demographics.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-demographics-clusters-3" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-demographics-clusters-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-demographics-clusters-3.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-demographics-clusters-3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13: Plots of demographics by cluster helps us explore whether the clusters may have significantly different demographics.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-demographics-clusters-4" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-demographics-clusters-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-demographics-clusters-4.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-demographics-clusters-4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14: Plots of demographics by cluster helps us explore whether the clusters may have significantly different demographics.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-demographics-clusters-5" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-demographics-clusters-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-demographics-clusters-5.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-demographics-clusters-5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;15: Plots of demographics by cluster helps us explore whether the clusters may have significantly different demographics.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-demographics-clusters-6" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-demographics-clusters-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-demographics-clusters-6.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-demographics-clusters-6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;16: Plots of demographics by cluster helps us explore whether the clusters may have significantly different demographics.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div id="fig-demographics-clusters-7" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-demographics-clusters-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-demographics-clusters-7.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-demographics-clusters-7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;17: Plots of demographics by cluster helps us explore whether the clusters may have significantly different demographics.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-topic-choice-clusters" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-topic-choice-clusters-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="survey-pretest-analysis_files/figure-html/fig-topic-choice-clusters-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-topic-choice-clusters-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;18: Plots of topic choice by cluster helps us explore whether the clusters may have significant differences in which topics they focused on.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>There may be significant differences in the demographic profiles of the clusters as shown in Figure @ref(fig:fig-demographics-clusters); however, further analyses would need to assess statistical significance. [i ran some out of curiosity but didn’t bother to report here because it’s probably not useful enough to be worth digesting the extra information]</p>
+<p>Consistent with Figure <span class="citation" data-cites="ref">(<a href="#ref-ref" role="doc-biblioref"><strong>ref?</strong></a>)</span>(fig: fig-topic-choice-clusters), a chi-square test of cluster and focus topic revealed a significant association, χ²(20, 200) = 205.8354936, p &lt; &lt; 0.001.</p>
+<p>Standardized residuals indicated that participants in Cluster 1 disproportionately focused on human euthanasia, healthcare, police conduct, A.I., and mandating vaccines. These participants were significantly less likely to focus on deportation policies, capitalism, transgender athletes in sports, climate change, or the Israeli-Palestinian conflict. Cluster 2 disproportionately focused on transgender athletes in sports, climate change, capitalism, and deportation policies. These participants were significantly less likely to focus on human euthanasia, healthcare, police conduct, A.I., or mandating vaccines. Participants in Cluster 3 disproportionately focused on capitalism, deportation policies, and the role of the U.S. in the Israeli-Palestinian conflict. These participants were significantly less likely to focus on human euthanasia, healthcare, transgender athletes in sports, police conduct, or climate change.</p>
+</section>
+</section>
+<section id="discussion" class="level2">
+<h2 class="anchored" data-anchor-id="discussion">Discussion</h2>
+<p>This pretest study aimed to assess the comprehensiveness and underlying structure of a newly developed 19-item questionnaire designed to capture the core concerns contributing to Americans’ unwillingness to engage in open, productive discussions on divisive topics. Our findings validate the instrument’s relevance and offer a preliminary structural framework, while also highlighting key areas for refinement.</p>
+<section id="comprehensiveness-of-concerns-1" class="level3">
+<h3 class="anchored" data-anchor-id="comprehensiveness-of-concerns-1">Comprehensiveness of Concerns</h3>
+<p>Our first objective was to determine if the 19-item inventory comprehensively captured the reasons for reluctance to engage. Through a qualitative analysis of participants’ free-response explanations for avoiding difficult conversations, we found that our items captured the majority of concerns but failed to capture pragmatic barriers and concerns about energy and relevance.</p>
+<p>Specifically, participants frequently cited topic complexity/lack of knowledge as a barrier, not just fearing embarrassment, but a practical inability to engage due to insufficient information. We also found concerns about the perceived lack of relevance of the topic to the participant’s personal life or ethical boundaries against speaking on issues outside of their firsthand experience. Furthermore, many expressed that it simply wouldn’t be worth their emotional and/or mental energy.</p>
+<p>In addition to these new constructs, our analysis revealed that two existing concepts warranted separation from the items in which they had been nested due to their high prevalence and distinct nature in the free responses. The first, damaging personal relationships, was often discussed in an intimate, personal sense that distinguished it from the broader concept of “social repercussions”. The second, others’ views not changing, was common enough to be separated from the general item about others causing the conversation to not be productive.</p>
+<p>Based on these results, we plan to add six new items to enhance the questionnaire’s comprehensiveness and construct validity. These items are</p>
+</section>
+<section id="structure-of-concerns" class="level3">
+<h3 class="anchored" data-anchor-id="structure-of-concerns">Structure of Concerns</h3>
+<p>Our second objective was to explore the latent structure of the 19 concerns. An Exploratory Factor Analysis (EFA) suggested a three-factor solution, which accounted for 41.2% of the total variance. These factors were conceptually labeled as:</p>
+<p>Emotional Vulnerability/Identity Threat (Factor 1): Concerns centered on internal psychological distress, such as negative feelings about the self or the world, and direct challenges to core beliefs or identity.</p>
+<p>Conversational Efficacy/Unproductive Process (Factor 2): Concerns focusing on the quality, respectfulness, and utility of the interaction, particularly whether the process would be a waste of time or devolve into disrespect.</p>
+<p>Social Evaluation/Reputation Risk (Factor 3): Concerns emphasizing external social perception, fear of embarrassment, public disapproval, and broader social consequences.</p>
+<p>The factors were moderately correlated (<span class="math inline">\(r\)</span> = 0.17–0.60) and exhibited some cross-loadings, suggesting conceptual overlap and the utility of an oblique rotation (oblimin). Importantly, four items failed to load strongly on any factor, indicating they may represent highly idiosyncratic or situational concerns, though some conceptually belong to the Social Evaluation factor (e.g., “The conversation could become awkward or tense”).</p>
+<p>The structural distinction between Factor 1 (internal, emotional threat) and Factor 3 (external, social risk) is noteworthy, as many items seem conceptually close (e.g., “I could feel humiliated or embarrassed in the conversation” loaded on Factor 3 but relates to emotional vulnerability).</p>
+</section>
+<section id="relationships-to-willingness-and-open-mindedness" class="level3">
+<h3 class="anchored" data-anchor-id="relationships-to-willingness-and-open-mindedness">Relationships to Willingness and Open-Mindedness</h3>
+<p>Our correlation analyses provide initial construct validation for our survey. A greater impact of most concerns was significantly associated with lower self-reported willingness to converse about the chosen topic, as measured by our slider questions.</p>
+<p>Furthermore, most concerns were also negatively correlated with participants’ open-mindedness. This suggests that individuals who feel more impacted by the various barriers to engagement also tend to rate themselves as less open-minded, which aligns with the literature suggesting that psychological and social anxieties inhibit constructive discourse.</p>
+</section>
+<section id="cluster-analysis-1" class="level3">
+<h3 class="anchored" data-anchor-id="cluster-analysis-1">Cluster Analysis</h3>
+<p>Our <span class="math inline">\(k\)</span>-means cluster analysis suggested that participants’ willingness concerns generally fell into one of three distinct clusters that were differentiated by the strength of the concerns’ impacts on their willingness.</p>
+<p>Cluster 2, the low impact group, comprised 33.5% of our sample. Correspondingly, they also reported the highest average willingness and open-mindedness. Cluster 1, the moderate impact group, comprised 52% of our sample. Cluster 3, the high impact group, comprised 14.5% of our sample and reported the lowest average willingness and open-mindedness.</p>
+<p>This clear differentiation by willingness and open-mindedness provides further evidence of the questionnaire’s ability to segment individuals based on their barriers to engagement.</p>
+<p>A particularly interesting finding is the significant association between cluster membership and the participant’s chosen focus topic. For example, Cluster 2 (Low Impact) was disproportionately focused on topics like transgender athletes in sports and climate change, whereas Cluster 3 (High Impact) disproportionately focused on issues like capitalism, deportation policies, and the Israeli-Palestinian conflict. This suggests that the topic itself may be linked to the level of perceived threat and concern, which should be taken under consideration in the development of interventions for increasing willingness.</p>
+</section>
+<section id="limitations-and-future-directions" class="level3">
+<h3 class="anchored" data-anchor-id="limitations-and-future-directions">Limitations and Future Directions</h3>
+<p>The primary limitation of this study is the reliance on self-report measures for all key variables (concerns, willingness, and open-mindedness). The discrepancy between the Likert-scale comfort ratings and the slider-based willingness ratings (both asked about the focus topic), for example, highlights the inherent difficulties in measuring these constructs. Future work should integrate behavioral or implicit measures to provide a more objective assessment.</p>
+<p>The EFA, while providing a clear structure, did not result in perfectly clean factors, as evidenced by cross-loadings and items that failed to load strongly. The six new items proposed for inclusion must be validated through a second factor analysis to confirm the underlying structure and assess the potential for developing subscales from the resulting factors.</p>
+<p>In conclusion, this pretest confirms that the 19-item questionnaire, particularly with the proposed additions, is a valuable tool for measuring the multifaceted barriers to productive discourse on divisive topics. The identified factor structure and participant clusters will be crucial for tailoring our individual-level intervention to specifically address the emotional, efficacy, and social concerns that drive an American’s unwillingness to engage.</p>
+</section>
+</section>
+<section id="references" class="level2 unnumbered">
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Aldao2010" class="csl-entry" role="listitem">
+Aldao, Amelia, Susan Nolen-Hoeksema, and Susanne Schweizer. 2010. <span>“Emotion-Regulation Strategies Across Psychopathology: A Meta-Analytic Review.”</span> <em>Clinical Psychology Review</em> 30 (2): 217–37.
+</div>
+<div id="ref-Beatty1987" class="csl-entry" role="listitem">
+Beatty, M. J. 1987. <span>“Communication Apprehension as a Determinant of Avoidance, Withdrawal and Performance Anxiety.”</span> <em>Communication Quarterly</em> 35 (2): 202–17.
+</div>
+<div id="ref-Chen2018" class="csl-entry" role="listitem">
+Chen, Hsuan-Ting. 2018. <span>“Spiral of Silence on Social Media and the Moderating Role of Disagreement and Publicness in the Network.”</span> <em>New Media &amp; Society</em> 20 (12): 4596–616.
+</div>
+<div id="ref-elnakouri2024" class="csl-entry" role="listitem">
+Elnakouri, Abdo, Alex C. Huynh, and Igor Grossmann. 2024. <span>“Explaining Contentious Political Issues Promotes Open-Minded Thinking.”</span> <em>Cognition</em> 247: 105769. <a href="https://doi.org/10.1016/j.cognition.2024.105769">https://doi.org/10.1016/j.cognition.2024.105769</a>.
+</div>
+<div id="ref-Haug2025" class="csl-entry" role="listitem">
+Haug, M., C. Maier, H. Gewald, and T. Weitzel. 2025. <span>“Supporting Opinions to Fit in: A Spiral of Silence-Theoretic Explanation of Online Self-Censorship.”</span> <em>Internet Research</em> 35 (1).
+</div>
+<div id="ref-Hunter1996" class="csl-entry" role="listitem">
+Hunter, J. A., M. J. Platow, and M. L. Howard. 1996. <span>“Social Identity and Intergroup Evaluative Bias: Realistic Categories and Domain Specific Self-Esteem in a Conflict Setting.”</span> <em>European Journal of Social Psychology</em> 26: 631–48.
+</div>
+<div id="ref-Kahneman2011" class="csl-entry" role="listitem">
+Kahneman, Daniel. 2011. <em>Thinking, Fast and Slow</em>. Farrar, Straus; Giroux.
+</div>
+<div id="ref-jspsychcite" class="csl-entry" role="listitem">
+Leeuw, Joshua R. de, Ryan A. Gilbert, and Benjamin Luchterhandt. 2023. <span>“jsPsych: Enabling an Open-Source Collaborative Ecosystem of Behavioral Experiments.”</span> <em>Journal of Open Source Software</em> 8 (85): 5351. <a href="https://doi.org/10.21105/joss.05351">https://doi.org/10.21105/joss.05351</a>.
+</div>
+<div id="ref-Lewandowsky2017" class="csl-entry" role="listitem">
+Lewandowsky, Stephan, Ullrich K. H. Ecker, and John Cook. 2017. <span>“Beyond Misinformation: Understanding and Coping with the <span>‘Post-Truth’</span> Era.”</span> <em>Journal of Applied Research in Memory and Cognition</em> 6: 353–69.
+</div>
+<div id="ref-Masters2019" class="csl-entry" role="listitem">
+Masters, M. R., M. J. Zimmer-Gembeck, and L. J. Farrell. 2019. <span>“Transactional Associations Between Adolescents’ Emotion Dysregulation and Symptoms of Social Anxiety and Depression.”</span> <em>Journal of Early Adolescence</em> 39 (4): 492–515.
+</div>
+<div id="ref-NoelleNeumann1974" class="csl-entry" role="listitem">
+Noelle-Neumann, Elisabeth. 1974. <span>“The Spiral of Silence: A Theory of Public Opinion.”</span> <em>Journal of Communication</em> 24 (2): 43–51.
+</div>
+<div id="ref-Schulenberg2023" class="csl-entry" role="listitem">
+Schulenberg, T. et al. 2023. <span>“Exploring Communication Apprehension in Nursing and Healthcare Education: A Scoping Review.”</span> <em>Nursing &amp; Health Sciences</em> 25: 130–45.
+</div>
+<div id="ref-Tajfel1979" class="csl-entry" role="listitem">
+Tajfel, Henri, and John C. Turner. 1979. <span>“An Integrative Theory of Intergroup Conflict.”</span> In <em>The Social Psychology of Intergroup Relations</em>, edited by William G. Austin and Stephen Worchel, 33–47. Brooks/Cole.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
