@@ -1,6 +1,7 @@
 ---
 title: "Spring 2026 Semester Report"
 subtitle: "Representative Sample Willingness Survey"
+author: "Jacqueline Adelmann"
 format: html
 bibliography: ../mocareferences.bib
 citation-location: document
