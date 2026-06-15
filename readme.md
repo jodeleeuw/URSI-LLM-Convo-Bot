@@ -1,9 +1,9 @@
-# URSI-LLM-Convo-Bot
+# Mind Opening Conversational Agent (MOCA)
 
 This repository contains the code, data, and analysis for an undergraduate cognitive science research project aimed at measuring and reducing American reluctance to engage in conversations about controversial topics. The project combines a multi-agent LLM architecture with advanced statistical profiling to foster open-minded, productive dialogue on divisive topics.
 
 ### Live Project Output & Data Analysis
-**[View the Representative Sample Willingness Survey Report](https://jodeleeuw.github.io/URSI-LLM-Convo-Bot/analysis/rep_sample_analysis.html)**
+**[View the Representative Sample Willingness Survey Report](https://jodeleeuw.github.io/URSI-LLM-Convo-Bot/analysis/survey_2_rep_sample/rep_sample_analysis.html)**
 
 This live report details the quantitative foundation of the project's measurement scale, including the dimensionality reduction and hierarchical clustering used to map the latent psychological factors preventing productive discourse.
 

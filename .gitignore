@@ -17,7 +17,9 @@ coverage/
 dist.zip
 .idea
 .env
-
+backend/.env.rtf
+.env.rtf
 **.csv
-
+experiment_run_through_screen_recording.mov
+analysis/screenshots_of_experiment/experiment_run_through_screen_recording.mov
 **/data
