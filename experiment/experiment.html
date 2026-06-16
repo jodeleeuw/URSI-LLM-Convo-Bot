@@ -898,7 +898,7 @@
             stimulus: `
         <p> You will be conversing with a chatbot designed for conversations about disputed topics. </p>
         <p> Be as truthful to your beliefs as possible during the conversation, and try your best to give full responses to the bot. </p>
-        <p> The conversation will end after you and the bot exchange ten messages. There is no right or wrong answer, no good or bad response to the bot. </p>
+        <p> The conversation will end after you and the bot exchange twelve messages. There is no right or wrong answer, no good or bad response to the bot. </p>
         <p> Copy-pasted messages to the bot will be detected and result in your participation being rejected. </p>
         <p> Press any key when you are ready to begin the conversation. </p>
       `,
@@ -985,8 +985,8 @@
 
         //continue to next portion button will show up after 7 message exchanges
         continue_button = {
-            message_trigger: 1,
-            message: "You have completed your rounds of ten messages! Click continue to proceed with the experiment.",
+            message_trigger: 6,
+            message: "You have completed your round of twelve messages! Click continue to proceed with the experiment.",
         }
 
 
@@ -1022,7 +1022,7 @@
 
         const willingness_reasons_bot_trial = {
             type: jsPsychChat,
-            ai_model: "gpt-4.1",
+            ai_model: "gpt-5.5",
             ai_prompt: () => {
                 const willingness_reasons = willingnessStatement;
                 return `Role: Your role is to be an expert on ${topicChoice}, which is a contentious topic that the user is significantly unwilling to discuss with others. You should be a conversational partner with whom the user can discuss the topic. 
@@ -1135,7 +1135,7 @@ Your output: You should remove the number from your selection option, and then r
 
         const willingness_selection_trial = {
             type: jsPsychChat,
-            ai_model: "gpt-4.1",
+            ai_model: "gpt-5.5",
             ai_prompt: () => {
                 // function to insert depolarization survey response statement into the bot's conversation starter
                 const lowercaseFirstLetter = (str) => { //function to convert the first letter of the string into lowercase so it can be seamlessly inserted into the bot's question
@@ -1234,7 +1234,7 @@ Your output: You should remove the number from your selection option, and then r
 
         const selection_trial = {
             type: jsPsychChat,
-            ai_model: "gpt-4.1",
+            ai_model: "gpt-5.5",
             ai_prompt: () => {
                 // function to insert depolarization survey response statement into the bot's conversation starter
                 const lowercaseFirstLetter = (str) => { //function to convert the first letter of the string into lowercase so it can be seamlessly inserted into the bot's question
@@ -1295,7 +1295,7 @@ Your output: You should remove the number from your selection option, and then r
 
         const individual_testing_trial = {
             type: jsPsychChat,
-            ai_model: "gpt-4.1",
+            ai_model: "gpt-5.5",
             ai_prompt:
                 () => {
                     const willingness_reasons = willingnessStatement;
